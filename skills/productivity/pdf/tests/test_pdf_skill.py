@@ -87,6 +87,80 @@ def test_extract_tables(report_pdf: Path, workdir: Path):
     assert csv_files and "Region" in csv_files[0].read_text(encoding="utf-8")
 
 
+def test_wide_table_stays_on_the_page(workdir: Path):
+    """Long cells wrap inside the page instead of widening the table past the page edges."""
+    long_cell = "A long description that must wrap inside its column rather than stretch the table. " * 3
+    spec = {"elements": [{"type": "table", "rows": [
+        ["Capability", "Description"],
+        ["Persistent memory & recall", long_cell],
+        ["R&D <draft>", long_cell],
+    ]}]}
+    spec_path = workdir / "wide_spec.json"
+    spec_path.write_text(json.dumps(spec), encoding="utf-8")
+    out = workdir / "wide.pdf"
+    run("pdf_create.py", str(spec_path), "-o", str(out))
+
+    import pdfplumber
+    with pdfplumber.open(out) as pdf:
+        page = pdf.pages[0]
+        words = page.extract_words()
+        assert words
+        assert min(w["x0"] for w in words) >= 0
+        assert max(w["x1"] for w in words) <= page.width
+        text = page.extract_text()
+    assert "Capability" in text and "Persistent memory & recall" in text  # first column not clipped
+    assert "R&D <draft>" in text  # markup characters in cells are escaped, not parsed
+
+
+def test_designed_report_puts_red_metrics_first_and_previews(workdir: Path):
+    """metrics sort red-first; every element type builds; --preview renders each page when a rasterizer exists."""
+    spec = {
+        "title": "KPI report", "theme": "modern",
+        "elements": [
+            {"type": "title", "text": "KPI report", "subtitle": "daily", "meta": "today"},
+            {"type": "callout", "tone": "warning", "title": "Heads up", "text": "R&D < budget <b>BOLDWORD</b>"},
+            {"type": "metrics", "columns": 2, "sort_by_status": True, "items": [
+                {"label": "Gross", "value": "GREENVAL", "status": "green"},
+                {"label": "Rate", "value": "REDVAL", "status": "red"},
+                {"label": "Efficiency", "value": "YELLOWVAL", "status": "yellow"},
+            ]},
+            {"type": "chart", "kind": "bar", "categories": ["a", "b"], "series": [{"name": "s1", "values": [1, 2]}, {"name": "s2", "values": [2, 1]}]},
+            {"type": "chart", "kind": "line", "categories": ["a", "b"], "series": [{"name": "s1", "values": [1, 2]}]},
+            {"type": "chart", "kind": "pie", "categories": ["a", "b"], "series": [{"name": "s1", "values": [3, 1]}]},
+            {"type": "table", "rows": [["Name", "Status"], ["x", "red"], ["y", "green"]], "status_col": 1},
+            {"type": "bullets", "items": ["<b>LEADIN:</b> first point", "second point"]},
+            {"type": "bullets", "numbered": True, "items": ["step one", "step two"]},
+            {"type": "spacer", "height": 8},
+        ],
+    }
+    spec_path = workdir / "design_spec.json"
+    spec_path.write_text(json.dumps(spec), encoding="utf-8")
+    out = workdir / "design.pdf"
+    result = json.loads(run("pdf_create.py", str(spec_path), "-o", str(out), "--preview", str(workdir / "prev")).stdout)
+
+    pages = json.loads(run("pdf_read.py", str(out), "--text").stdout)["pages"]
+    text = pages[0]
+    assert text.index("REDVAL") < text.index("YELLOWVAL") < text.index("GREENVAL")  # red first
+    assert "R&D < budget" in text  # stray markup characters survive as text
+    assert "BOLDWORD" in text and "<b>" not in text  # real inline markup is applied, not printed
+    all_text = "\n".join(pages)
+    assert "LEADIN:" in all_text and "step two" in all_text  # bullet and numbered list items render
+    preview = result["preview"]
+    if preview["rendered"]:
+        assert preview["files"] and all(Path(f).exists() for f in preview["files"])
+    else:
+        assert preview.get("missing") or preview.get("error")  # degrades with a reason instead of failing the build
+
+
+def test_classic_theme_still_builds(workdir: Path):
+    spec = {"theme": "classic", "elements": [{"type": "heading", "text": "Plain"}, {"type": "table", "rows": [["a", "b"], ["1", "2"]]}]}
+    spec_path = workdir / "classic_spec.json"
+    spec_path.write_text(json.dumps(spec), encoding="utf-8")
+    out = workdir / "classic.pdf"
+    run("pdf_create.py", str(spec_path), "-o", str(out))
+    assert "Plain" in json.loads(run("pdf_read.py", str(out), "--text").stdout)["pages"][0]
+
+
 @pytest.fixture(scope="module")
 def form_pdf(workdir: Path) -> Path:
     from reportlab.lib.pagesizes import A4

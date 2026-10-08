@@ -9,16 +9,16 @@
 'use strict'
 
 const variants = {
-  '': { display: 'Hermes', kebab: 'hermes', pascal: 'Hermes' },
+  '': { display: 'Gideon', kebab: 'gideon', pascal: 'Gideon' },
   light: {
-    display: 'Hermes Light',
-    kebab: 'hermes-light',
-    pascal: 'HermesLight'
+    display: 'Gideon Light',
+    kebab: 'gideon-light',
+    pascal: 'GideonLight'
   },
   bundled: {
-    display: 'Hermes Agent',
-    kebab: 'hermes-bundled',
-    pascal: 'HermesBundled'
+    display: 'Gideon Agent',
+    kebab: 'gideon-bundled',
+    pascal: 'GideonBundled'
   }
 }
 
@@ -54,7 +54,7 @@ const displayName = buildCommit
 
 const kebabSuffix = buildCommit ? `-${buildCommit}` : canary ? '-canary' : ''
 const pascalSuffix = buildCommit ? `Commit${buildCommit}` : canary ? 'Canary' : ''
-const cliName = `${light ? 'hermes-light' : 'hermes'}${kebabSuffix}`
+const cliName = `${light ? variants.light.kebab : variants[''].kebab}${kebabSuffix}`
 if (store && (canary || buildCommit)) {
   throw new Error('Store packaging is only eligible for stable releases')
 }
@@ -66,7 +66,7 @@ const identity = {
   store,
   light,
   displayName,
-  appId: `com.nousresearch.${name.kebab}${kebabSuffix}`,
+  appId: `com.acme.${name.kebab}${kebabSuffix}`,
   // Store and commit builds do not publish a release feed.
   channel: store || buildCommit ? null : light ? (canary ? 'light-canary' : 'light') : (canary ? 'canary' : 'latest'),
   appNamePascal: `${name.pascal}${pascalSuffix}`,
@@ -76,14 +76,14 @@ const identity = {
   msixAppIdWithOrg: `NousResearch.${name.pascal}${pascalSuffix}`,
   ...(store
     ? {
-        storeMsix: {
-          // Partner Center publisher identity (the account's publisher ID) —
-          // validated + re-signed by the Store on submission.
-          identityName: 'NousResearchInc.HermesAgent',
-          publisher: 'CN=EE6D86E4-606F-4E38-B940-AD7248C9D519',
-          publisherDisplayName: 'Nous Research Inc.'
-        }
+      storeMsix: {
+        // Partner Center publisher identity (the account's publisher ID) —
+        // validated + re-signed by the Store on submission.
+        identityName: 'NousResearchInc.HermesAgent',
+        publisher: 'CN=EE6D86E4-606F-4E38-B940-AD7248C9D519',
+        publisherDisplayName: 'Nous Research Inc.'
       }
+    }
     : {})
 }
 

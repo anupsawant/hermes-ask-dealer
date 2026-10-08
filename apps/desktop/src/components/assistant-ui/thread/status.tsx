@@ -8,7 +8,6 @@ import { toolPresentVerb } from '@/components/assistant-ui/tool/run-summary'
 import { useElapsedSeconds } from '@/components/chat/activity-timer'
 import { ActivityTimerText } from '@/components/chat/activity-timer-text'
 import { SCAFFOLD_LABEL_CLASS } from '@/components/chat/scaffold-row'
-import { useOnboardingChatActive } from '@/components/onboarding-chat/assembly'
 import { Codicon } from '@/components/ui/codicon'
 import { Loader } from '@/components/ui/loader'
 import { StatusPulse } from '@/components/ui/status-pulse'
@@ -20,8 +19,7 @@ import { sessionCompacting } from '@/store/compaction'
 import { $localModelsEnabled } from '@/store/local-models-flag'
 import { sessionAwaitingInput } from '@/store/prompts'
 import { parseModelLoadWait, sessionProviderWait } from '@/store/provider-wait'
-import { $showReasoning } from '@/store/reasoning-disclosure'
-import { $currentModel, $currentProvider } from '@/store/session'
+import { $currentModel } from '@/store/session'
 import { type DraftingTool, sessionDraftingTool } from '@/store/tool-drafting'
 import type { LocalModelLoadProgress } from '@/types/hermes'
 
@@ -57,9 +55,6 @@ const HintText: FC<{ children: ReactNode }> = ({ children }) => (
   <span className={cn(SCAFFOLD_LABEL_CLASS, 'shimmer min-w-0 flex-1 truncate')}>{children}</span>
 )
 
-// Provider slug of the managed local server (inventory.py's _local_runtime_row).
-const LOCAL_PROVIDER_SLUG = 'llamacpp'
-
 /** Renderer-side load synthesis: poll the local-models status while a turn
  * is busy with NO progress frame from the backend. The backend's wait loop
  * only narrates the MAIN chat request — a model load triggered while the
@@ -69,13 +64,11 @@ const LOCAL_PROVIDER_SLUG = 'llamacpp'
  * the same SSE snapshot, so this bar carries the identical percent. */
 function useLocalModelLoad(active: boolean): (LocalModelLoadProgress & { model: string }) | null {
   const model = useStore($currentModel)
-  const provider = useStore($currentProvider)
   const [progress, setProgress] = useState<(LocalModelLoadProgress & { model: string }) | null>(null)
 
-  // Behind the --local launch flag, and only while the managed local server
-  // is the current provider: a remote model never waits on a local load, so
-  // busy turns on it must not poll.
-  const enabled = $localModelsEnabled.get() && provider === LOCAL_PROVIDER_SLUG
+  // Behind the --local launch flag: without it, no status polling and no
+  // load bar (the local server can't be the current provider anyway).
+  const enabled = $localModelsEnabled.get()
 
   useEffect(() => {
     if (!enabled || !active || !model) {
@@ -297,61 +290,6 @@ export const BackgroundResumeNotice: FC = () => {
   )
 }
 
-// Hands a turn back from the user, re-arming the quiet mark: see the call site.
-function useHandBackQuiet(
-  awaitingInput: boolean,
-  turnStartedAt: number | undefined,
-  setQuietSince: (since: number) => void
-) {
-  const [handBack, setHandBack] = useState({ awaitingInput, turnStartedAt })
-
-  if (handBack.awaitingInput !== awaitingInput || handBack.turnStartedAt !== turnStartedAt) {
-    setHandBack({ awaitingInput, turnStartedAt })
-
-    if (turnStartedAt !== undefined && turnStartedAt !== handBack.turnStartedAt) {
-      setQuietSince(turnStartedAt)
-    } else if (handBack.awaitingInput && !awaitingInput) {
-      setQuietSince(Date.now())
-    }
-  }
-}
-
-interface TurnActivityRowProps {
-  active: boolean
-  elapsed: number
-  hint: string
-  localLoad: ReturnType<typeof useLocalModelLoad>
-}
-
-const TurnActivityRow: FC<TurnActivityRowProps> = ({ active, elapsed, hint, localLoad }) => {
-  const { t } = useI18n()
-
-  return (
-    <StatusRow
-      className={cn(!active && 'sr-only')}
-      data-slot="aui_turn-activity"
-      data-state={active ? 'active' : 'idle'}
-      label={active ? hint || 'Hermes is working' : ''}
-    >
-      {active && (
-        <>
-          <StatusPulse
-            aria-hidden="true"
-            className="dither inline-block size-3 rounded-[2px] text-midground/80"
-            kind="opacity"
-          />
-          {hint ? (
-            <WaitHint hint={hint} />
-          ) : localLoad ? (
-            <ProgressHint label={t.assistant.thread.loadingLocalModel(localLoad.model)} percent={localLoad.percent} />
-          ) : null}
-          <ActivityTimerText aria-hidden={true} seconds={elapsed} />
-        </>
-      )}
-    </StatusRow>
-  )
-}
-
 // Tail activity row. The pre-first-token spinner goes away once content flows,
 // but a turn keeps working through gaps it produces nothing during — between
 // one tool result landing and the next call arriving, while the provider
@@ -367,12 +305,9 @@ const TurnActivityRow: FC<TurnActivityRowProps> = ({ active, elapsed, hint, loca
 // Subscribes to the activity signal ITSELF (rather than taking it as a prop)
 // so that per-token updates re-render only this leaf, not the whole
 // AssistantMessage subtree.
-export const TurnActivityIndicator: FC<{ thinking?: boolean }> = ({ thinking = false }) => {
-  // Same rule the reasoning disclosure renders by (message-parts.tsx).
-  const showReasoning = useStore($showReasoning)
-  const guidedChat = useOnboardingChatActive()
-  const reasoningShown = showReasoning && !guidedChat
-  const activity = useAuiState(s => activitySignature(s.message.content, reasoningShown))
+export const TurnActivityIndicator: FC = () => {
+  const { t } = useI18n()
+  const activity = useAuiState(s => activitySignature(s.message.content))
 
   // Timestamp of the last visible progress, held from the moment the quiet
   // spell qualifies. Holding the timestamp (not a boolean) is what lets the
@@ -388,14 +323,12 @@ export const TurnActivityIndicator: FC<{ thinking?: boolean }> = ({ thinking = f
   // (`todo`, reactions) render nothing, so they narrate nothing.
   const toolNarrating = useAuiState(s => toolNarratesWait(s.message.content))
 
-  // Streaming can lead busy by one view flush on the first turn of a fresh
-  // chat. Honor that lead only while this session still has an armed turn
-  // clock: a pending bubble can outlive the backend's busy=false settle and
-  // must not keep its tail timer running after the turn ends.
+  // Streaming counts as working too, and it leads busy by a flush on the first
+  // turn of a fresh chat — so the row can't wait for the store to catch up.
   const messageRunning = useAuiState(s => s.message.status?.type === 'running')
-  const working = busy || (messageRunning && turnStartedAt !== undefined)
 
   // Renderer-synthesized load bar (see ResponseLoadingIndicator).
+  const working = busy || messageRunning
   const localLoad = useLocalModelLoad(working && !hint && !toolNarrating)
 
   useEffect(() => {
@@ -405,13 +338,6 @@ export const TurnActivityIndicator: FC<{ thinking?: boolean }> = ({ thinking = f
 
     return () => window.clearTimeout(id)
   }, [activity])
-
-  // The user handing the turn back is progress too: a hidden setup prompt
-  // starts a fresh turn under the card it answers, and an answered question
-  // card resumes the turn it paused. Neither is a gap between two quick calls,
-  // so the wait after it shows at once, timed from that moment, the way a
-  // normal send's row does.
-  useHandBackQuiet(awaitingInput, turnStartedAt, setQuietSince)
 
   // Every second the app claims to be working belongs to something. A named
   // wait says what it is straight away; an unnamed gap has to go quiet for
@@ -444,15 +370,32 @@ export const TurnActivityIndicator: FC<{ thinking?: boolean }> = ({ thinking = f
     setEverActive(true)
   }
 
-  // A reply that has only thought so far, with the thinking not drawn, has
-  // still put nothing on screen: it keeps the pre-first-token row.
-  if (thinking && !reasoningShown) {
-    return <ResponseLoadingIndicator />
-  }
-
   if (!active && !everActive) {
     return null
   }
 
-  return <TurnActivityRow active={active} elapsed={elapsed} hint={hint} localLoad={localLoad} />
+  return (
+    <StatusRow
+      className={cn(!active && 'sr-only')}
+      data-slot="aui_turn-activity"
+      data-state={active ? 'active' : 'idle'}
+      label={active ? hint || 'Gideon is working' : ''}
+    >
+      {active && (
+        <>
+          <StatusPulse
+            aria-hidden="true"
+            className="dither inline-block size-3 rounded-[2px] text-midground/80"
+            kind="opacity"
+          />
+          {hint ? (
+            <WaitHint hint={hint} />
+          ) : localLoad ? (
+            <ProgressHint label={t.assistant.thread.loadingLocalModel(localLoad.model)} percent={localLoad.percent} />
+          ) : null}
+          <ActivityTimerText aria-hidden={true} seconds={elapsed} />
+        </>
+      )}
+    </StatusRow>
+  )
 }

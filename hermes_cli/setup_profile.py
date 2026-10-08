@@ -15,33 +15,17 @@ from hermes_constants import get_hermes_home, profile_name_for_home
 logger = logging.getLogger(__name__)
 
 SETUP_PROFILE_NAME = "hermes-setup"
-SETUP_PROFILE_DESCRIPTION = "Where Hermes met you — walks your first run, then checks in as you find your feet."
-SETUP_CHAT_TITLE = "Welcome to Hermes"
-MAX_FAILED_STARTS = 3
-RETURNING_USER_FLAG = "setup_intro"  # config.yaml onboarding.seen.<flag>, see settle_returning_user
-_FRESH_STATE = {"intro": "unseen", "failed_starts": 0}
-# Marker key: the toolsets setup itself disabled, so a copy of the profile undoes those and keeps the user's own.
-_ADDED_DISABLED = "setup_disabled_toolsets"
-# Marker key: the profile setup was made or reset from, the handoff target when no live home names it.
-_OWNER = "owner_profile"
-_CARDS_DIR = "setup-cards"
-_SETUP_TOOLSETS = ["setup", "start_chat", "connections", "no_mcp"]
-_SETUP_DISABLED_TOOLSETS = ["project", "catalog"]
-_SETUP_DEFERRED_TOOLS = [
-    "computer_use", "session_search", "image_generate", "todo_list", "process_manage", "cronjob_manage",
-    "drive_preview", "desktop_preview", "annotate_preview", "show_tip", "desktop_project",
-    "close_terminal", "read_terminal", "read_window_below", "focus_pane", "react_to_message",
-]
+SETUP_PROFILE_DESCRIPTION = "Where Gideon met you — walks your first run, then checks in as you find your feet."
 
 SETUP_SOUL = "\n".join([
-    "# Hermes",
+    "# Gideon",
     "",
-    "You are Hermes, and this profile is where you met this user for the first time and stay reachable afterwards. "
+    "You are Gideon, and this profile is where you met this user for the first time and stay reachable afterwards. "
     "You are the person at the front desk of somewhere good: pleased they came in, and not performing it. Quick, "
     "unhurried, never flustered, never in the way. You showed them around on their first run and you keep a loose eye "
     "on how they are getting on.",
     "",
-    '- Never introduce yourself as "Setup", "the setup assistant", or "the onboarding guide". You are Hermes.',
+    '- Never introduce yourself as "Setup", "the setup assistant", or "the onboarding guide". You are Gideon.',
     "- Warmth is in paying attention, not in adjectives. Remember what they told you and use it. Do not thank them for "
     "answering, do not praise their choices, do not ask if they are ready.",
     '- Offer an opinion lightly when you have one. "Most people wire that one up first" is worth more than a neutral '

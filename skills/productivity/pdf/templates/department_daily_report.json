@@ -1,0 +1,46 @@
+{
+  "title": "Service Department Daily Report",
+  "author": "Hermes Agent",
+  "page_size": "A4",
+  "theme": "corporate",
+  "footer_text": "Service Department Daily Report  |  SAMPLE DATA - replace before sending",
+  "elements": [
+    {"type": "title", "text": "Service Department Daily Report", "subtitle": "Daily metrics for the department manager", "meta": "Report date: YYYY-MM-DD   |   Prepared automatically"},
+
+    {"type": "heading", "text": "Needs attention today", "level": 1},
+    {"type": "callout", "tone": "danger", "title": "2 metrics are red", "text": "Effective labor rate and discounts are outside target. Details below; red metrics always appear first."},
+    {"type": "metrics", "columns": 3, "sort_by_status": true, "items": [
+      {"label": "Effective labor rate", "value": "$0.00", "status": "red", "note": "Target $0.00   |   Yesterday $0.00"},
+      {"label": "Discounts (total)", "value": "0.0%", "status": "red", "note": "Target 0.0%   |   Yesterday 0.0%"},
+      {"label": "Efficiency", "value": "0%", "status": "yellow", "note": "Target 0%   |   Yesterday 0%"},
+      {"label": "Proficiency", "value": "0%", "status": "yellow", "note": "Target 0%   |   Yesterday 0%"},
+      {"label": "Daily gross", "value": "$0", "status": "green", "note": "Target $0   |   Yesterday $0"},
+      {"label": "Daily sales", "value": "$0", "status": "green", "note": "Target $0   |   Yesterday $0"}
+    ]},
+
+    {"type": "heading", "text": "Trend", "level": 1},
+    {"type": "chart", "kind": "line", "title": "Effective labor rate - last 7 days", "categories": ["D-6", "D-5", "D-4", "D-3", "D-2", "D-1", "Today"],
+     "series": [{"name": "Actual", "values": [0, 0, 0, 0, 0, 0, 0]}, {"name": "Target", "values": [0, 0, 0, 0, 0, 0, 0]}], "height": 190},
+
+    {"type": "heading", "text": "By advisor", "level": 1},
+    {"type": "table", "header": true, "status_col": 3, "col_widths": [3, 2, 2, 1.4], "rows": [
+      ["Advisor", "Sales", "Discounts", "Status"],
+      ["Advisor A", "$0", "0.0%", "red"],
+      ["Advisor B", "$0", "0.0%", "yellow"],
+      ["Advisor C", "$0", "0.0%", "green"]
+    ]},
+
+    {"type": "heading", "text": "Schedule and capacity", "level": 1},
+    {"type": "chart", "kind": "bar", "title": "Booked vs available hours - next 5 days", "categories": ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
+     "series": [{"name": "Booked", "values": [0, 0, 0, 0, 0]}, {"name": "Available", "values": [0, 0, 0, 0, 0]}], "height": 190},
+    {"type": "callout", "tone": "info", "title": "Areas to fill", "text": "List days or time slots with open capacity here."},
+
+    {"type": "heading", "text": "Comparison", "level": 1},
+    {"type": "table", "header": true, "rows": [
+      ["Metric", "Today", "Week to date", "Month to date", "Year to date", "Same period last year"],
+      ["Effective labor rate", "-", "-", "-", "-", "-"],
+      ["Gross", "-", "-", "-", "-", "-"],
+      ["Labor ops per day", "-", "-", "-", "-", "-"]
+    ]}
+  ]
+}
