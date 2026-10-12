@@ -12,6 +12,17 @@ import { defineLocale, type TranslationOverrides } from './define-locale'
 import { introDe } from './intro-de'
 
 export const deOverrides = {
+  askDealer: {
+    login: {
+      title: 'Willkommen bei Gideon',
+      subtitle: 'Melde dich an, um fortzufahren',
+      continueWithGoogle: 'Weiter mit Google'
+    },
+    endpointSetup: {
+      title: 'KI-Endpunkt verbinden',
+      description: 'Gib die Endpunkt-URL, den API-Schlüssel und das Modell ein, das Gideon verwenden soll. Du kannst das später in den Einstellungen ändern.'
+    }
+  },
   sharedMetrics: deSharedMetrics,
   intro: introDe,
   connectors: {

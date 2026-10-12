@@ -31,6 +31,8 @@ import { EmptyState, Pill, SectionHeading, SettingsContent, SettingsSkeleton } f
 import { SettingsProfileScope } from './profile-scope'
 
 interface CustomEndpointsSettingsProps {
+  /** Drop the settings-page insets, for hosting inside a dialog. */
+  bare?: boolean
   onConfigSaved?: () => void
   onMainModelChanged?: (provider: string, model: string) => void
 }
@@ -103,7 +105,11 @@ function toPayload(
   }
 }
 
-export function CustomEndpointsSettings({ onConfigSaved, onMainModelChanged }: CustomEndpointsSettingsProps) {
+export function CustomEndpointsSettings({
+  bare = false,
+  onConfigSaved,
+  onMainModelChanged
+}: CustomEndpointsSettingsProps) {
   const { t } = useI18n()
   const ce = t.settings.customEndpoints
   const copyRef = useRef(ce)
@@ -331,7 +337,7 @@ export function CustomEndpointsSettings({ onConfigSaved, onMainModelChanged }: C
 
   if (loading) {
     return (
-      <SettingsContent>
+      <SettingsContent bare={bare}>
         <SettingsProfileScope className="mb-5" />
         <SettingsSkeleton sections={[{ heading: true, rows: 3 }]} />
       </SettingsContent>
@@ -342,7 +348,7 @@ export function CustomEndpointsSettings({ onConfigSaved, onMainModelChanged }: C
   const canSave = form.name.trim() && form.baseUrl.trim() && form.model.trim()
 
   return (
-    <SettingsContent>
+    <SettingsContent bare={bare}>
       <SettingsProfileScope className="mb-5" />
       <div className="space-y-6">
         <section>

@@ -12,6 +12,17 @@ import { frSharedMetrics } from './fr_shared_metrics'
 import { introFr } from './intro-fr'
 
 export const frOverrides = {
+  askDealer: {
+    login: {
+      title: 'Bienvenue dans Gideon',
+      subtitle: 'Connectez-vous pour continuer',
+      continueWithGoogle: 'Continuer avec Google'
+    },
+    endpointSetup: {
+      title: 'Connectez votre endpoint d’IA',
+      description: 'Ajoutez l’URL de l’endpoint, la clé API et le modèle que Gideon doit utiliser. Vous pourrez le modifier plus tard dans les Réglages.'
+    }
+  },
   sharedMetrics: frSharedMetrics,
   intro: introFr,
   connectors: {

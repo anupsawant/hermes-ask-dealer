@@ -12,6 +12,17 @@ import { arSettings } from './ar_settings'
 import { defineLocale, type TranslationOverrides } from './define-locale'
 
 export const arOverrides = {
+  askDealer: {
+    login: {
+      title: 'مرحبًا بك في Gideon',
+      subtitle: 'سجّل الدخول للمتابعة',
+      continueWithGoogle: 'المتابعة باستخدام Google'
+    },
+    endpointSetup: {
+      title: 'اربط نقطة نهاية الذكاء الاصطناعي',
+      description: 'أضف عنوان URL لنقطة النهاية ومفتاح API والنموذج الذي يجب أن يستخدمه Gideon. يمكنك تغييره لاحقًا من الإعدادات.'
+    }
+  },
   sharedMetrics: arCommon.sharedMetrics,
   externalOpenFailed: arChrome.externalOpenFailed,
   sessionImport: arConnectors.sessionImport,

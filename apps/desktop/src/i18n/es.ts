@@ -12,6 +12,17 @@ import { esSharedMetrics } from './es_shared_metrics'
 import { introEs } from './intro-es'
 
 export const esOverrides = {
+  askDealer: {
+    login: {
+      title: 'Te damos la bienvenida a Gideon',
+      subtitle: 'Inicia sesión para continuar',
+      continueWithGoogle: 'Continuar con Google'
+    },
+    endpointSetup: {
+      title: 'Conecta tu endpoint de IA',
+      description: 'Añade la URL del endpoint, la clave de API y el modelo que debe usar Gideon. Puedes cambiarlo más tarde en Ajustes.'
+    }
+  },
   sharedMetrics: esSharedMetrics,
   intro: introEs,
   connectors: {

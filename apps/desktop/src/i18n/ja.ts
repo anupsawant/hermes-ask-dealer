@@ -12,6 +12,17 @@ import { jaProjects } from './ja_projects'
 import { jaSharedMetrics } from './ja_shared_metrics'
 
 export const jaOverrides = {
+  askDealer: {
+    login: {
+      title: 'Gideon へようこそ',
+      subtitle: '続行するにはサインインしてください',
+      continueWithGoogle: 'Google で続行'
+    },
+    endpointSetup: {
+      title: 'AI エンドポイントを接続',
+      description: 'Gideon が使用するエンドポイント URL、API キー、モデルを追加してください。後から設定で変更できます。'
+    }
+  },
   externalOpenFailed: {
     title: 'このリンクを開けませんでした',
     message: 'このアドレスを開くブラウザが登録されていません。リンクをコピーして手動で開いてください。',

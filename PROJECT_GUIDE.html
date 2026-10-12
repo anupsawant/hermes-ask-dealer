@@ -1,0 +1,1532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gideon Developer Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: blueprint-style reference manual. Sticky contents rail on the left,
+   one reading column (~72ch) on the right; tables, code and diagrams scroll
+   inside their own boxes. Collapses to a single column under 980px. */
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --sunken: #edf0f5;
+  --ink: #18202e;
+  --muted: #586274;
+  --rule: #d9dfe8;
+  --accent: #2d55c8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e5ebfa;
+  --ok: #1d7448;
+  --ok-soft: #e2f3ea;
+  --warn: #9a5a06;
+  --warn-soft: #fbefd9;
+  --bad: #b02a1d;
+  --bad-soft: #fbe5e2;
+  --code: #1f2a3d;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 0.96875rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --step-3: 1.875rem;
+  --step-4: 2.625rem;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1219; --surface: #151b25; --sunken: #111721; --ink: #e3e8f0; --muted: #98a3b5;
+    --rule: #263042; --accent: #86a5ff; --accent-ink: #0e1219; --accent-soft: #1b2742;
+    --ok: #63c793; --ok-soft: #143024; --warn: #e7a84f; --warn-soft: #33260f;
+    --bad: #f17a6b; --bad-soft: #3a1a17; --code: #d4dcea; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1219; --surface: #151b25; --sunken: #111721; --ink: #e3e8f0; --muted: #98a3b5;
+  --rule: #263042; --accent: #86a5ff; --accent-ink: #0e1219; --accent-soft: #1b2742;
+  --ok: #63c793; --ok-soft: #143024; --warn: #e7a84f; --warn-soft: #33260f;
+  --bad: #f17a6b; --bad-soft: #3a1a17; --code: #d4dcea; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.25rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 var(--step-0)/1.65 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 17.5rem minmax(0, 1fr);
+  gap: 3rem;
+  max-width: 82rem;
+  margin: 0 auto;
+  padding-inline: 1.5rem;
+}
+@media (max-width: 980px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 1rem; }
+}
+
+/* Contents rail */
+.rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding-block: 1.75rem 2rem;
+  font-size: var(--step--1);
+}
+.rail .brand { display: grid; gap: 0.15rem; margin-bottom: 1.25rem; }
+.rail .brand b { font: 700 var(--step-1)/1.2 var(--font-display); letter-spacing: 0.01em; }
+.rail .brand span { color: var(--muted); }
+.rail-tools { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.rail-tools input {
+  flex: 1; min-width: 0; font: inherit; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.4rem 0.6rem;
+}
+.theme-btn {
+  font: 500 var(--step--1)/1 var(--font-body); color: var(--ink); cursor: pointer;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.4rem 0.6rem;
+}
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; }
+.toc a {
+  display: grid; grid-template-columns: 1.9rem 1fr; gap: 0.25rem;
+  padding: 0.3rem 0.5rem; border-radius: 4px; color: var(--muted); text-decoration: none; line-height: 1.35;
+}
+.toc a .n { font: 500 var(--step--1)/1.35 var(--font-mono); color: var(--muted); opacity: 0.75; }
+.toc a:hover { background: var(--sunken); color: var(--ink); }
+.toc a.active { background: var(--accent-soft); color: var(--ink); }
+.toc a.active .n { color: var(--accent); opacity: 1; }
+.toc .grp { margin: 0.85rem 0 0.2rem 0.5rem; font: 600 0.6875rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 980px) {
+  .rail { position: static; max-height: none; border-bottom: 1px solid var(--rule); padding-bottom: 1rem; }
+  .toc { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+  .toc .grp { grid-column: 1 / -1; }
+}
+
+/* Reading column */
+main { min-width: 0; padding-block: 2.5rem 6rem; max-width: 52rem; }
+.hero { display: grid; gap: 0.9rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule); margin-bottom: 1rem; }
+.eyebrow { font: 600 0.75rem/1 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 var(--step-4)/1.05 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 0; font-size: var(--step-1); color: var(--muted); max-width: 62ch; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font: 500 var(--step--1)/1 var(--font-mono); padding: 0.35rem 0.55rem;
+  border-radius: 4px; background: var(--surface); border: 1px solid var(--rule); color: var(--muted);
+}
+
+section.doc { padding-top: 2.25rem; }
+section.doc > h2 {
+  display: flex; align-items: baseline; gap: 0.75rem;
+  margin: 0 0 1rem; font: 700 var(--step-3)/1.15 var(--font-display); text-wrap: balance;
+}
+section.doc > h2 .n { font: 500 var(--step-1)/1 var(--font-mono); color: var(--accent); }
+h3 { margin: 2rem 0 0.6rem; font: 600 var(--step-2)/1.25 var(--font-display); text-wrap: balance; }
+h4 { margin: 1.4rem 0 0.4rem; font: 600 var(--step-1)/1.3 var(--font-body); }
+p { margin: 0 0 0.9rem; max-width: 72ch; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; max-width: 72ch; }
+li { margin: 0.2rem 0; }
+li > ul, li > ol { margin: 0.25rem 0 0.4rem; }
+strong { font-weight: 600; }
+code {
+  font: 400 0.86em/1.4 var(--font-mono); background: var(--sunken); color: var(--code);
+  padding: 0.08em 0.32em; border-radius: 3px; overflow-wrap: anywhere;
+}
+pre {
+  margin: 0 0 1.1rem; padding: 0.9rem 1rem; background: var(--sunken); border: 1px solid var(--rule);
+  border-radius: var(--radius); overflow-x: auto; font: 400 var(--step--1)/1.55 var(--font-mono); color: var(--code);
+}
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+
+.table-wrap { overflow-x: auto; margin: 0 0 1.25rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: var(--step--1); line-height: 1.5; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.75rem/1.3 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+td.wrap code { white-space: normal; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.callout {
+  display: grid; gap: 0.35rem; margin: 0 0 1.25rem; padding: 0.85rem 1rem;
+  border-radius: var(--radius); border: 1px solid var(--rule); background: var(--surface);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout .label { font: 600 0.72rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; }
+.callout.info { background: var(--accent-soft); border-color: transparent; }
+.callout.info .label { color: var(--accent); }
+.callout.warn { background: var(--warn-soft); border-color: transparent; }
+.callout.warn .label { color: var(--warn); }
+.callout.bad { background: var(--bad-soft); border-color: transparent; }
+.callout.bad .label { color: var(--bad); }
+.callout.ok { background: var(--ok-soft); border-color: transparent; }
+.callout.ok .label { color: var(--ok); }
+
+.pill { display: inline-block; font: 600 0.6875rem/1 var(--font-body); letter-spacing: 0.05em; text-transform: uppercase; padding: 0.3rem 0.45rem; border-radius: 3px; white-space: nowrap; }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.info { background: var(--accent-soft); color: var(--accent); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.85rem; margin: 0 0 1.25rem; }
+.card { min-width: 0; padding: 0.9rem 1rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); }
+.card h4 { margin: 0 0 0.35rem; }
+.card p, .card ul { margin-bottom: 0; font-size: var(--step--1); }
+.card .path { font: 500 var(--step--1)/1.4 var(--font-mono); color: var(--accent); margin-bottom: 0.35rem; overflow-wrap: anywhere; }
+
+.diagram {
+  margin: 0 0 1.25rem; padding: 1rem; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); overflow-x: auto;
+}
+.diagram figcaption { font-size: var(--step--1); color: var(--muted); margin-top: 0.6rem; }
+pre.mermaid { background: none; border: 0; padding: 0; margin: 0; color: var(--muted); white-space: pre; }
+pre.mermaid svg { max-width: 100%; height: auto; }
+
+ol.steps { counter-reset: s; list-style: none; padding-left: 0; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 0.5rem; margin: 0.45rem 0; }
+ol.steps > li::before {
+  content: counter(s); font: 600 var(--step--1)/1.9 var(--font-mono); color: var(--accent);
+  text-align: center; background: var(--accent-soft); border-radius: 4px; height: 1.6rem; line-height: 1.6rem;
+}
+dl.gloss { display: grid; grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr); gap: 0.45rem 1.25rem; margin: 0 0 1rem; }
+dl.gloss dt { font: 500 var(--step--1)/1.6 var(--font-mono); color: var(--accent); }
+dl.gloss dd { margin: 0; }
+@media (max-width: 560px) { dl.gloss { grid-template-columns: minmax(0, 1fr); } dl.gloss dd { margin-bottom: 0.6rem; } }
+.small { font-size: var(--step--1); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+footer { margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: var(--step--1); color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="rail" aria-label="Contents">
+  <div class="brand"><b>Gideon Developer Guide</b><span>hermes-agent fork · Ask Dealer</span></div>
+  <div class="rail-tools">
+    <input id="toc-filter" type="search" placeholder="Filter sections" aria-label="Filter sections">
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">Theme</button>
+  </div>
+  <ol class="toc" id="toc">
+    <li class="grp">Orientation</li>
+    <li><a href="#overview"><span class="n">01</span>What this project is</a></li>
+    <li><a href="#repo-map"><span class="n">02</span>Repository map</a></li>
+    <li><a href="#state"><span class="n">03</span>Current state &amp; known issues</a></li>
+    <li><a href="#rules"><span class="n">04</span>Rules you must not break</a></li>
+    <li class="grp">Flows</li>
+    <li><a href="#architecture"><span class="n">05</span>System architecture</a></li>
+    <li><a href="#flow-boot"><span class="n">06</span>Desktop boot flow</a></li>
+    <li><a href="#flow-chat"><span class="n">07</span>Sending a chat message</a></li>
+    <li><a href="#flow-turn"><span class="n">08</span>One agent turn</a></li>
+    <li><a href="#flow-tools"><span class="n">09</span>Tool call dispatch</a></li>
+    <li><a href="#flow-gateway"><span class="n">10</span>Messaging gateway flow</a></li>
+    <li><a href="#flow-cron"><span class="n">11</span>Scheduled jobs (cron)</a></li>
+    <li><a href="#flow-login"><span class="n">12</span>Ask Dealer login &amp; endpoint</a></li>
+    <li class="grp">Implementation</li>
+    <li><a href="#agent-core"><span class="n">13</span>Agent core (Python)</a></li>
+    <li><a href="#prompt"><span class="n">14</span>System prompt &amp; caching</a></li>
+    <li><a href="#compression"><span class="n">15</span>Context compression</a></li>
+    <li><a href="#providers"><span class="n">16</span>Providers &amp; models</a></li>
+    <li><a href="#tools"><span class="n">17</span>Tools, approvals, delegation</a></li>
+    <li><a href="#memory"><span class="n">18</span>Memory, skills, persona</a></li>
+    <li><a href="#storage"><span class="n">19</span>Sessions, home, profiles</a></li>
+    <li><a href="#plugins"><span class="n">20</span>Plugins</a></li>
+    <li><a href="#serve"><span class="n">21</span><code>hermes serve</code> backend</a></li>
+    <li><a href="#rpc"><span class="n">22</span>JSON-RPC gateway</a></li>
+    <li><a href="#cli"><span class="n">23</span>CLI &amp; configuration</a></li>
+    <li><a href="#electron"><span class="n">24</span>Desktop: Electron main</a></li>
+    <li><a href="#renderer"><span class="n">25</span>Desktop: renderer</a></li>
+    <li><a href="#i18n"><span class="n">26</span>Desktop: strings (i18n)</a></li>
+    <li><a href="#other-ui"><span class="n">27</span>TUI &amp; web dashboard</a></li>
+    <li class="grp">Reference</li>
+    <li><a href="#js-packages"><span class="n">28</span>JavaScript packages</a></li>
+    <li><a href="#py-packages"><span class="n">29</span>Python packages</a></li>
+    <li><a href="#infra"><span class="n">30</span>Tooling &amp; infrastructure</a></li>
+    <li><a href="#fork"><span class="n">31</span>What the fork changed</a></li>
+    <li><a href="#workflow"><span class="n">32</span>Dev workflow &amp; commands</a></li>
+    <li><a href="#recipes"><span class="n">33</span>To change X, edit Y</a></li>
+    <li><a href="#doc-drift"><span class="n">34</span>Where docs disagree with code</a></li>
+    <li><a href="#glossary"><span class="n">35</span>Glossary</a></li>
+  </ol>
+</nav>
+
+<main id="top">
+
+<header class="hero">
+  <div class="eyebrow">Developer reference</div>
+  <h1>Gideon Developer Guide</h1>
+  <p class="lede">How the Gideon (Ask Dealer) fork of Nous Research's hermes-agent is built: the processes, the flows between them, where each piece of code lives, the packages it depends on, and what to edit when you want to change something.</p>
+  <div class="meta-row">
+    <span class="chip">branch ask-dealer-changes</span>
+    <span class="chip">fork commit 751e37b612</span>
+    <span class="chip">upstream base dde8800ed9</span>
+    <span class="chip">snapshot 2026-10-12</span>
+  </div>
+</header>
+
+<!-- 01 -->
+<section class="doc" id="overview">
+<h2><span class="n">01</span>What this project is</h2>
+<p><strong>Hermes Agent</strong> is an open-source personal AI agent by Nous Research. One Python agent core runs behind several surfaces: a terminal CLI, an Ink terminal UI (TUI), an Electron desktop app, a browser dashboard, and a messaging gateway that connects the agent to Telegram, Discord, Slack, WhatsApp and about 20 other platforms. It remembers across sessions (memory and skills), runs tools (terminal, files, browser, web search, code execution), delegates to subagents, and runs scheduled jobs.</p>
+<p>This repository is a <strong>fork rebranded as Gideon, "Acme Corp's private AI assistant"</strong>, for the Ask Dealer product. The product being built is the <strong>desktop app</strong> (<code>apps/desktop</code>). It spawns the upstream Python backend (<code>hermes serve</code>) as a child process and talks to it over HTTP and WebSocket.</p>
+<div class="grid-2">
+  <div class="card"><h4>What the fork changes</h4><p>User-facing identity strings (Gideon, Acme Corp), the PDF skill (designed reports and a dealership daily-report template), and a placeholder login screen plus endpoint setup popup in the desktop app.</p></div>
+  <div class="card"><h4>What the fork keeps</h4><p>Everything internal: Python module names (<code>hermes_*</code>), environment variables (<code>HERMES_*</code>), the <code>hermes</code> CLI, IPC channel names (<code>hermes:*</code>). Rebrand only what users read.</p></div>
+  <div class="card"><h4>Where most work happens</h4><p><code>apps/desktop</code> (Electron + React). The Python agent, gateway and TUI are upstream code that the desktop runs.</p></div>
+  <div class="card"><h4>Design spec in progress</h4><p><code>ASK_DEALER_LOGIN.md</code> at the root: Google sign-in, a build-time "dealer edition" that hides advanced features, and a top-level endpoint setup.</p></div>
+</div>
+<div class="callout info"><span class="label">How to read this guide</span><p>Sections 05–12 explain the runtime flows end to end. Sections 13–27 go component by component with file paths and key symbols. Sections 28–35 are reference tables. Paths are relative to the repo root unless they start with <code>src/</code> or <code>electron/</code>, which are under <code>apps/desktop/</code>.</p></div>
+</section>
+
+<!-- 02 -->
+<section class="doc" id="repo-map">
+<h2><span class="n">02</span>Repository map</h2>
+<p>Every former "god file" is now a <strong>facade</strong> that keeps the public names, plus <strong>siblings</strong> named <code>&lt;stem&gt;_&lt;topic&gt;.py</code> that hold one topic each. Find code by grepping the siblings (<code>grep -rn "def name" agent/turn_*.py</code>), not by reading the facade.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Path</th><th>What it holds</th></tr></thead>
+<tbody>
+<tr><td><code>run_agent.py</code></td><td><code>AIAgent</code> facade. The turn loop lives in <code>agent/turn_*.py</code> and <code>agent/conversation_loop.py</code>.</td></tr>
+<tr><td><code>agent/</code></td><td>Turn phases, prompt building, prompt caching, compression, providers and transports, memory manager, curator, auxiliary LLM client, error classification, fallback.</td></tr>
+<tr><td><code>model_tools.py</code>, <code>toolsets.py</code></td><td>Tool discovery and dispatch (<code>handle_function_call</code>); toolset definitions (<code>TOOLSETS</code>, <code>_HERMES_CORE_TOOLS</code>).</td></tr>
+<tr><td><code>tools/</code></td><td>Tool implementations registered in <code>tools/registry.py</code>; execution backends in <code>tools/environments/</code> (local, docker, ssh, modal, …); approvals; delegation.</td></tr>
+<tr><td><code>hermes_state.py</code> + <code>hermes_state_*.py</code></td><td><code>SessionDB</code>: SQLite <code>state.db</code> with sessions, messages, FTS search, compaction generations.</td></tr>
+<tr><td><code>hermes_constants.py</code></td><td><code>get_hermes_home()</code>, <code>display_hermes_home()</code>: profile-aware paths.</td></tr>
+<tr><td><code>cli.py</code>, <code>hermes_cli/</code></td><td>The <code>hermes</code> command: REPL (<code>HermesCLI</code> + <code>cli_*_mixin.py</code>), subcommands, config system, profiles, setup, updater, plugin loader, the FastAPI server (<code>web_server.py</code> + <code>web_routers/</code>).</td></tr>
+<tr><td><code>tui_gateway/</code></td><td>JSON-RPC backend shared by the TUI, the desktop and the dashboard (sessions, prompts, events).</td></tr>
+<tr><td><code>gateway/</code></td><td>Messaging gateway (<code>run.py</code> facade + <code>run_*.py</code> phases, <code>platforms/</code> adapters).</td></tr>
+<tr><td><code>cron/</code></td><td>Scheduler (<code>scheduler.py</code>, <code>scheduler_tick.py</code>) and job store (<code>jobs.py</code>).</td></tr>
+<tr><td><code>plugins/</code></td><td>Built-in plugins: model providers (~40), messaging platforms, web search, browser, image/video generation, memory, kanban, observability, dashboard auth.</td></tr>
+<tr><td><code>providers/</code></td><td>Provider registry (<code>ProviderProfile</code>, <code>register_provider</code>); profiles live in <code>plugins/model-providers/</code>.</td></tr>
+<tr><td><code>skills/</code>, <code>optional-skills/</code></td><td>Bundled skills (synced into the user's home) and skills installed on demand.</td></tr>
+<tr><td><code>apps/desktop/</code></td><td>Electron desktop app: <code>electron/</code> (main process), <code>src/</code> (React renderer).</td></tr>
+<tr><td><code>apps/shared/</code></td><td><code>@hermes/shared</code>: JSON-RPC client, WebSocket URL helpers, generated gateway contract types, i18n merge helpers.</td></tr>
+<tr><td><code>apps/bootstrap-installer/</code></td><td>Tauri native installer UI that drives <code>scripts/install.ps1</code>.</td></tr>
+<tr><td><code>ui-tui/</code></td><td>Ink (React) terminal UI, with a vendored Ink fork in <code>ui-tui/packages/hermes-ink</code>.</td></tr>
+<tr><td><code>web/</code></td><td>Dashboard SPA served by <code>hermes dashboard</code> (embeds the real TUI over a PTY).</td></tr>
+<tr><td><code>pm/</code>, <code>hermes_platform/</code></td><td>In-house package/environment manager; host facts and executable lookup.</td></tr>
+<tr><td><code>scripts/</code></td><td><code>check</code> (all CI lint), <code>run_tests.sh</code> (pytest runner), <code>code_health/</code>, <code>ci/</code>, <code>build/</code>, <code>bundles/</code>.</td></tr>
+<tr><td><code>tests/</code>, <code>tests-js/</code></td><td>Pytest suite mirroring the source tree; repo-level vitest suite for build/packaging.</td></tr>
+<tr><td><code>website/</code></td><td>Docusaurus docs. <code>website/docs/developer-guide/</code> has ~50 long-form internals pages.</td></tr>
+<tr><td><code>plugin-catalog/</code>, <code>optional-mcps/</code>, <code>locales/</code></td><td>Community plugin manifests (~485), MCP server manifests (65), CLI/TUI translations (16 languages).</td></tr>
+<tr><td><code>docker/</code>, <code>Dockerfile</code>, <code>nix/</code>, <code>flake.nix</code></td><td>Container image (s6-overlay) and Nix packaging.</td></tr>
+<tr><td><code>AGENTS.md</code> (root + each area)</td><td>The authoritative engineering rules. Read the area's file before editing there.</td></tr>
+<tr><td><code>CLAUDE.md</code>, <code>PROJECT_MAP.md</code>, <code>ASK_DEALER_LOGIN.md</code></td><td>Fork notes: commands, current state and traps, login design spec.</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 03 -->
+<section class="doc" id="state">
+<h2><span class="n">03</span>Current state &amp; known issues</h2>
+<p>The fork is one commit on top of upstream, plus uncommitted work in the tree. Read this before you run or change anything.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Status</th><th>Issue</th><th>Detail and fix</th></tr></thead>
+<tbody>
+<tr><td><span class="pill bad">Broken</span></td><td><code>hermes_cli/setup_profile.py</code> constants deleted</td><td class="wrap">The fork commit deleted <code>SETUP_CHAT_TITLE</code>, <code>MAX_FAILED_STARTS</code>, <code>RETURNING_USER_FLAG</code>, <code>_FRESH_STATE</code>, <code>_ADDED_DISABLED</code>, <code>_OWNER</code>, <code>_CARDS_DIR</code>, <code>_SETUP_TOOLSETS</code>, <code>_SETUP_DISABLED_TOOLSETS</code>, <code>_SETUP_DEFERRED_TOOLS</code>. They are still used in the file, and <code>tui_gateway/methods_onboarding.py:28</code> imports <code>SETUP_CHAT_TITLE</code>, so the setup-profile and <code>onboarding.*</code> paths raise <code>NameError</code>/<code>ImportError</code>. Fix: restore the block from <code>751e37b612~1</code> and keep only the Gideon string edits. Not fixed in the working tree.</td></tr>
+<tr><td><span class="pill warn">Likely bug</span></td><td>Window titles may still say "Hermes"</td><td class="wrap"><code>electron/main.ts:1438</code>: <code>APP_NAME = IDENTITY_APP_NAME || HERMES_DESKTOP_APP_NAME || 'Hermes'</code>. For the stable variant <code>applyDesktopIdentity</code> returns <code>null</code> (no channel token and <code>appNamePascal === artifactNamePascal</code>), so <code>APP_NAME</code> falls back to <code>'Hermes'</code>. <code>apps/desktop/package.json</code> also still has <code>productName: "Hermes"</code>, so dev userData and the single-instance lock may collide with an installed upstream Hermes Desktop. Found by reading code, not verified at runtime.</td></tr>
+<tr><td><span class="pill warn">Setup</span></td><td><code>ws</code> / <code>@types/ws</code> not installed</td><td class="wrap">Declared in <code>apps/desktop/package.json</code> by the fork but missing from <code>node_modules</code>. <code>scripts/assert-root-install.mjs</code> then blocks <code>npm run dev</code> and <code>build</code>. Fix: run <code>npm ci</code> at the repo root.</td></tr>
+<tr><td><span class="pill ok">Fixed (uncommitted)</span></td><td>Stale files in the fork commit</td><td class="wrap">The commit pasted older upstream copies of <code>electron/main.ts</code> (from 2026-08-18), <code>thread/status.tsx</code>, <code>src/i18n/en.ts</code> and <code>hermes-bots/group-chat.ts</code>, undoing weeks of upstream fixes and breaking typecheck. The working tree restored them to upstream plus only the Gideon strings. <code>main.ts</code> now differs from upstream by four <code>title: APP_NAME</code> lines; about 15 user-facing "Hermes" strings in it remain (e.g. "Waiting to start Hermes backend").</td></tr>
+<tr><td><span class="pill info">Placeholder</span></td><td>Login is fake</td><td class="wrap">"Continue with Google" signs in immediately (in-memory, every launch starts at login). Real OAuth, the edition switch and the hiding are designed but not built (§12).</td></tr>
+<tr><td><span class="pill info">Cosmetic</span></td><td>Leftover upstream branding</td><td class="wrap"><code>docker/SOUL.md</code> ("You are Hermes Agent…"), the website title, <code>README*</code>, CLI/TUI strings in <code>locales/*.yaml</code>, the Store MSIX identity in <code>product-identity.cjs</code>, the <code>hermes://</code> deep-link scheme, PDF templates' <code>"author": "Hermes Agent"</code>, non-English desktop locales.</td></tr>
+<tr><td><span class="pill info">Doc mismatch</span></td><td>PDF skill table rule</td><td class="wrap"><code>skills/productivity/pdf/SKILL.md</code> says tables up to 15 rows stay on one page; <code>pdf_create.py</code> uses <code>_KEEP_TOGETHER_ROWS = 8</code>.</td></tr>
+<tr><td><span class="pill info">Typo</span></td><td><code>tests/e2e/core/parity/_drive_cron.py</code></td><td class="wrap">The fork accidentally changed a docstring path to <code>hermes_cli/::_job_action</code>. Harmless.</td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="label">Rule learned the hard way</span><p>Rebrand by editing strings on top of the <em>current</em> upstream file. Never paste in a whole file from another revision: it silently reverts upstream fixes and breaks sibling modules. <code>git diff 751e37b612~1 -- &lt;file&gt;</code> shows exactly what the fork changed in any file.</p></div>
+</section>
+
+<!-- 04 -->
+<section class="doc" id="rules">
+<h2><span class="n">04</span>Rules you must not break</h2>
+<p>These come from the root and area <code>AGENTS.md</code> files. Reviews reject changes that break them, and most of the architecture exists to protect them.</p>
+<div class="grid-2">
+  <div class="card"><h4>Prompt caching is sacred</h4><p>Never change the system prompt, toolsets, memory snapshot or past messages mid-conversation. Providers cache the exact prefix bytes; a change re-bills the whole history. The only exception is context compression. Commands that would change prompt state apply to the next session (or take an opt-in <code>--now</code>).</p></div>
+  <div class="card"><h4>The core is a narrow waist</h4><p>Every core tool is sent on every API call. New capability arrives as a CLI command + skill, a service-gated tool, or a plugin, not as a new core tool. Order of preference: extend existing code → CLI + skill → gated tool → plugin → MCP server → core tool.</p></div>
+  <div class="card"><h4>Never hardcode <code>~/.hermes</code></h4><p>Use <code>get_hermes_home()</code> for paths and <code>display_hermes_home()</code> for text. On Windows the default is <code>%LOCALAPPDATA%\hermes</code>.</p></div>
+  <div class="card"><h4>One process, many profiles</h4><p>Code that runs outside a turn (timers, callbacks, RPC handlers, threads) must bind the owning profile explicitly. <code>os.environ</code> and module globals hold the launch profile's values; an unbound read leaks the default profile.</p></div>
+  <div class="card"><h4><code>.env</code> is secrets only</h4><p>Behaviour settings go in <code>config.yaml</code>. Don't add new <code>HERMES_*</code> env vars for non-secret config.</p></div>
+  <div class="card"><h4>Size and complexity ratchets</h4><p>New functions: cyclomatic complexity ≤ 20, ≤ 300 lines, nesting ≤ 6. Files ≤ 2,000 lines. Units already over may only shrink. Enforced by <code>python scripts/check</code>.</p></div>
+  <div class="card"><h4>Desktop seams</h4><p>The renderer never touches Node or Electron directly; native power arrives as a typed preload capability. State lives with its authority: backend &gt; Electron &gt; renderer.</p></div>
+  <div class="card"><h4>Tests are behaviour contracts</h4><p>Use <code>scripts/run_tests.sh</code>, never bare <code>pytest</code>. No snapshot or source-reading tests. Tests never write to the real home. A fix ships with 1–2 tests proven red on the base.</p></div>
+  <div class="card"><h4>Dependencies are bounded</h4><p><code>&gt;=floor,&lt;next_major</code>; git URLs and Actions pinned to a SHA. After editing <code>pyproject.toml</code>, run <code>hermes pm lock</code> and commit <code>uv.lock</code>. Never raw <code>pip</code>/<code>uv</code> into a Hermes env.</p></div>
+  <div class="card"><h4>Guest content never opens anything</h4><p>Artifact iframes and the preview webview can't open windows or the OS browser by themselves (security advisory GHSA-9f4c-93c8-jc8g). Don't widen <code>setWindowOpenHandler</code>, the preview partition, or the scheme allowlist.</p></div>
+</div>
+</section>
+
+<!-- 05 -->
+<section class="doc" id="architecture">
+<h2><span class="n">05</span>System architecture</h2>
+<p>Several front ends share one agent core. The desktop app, the TUI and the dashboard reach it through the same JSON-RPC backend (<code>tui_gateway</code>); messaging platforms reach it through the messaging gateway. Everything persists to the active profile's home folder.</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart LR
+  subgraph Clients
+    D["Desktop app (Electron + React)"]
+    T["TUI (Ink, stdio)"]
+    W["Web dashboard (SPA)"]
+    C["Classic CLI REPL"]
+    M["Messaging platforms: Telegram, Slack, Discord ..."]
+  end
+  subgraph Backend["hermes serve / hermes dashboard (FastAPI + uvicorn)"]
+    REST["REST routers /api/*"]
+    WS["/api/ws JSON-RPC (tui_gateway)"]
+    PTY["/api/pty real TUI"]
+  end
+  GW["Messaging gateway (gateway/run.py)"]
+  AG["AIAgent (run_agent.py + agent/turn_*)"]
+  TL["Tools (tools/, plugins)"]
+  LLM["LLM providers (OpenAI-compatible, Anthropic, Bedrock ...)"]
+  DB[("state.db SQLite")]
+  HOME["Profile home: config.yaml, .env, SOUL.md, skills, memories"]
+  D -- "REST via Electron IPC proxy" --> REST
+  D -- "WebSocket" --> WS
+  W --> REST
+  W --> PTY
+  T -- "stdio JSON-RPC" --> AG
+  C --> AG
+  M --> GW
+  WS --> AG
+  GW --> AG
+  AG --> LLM
+  AG --> TL
+  AG --> DB
+  AG --> HOME
+  CR["Cron ticker"] --> AG
+</pre>
+<figcaption>Runtime components. The TUI spawns <code>python -m tui_gateway.entry</code> over stdio; desktop and dashboard reach the same dispatcher over <code>/api/ws</code>.</figcaption>
+</figure>
+<h3>The desktop's three parties</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Party</th><th>Authoritative for</th><th>Lives in</th></tr></thead>
+<tbody>
+<tr><td>Electron main</td><td>Process lifecycle, backend spawn and pool, native filesystem/git/terminal/windows, install and update, secrets (safeStorage)</td><td><code>apps/desktop/electron/</code> (<code>entry.ts</code> → <code>main.ts</code>, ~19.8k lines, plus ~250 tested sibling modules)</td></tr>
+<tr><td>Renderer</td><td>Navigation, presentation, short-lived UI state</td><td><code>apps/desktop/src/</code> (React 19, nanostores, assistant-ui)</td></tr>
+<tr><td>Backend <code>hermes serve</code></td><td>Sessions, tools, model calls, streaming, config, cron</td><td>Python; one headless process per (connection, profile)</td></tr>
+</tbody></table></div>
+<h4>The four seams</h4>
+<ol>
+<li><strong>Renderer ↔ Electron:</strong> only through <code>window.hermesDesktop</code> from <code>electron/preload.ts</code>. Windows run with <code>contextIsolation: true</code>, <code>sandbox: true</code>, <code>nodeIntegration: false</code>.</li>
+<li><strong>Renderer ↔ backend (JSON-RPC):</strong> WebSocket <code>ws://127.0.0.1:&lt;port&gt;/api/ws?token=…</code> through <code>JsonRpcGatewayClient</code> (<code>apps/shared/src/json-rpc-gateway.ts</code>). Electron supplies the URL.</li>
+<li><strong>Renderer ↔ backend (REST):</strong> proxied through Electron. <code>hermesApi()</code> → <code>window.hermesDesktop.api()</code> → IPC <code>hermes:api</code> → main picks the right backend by profile and connection.</li>
+<li><strong>Electron ↔ backend:</strong> spawn args and env; readiness via the stdout line <code>HERMES_BACKEND_READY port=N</code>, then health polling.</li>
+</ol>
+</section>
+
+<!-- 06 -->
+<section class="doc" id="flow-boot">
+<h2><span class="n">06</span>Desktop boot flow</h2>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  participant U as User
+  participant E as Electron main
+  participant R as Renderer
+  participant B as hermes serve
+  U->>E: launch app
+  E->>E: applyDesktopIdentity, single-instance lock
+  E->>E: app.whenReady: CA trust, safeStorage, deep links, tray
+  E->>R: createWindow loads renderer (dev server or file://)
+  par backend starts in parallel
+    E->>E: startHermes, resolveHermesBackend ladder
+    E->>B: spawn hermes serve --host 127.0.0.1 --port 0
+    B-->>E: stdout HERMES_BACKEND_READY port=N
+    E->>B: health poll until ready
+  and renderer boots
+    R->>R: main.tsx providers, ContribController, ContribWiring
+    R->>E: getConnection (joins boot in flight)
+  end
+  E-->>R: connection: port, token, ws url
+  R->>B: open WebSocket /api/ws
+  B-->>R: gateway.ready event
+  R->>R: gatewayState = open, overlays and gates evaluate
+</pre>
+<figcaption>Boot progress is pushed to the renderer: backend.resolve 8% → runtime 28% → spawn 84% → ready 94%.</figcaption>
+</figure>
+<h3>Step by step</h3>
+<ol class="steps">
+<li><div><strong><code>electron/entry.ts</code></strong> (Linux only: may relaunch through WSLg/Wayland), then <code>import('./main')</code>.</div></li>
+<li><div><strong>Identity:</strong> <code>applyDesktopIdentity(app)</code> (<code>main.ts:731</code>) from <code>electron/product-identity.ts</code>. The identity is baked at build time as <code>__HERMES_PRODUCT_IDENTITY__</code> by <code>scripts/bundle-electron-main.mjs</code>; dev reads <code>product-identity.cjs</code> live.</div></li>
+<li><div><strong>Single-instance lock</strong> (<code>acquireSingleInstanceLock</code>, <code>main.ts:1261</code>). A second instance forwards deep links to the first and exits.</div></li>
+<li><div><strong><code>app.whenReady()</code></strong> (<code>main.ts:19318</code>): login-shell PATH, system CA trust, safeStorage, secret migration, media protocol, <code>hermes://</code> deep links, preview guest preload, tray, Quick Entry chord, application menu.</div></li>
+<li><div><strong><code>createWindow()</code></strong> (<code>main.ts:15021</code>): frameless window with <code>titleBarOverlay</code>, loads the renderer, and <em>starts the backend in parallel</em> (<code>main.ts:15471</code>). The promise is shared through <code>backendConnectionState</code> so the renderer's <code>getConnection()</code> joins it.</div></li>
+<li><div><strong>Backend resolution ladder</strong> (<code>resolveHermesBackend</code>, <code>main.ts:5240</code>): bundled payload → <code>HERMES_DESKTOP_HERMES_ROOT</code> (dev checkout) → source checkout when unpackaged → <code>HERMES_DESKTOP_HERMES</code> override → active install (<code>%LOCALAPPDATA%\hermes\hermes-agent</code>) → published launcher → otherwise <code>bootstrap-needed</code> (first-run installer, <code>bootstrap-runner.ts</code>).</div></li>
+<li><div><strong>Spawn:</strong> <code>serveBackendArgs</code> (<code>electron/backend-command.ts</code>) builds <code>[--profile X] serve --host 127.0.0.1 --port 0</code>; only runtimes that lack <code>serve</code> get the legacy <code>dashboard --no-open</code>. Env: <code>HERMES_HOME</code>, a fresh 32-byte <code>HERMES_DASHBOARD_SESSION_TOKEN</code>, <code>HERMES_DESKTOP=1</code>, parent-watchdog identity.</div></li>
+<li><div><strong>Readiness:</strong> the port announcement listener is attached before any await (90 s timeout), then <code>waitForHermes</code> health-polls (180 s budget).</div></li>
+<li><div><strong>Renderer:</strong> <code>useGatewayBoot</code> calls <code>getConnection()</code>, opens the socket (8 attempts, 3 s apart, re-minting the URL each time), and publishes <code>$connection</code> / <code>$gatewayState</code>.</div></li>
+</ol>
+<h4>Extra backends (the pool)</h4>
+<p>The primary backend serves the launch profile. Other profiles get pooled backends: <code>ensureBackend(profile)</code> (<code>main.ts:10939</code>) reuses or spawns one, with LRU eviction. Limits come from <code>pool-limits.json</code> in userData. Local profile backends are never idle-reaped (upstream commit <code>167e9fdb84</code>). Remote sources (SSH, URL+token, Cloud) go through <code>ensureRegistryBackend(connectionId, profile)</code>. The <code>serve</code> process dies with the app; a messaging gateway started from it is detached and keeps running.</p>
+</section>
+
+<!-- 07 -->
+<section class="doc" id="flow-chat">
+<h2><span class="n">07</span>Sending a chat message</h2>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  participant C as Composer (ChatBar)
+  participant P as usePromptActions / submit.ts
+  participant G as JsonRpcGatewayClient
+  participant S as tui_gateway (prompt.submit)
+  participant A as AIAgent turn loop
+  participant M as useMessageStream
+  participant V as Thread view
+  C->>P: onSubmit(text)
+  P->>P: slash? run locally or slash.exec. Busy? queue
+  P->>G: session.create (source desktop) if new
+  P->>P: paint optimistic user message
+  P->>G: prompt.submit {session_id, text}
+  G->>S: JSON-RPC over WebSocket
+  S->>S: persist session and user row first
+  S-->>G: ack {user_row_id}
+  S->>A: run_conversation on worker thread
+  loop streaming
+    A-->>S: deltas, tool events, reasoning
+    S-->>G: message.delta, tool.start, tool.complete ...
+    G-->>M: gateway events
+    M->>M: update $sessionStates, $messages, $busy
+    M-->>V: assistant-ui runtime re-renders
+  end
+  A-->>S: final answer
+  S-->>G: message.complete
+</pre>
+<figcaption><code>prompt.submit</code> is effectively fire-and-forget (30-minute ack timeout). Completion always arrives as events.</figcaption>
+</figure>
+<div class="table-wrap"><table>
+<thead><tr><th>Stage</th><th>File</th></tr></thead>
+<tbody>
+<tr><td>Composer UI, draft, attachments</td><td><code>src/app/chat/composer/index.tsx</code>, <code>composer/hooks/</code>, <code>src/store/composer.ts</code></td></tr>
+<tr><td>Slash commands (desktop curation)</td><td><code>src/app/session/hooks/use-prompt-actions/slash.ts</code>, <code>src/lib/desktop-slash-commands.ts</code></td></tr>
+<tr><td>Submit pipeline</td><td><code>src/app/session/hooks/use-prompt-actions/submit.ts</code> (<code>useSubmitPrompt</code>, retries on session-not-found and busy)</td></tr>
+<tr><td>Owner routing</td><td><code>src/app/contrib/wiring.tsx</code> → <code>createSessionRpcDispatcher</code> → <code>src/app/gateway/hooks/use-gateway-request.ts</code></td></tr>
+<tr><td>Socket registry (multi-profile)</td><td><code>src/store/gateway.ts</code></td></tr>
+<tr><td>Transport</td><td><code>apps/shared/src/json-rpc-gateway.ts</code></td></tr>
+<tr><td>Backend handler</td><td><code>tui_gateway/methods_prompt.py</code> (<code>prompt.submit</code>)</td></tr>
+<tr><td>Event dispatch</td><td><code>src/app/session/hooks/use-message-stream/gateway-event/</code>: <code>message-stream.ts</code>, <code>tools.ts</code>, <code>input-requests.ts</code>, <code>lifecycle.ts</code>, <code>status.ts</code></td></tr>
+<tr><td>Session state stores</td><td><code>src/store/session-states.ts</code> (<code>$sessionStates</code>), <code>src/store/session.ts</code> (<code>$messages</code>, <code>$busy</code>)</td></tr>
+<tr><td>Rendering</td><td><code>src/app/chat/index.tsx</code> (<code>ChatView</code>) → <code>src/components/assistant-ui/thread/</code> (<code>assistant-message.tsx</code>, <code>message-parts.tsx</code>, <code>tool/</code>, <code>markdown-text.tsx</code>)</td></tr>
+</tbody></table></div>
+<p>While a turn runs, the backend can ask the client something through <strong>server requests</strong> (<code>approval</code>, <code>clarify</code>, <code>sudo</code>, <code>secret</code>, …). They block the agent thread until answered; the desktop handles them in <code>gateway-event/input-requests.ts</code>.</p>
+</section>
+
+<!-- 08 -->
+<section class="doc" id="flow-turn">
+<h2><span class="n">08</span>One agent turn</h2>
+<p>A "turn" is one user message through to a final answer, including every model call and tool round in between. Entry: <code>AIAgent.run_conversation()</code> (<code>agent/turn_facade.py</code>) → <code>agent/conversation_loop.py::run_conversation</code>.</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TD
+  A["Admission: durable session turn lease"] --> B["build_turn_context: restore primary runtime, append user msg"]
+  B --> C["Restore stored system prompt byte-for-byte, or build and persist"]
+  C --> D["Turn-start compaction check, pre_llm_call plugins, memory prefetch"]
+  D --> E{"Budget left?"}
+  E -- yes --> F["prepare_iteration: steer drain, sanitize, role repair"]
+  F --> G["assemble_api_request: canonicalize, prompt-cache plan"]
+  G --> H["Preflight compression gate"]
+  H --> I["API call: stream or non-stream, retries and fallback"]
+  I --> J{"Tool calls?"}
+  J -- yes --> K["Validate, persist assistant row, run tools"]
+  K --> L["Compress after tool results if needed"]
+  L --> E
+  J -- no --> N["finish_text_response: empty and length recovery, stop gates"]
+  E -- no --> N
+  N --> O["finalize_turn: persist, hooks, memory sync, background review"]
+</pre>
+<figcaption>Loop skeleton: <code>agent/conversation_loop.py::_run_conversation_turn</code>. Each box is a <code>turn_*.py</code> phase.</figcaption>
+</figure>
+<h3>Phases and their files</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Phase</th><th>File</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Admission</td><td><code>agent/turn_facade_lease.py</code></td><td class="wrap">Cross-process lease: only one process may load → run → flush a session at a time. Liveness watchdog in <code>turn_liveness.py</code>.</td></tr>
+<tr><td>Prologue</td><td><code>agent/turn_context.py</code></td><td class="wrap">Recover rotated compression session, undo previous fallback, MCP refresh, append user message, restore-or-build system prompt, ensure session row, turn-start compaction, plugin context, memory prefetch, title generation (daemon thread). Injected context is stamped on the <em>user message</em> (<code>api_content</code> sidecar), never the system prompt.</td></tr>
+<tr><td>Iteration prep</td><td><code>turn_iteration_prep.py</code></td><td class="wrap">Interrupt and budget exits; <code>/steer</code> text delivered as a user row after the newest tool result; run-budget wrap-up notice at 80%.</td></tr>
+<tr><td>Request assembly</td><td><code>turn_request_assembly.py</code>, <code>turn_api_request.py</code></td><td class="wrap">Build <code>api_messages</code>, canonicalize for a bit-identical cache prefix, plan cache breakpoints last, run <code>pre_api_request</code> hooks and LLM middleware.</td></tr>
+<tr><td>Preflight</td><td><code>turn_preflight_gate.py</code>, <code>turn_preflight.py</code></td><td class="wrap">Compress before the call if the context is over threshold.</td></tr>
+<tr><td>API call</td><td><code>turn_api_call.py</code>, <code>chat_completion_helpers.py</code></td><td class="wrap">Streaming preferred (also used for stale-stream health checks). Non-stream path runs on a worker thread so an interrupt closes only that connection.</td></tr>
+<tr><td>Errors and retry</td><td><code>turn_api_error.py</code>, <code>error_classifier.py</code>, <code>turn_recovery*.py</code>, <code>turn_overflow.py</code></td><td class="wrap">Classify, then credential refresh/rotation, jittered backoff (<code>agent.api_max_retries</code>, default 3), fallback chain, context overflow → compress and restart, auto-recover ladder for transient 5xx/529/timeouts.</td></tr>
+<tr><td>Tool round</td><td><code>turn_tool_round.py</code>, <code>tool_executor.py</code></td><td class="wrap">Validate (auto-repair unknown names, 3 strikes), dedupe, persist the assistant tool-call row <em>before</em> running tools, then run sequentially or in parallel (up to 8 workers). See §09.</td></tr>
+<tr><td>Final text</td><td><code>turn_final_response.py</code></td><td class="wrap">Empty/thinking-only recovery, length continuation (up to 4 nudges), stop gates (verify-on-stop, <code>pre_verify</code> hook).</td></tr>
+<tr><td>Finalize</td><td><code>turn_finalizer.py</code></td><td class="wrap">Persist, save trajectory, clean up VM/browser resources, output hooks, external memory sync, background memory/skill review, return the result dict (<code>final_response</code>, <code>messages</code>, token and cost fields, <code>turn_exit_reason</code>).</td></tr>
+</tbody></table></div>
+<h4>Controlling a running turn</h4>
+<ul>
+<li><code>interrupt()</code> / <code>hard_interrupt()</code>: soft and hard stop from another thread (<code>agent/interrupt_control.py</code>).</li>
+<li><code>steer(text)</code>: queue a correction delivered after the current tool batch.</li>
+<li><code>redirect(text)</code>: cancel only the in-flight model request and append the correction.</li>
+<li>Budgets: <code>IterationBudget</code> (<code>agent/iteration_budget.py</code>), <code>agent.max_turns</code> (default unlimited), <code>agent.run_budget_seconds</code>, per-subagent budgets.</li>
+</ul>
+</section>
+
+<!-- 09 -->
+<section class="doc" id="flow-tools">
+<h2><span class="n">09</span>Tool call dispatch</h2>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TD
+  A["Model returns tool_calls"] --> B["validate_tool_calls, dedupe, cap delegate calls"]
+  B --> C["Persist assistant tool-call row"]
+  C --> D{"One call or many?"}
+  D -- one --> E["execute_tool_calls_sequential"]
+  D -- many --> F["Plan batch: parallel-safe runs and barriers"]
+  F --> G["execute_tool_calls_concurrent, max 8 workers"]
+  E --> H["_dispatch_authorized_once"]
+  G --> H
+  H --> I["Session scope check, pre_tool_call hooks, guardrails"]
+  I --> J{"Agent-level tool?"}
+  J -- "yes: memory, todo, delegate, clarify ..." --> K["INLINE_TOOL_EXECUTORS"]
+  J -- no --> L["model_tools.handle_function_call"]
+  L --> M["Aliases, tool search bridge, middleware, approval guards"]
+  M --> N["registry.dispatch to handler"]
+  N --> O["post_tool_call, transform_tool_result"]
+  K --> P["Tool result message"]
+  O --> P
+</pre>
+<figcaption>Results return in the original call order. Handlers return a JSON string; exceptions become <code>{"error": ...}</code>.</figcaption>
+</figure>
+<p>Terminal commands pass the approval guards in <code>tools/approval.py</code> before they run (§17).</p>
+</section>
+
+<!-- 10 -->
+<section class="doc" id="flow-gateway">
+<h2><span class="n">10</span>Messaging gateway flow</h2>
+<p>The messaging gateway (<code>hermes gateway run</code>) connects the agent to chat platforms. It runs independently of the desktop and keeps running when the app closes.</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  participant P as Platform (e.g. Telegram)
+  participant AD as Adapter (BasePlatformAdapter)
+  participant GR as GatewayRunner
+  participant AG as AIAgent
+  participant SC as GatewayStreamConsumer
+  P->>AD: inbound message
+  AD->>AD: build_source, busy? queue in _pending_messages
+  AD->>GR: handle_message(event)
+  GR->>GR: canonicalize identity, authorize, session key
+  GR->>GR: session busy? intercept /stop /new /queue /status
+  GR->>AG: _run_agent with platform toolset under profile scope
+  AG-->>SC: deltas
+  SC->>P: progressively edit one message
+  AG-->>GR: final answer
+  GR->>GR: persist via SessionStore + SessionDB
+</pre>
+</figure>
+<ul>
+<li><strong>Files:</strong> <code>gateway/run.py</code> (<code>GatewayRunner</code>, ~20 mixins), <code>run_inbound.py</code> (<code>_handle_message</code>), <code>run_turn.py</code>, <code>run_busy.py</code>, <code>session.py</code> (<code>build_session_key</code>), <code>stream_consumer.py</code>, <code>platforms/base.py</code>.</li>
+<li><strong>Session key:</strong> <code>&lt;ns&gt;:&lt;platform&gt;:&lt;chat_type&gt;[:scope][:chat_id][:thread][:user]</code>.</li>
+<li><strong>Token locks:</strong> <code>gateway.status.acquire_scoped_lock()</code> stops two profiles from using one bot credential.</li>
+<li><strong>Platforms:</strong> built-in in <code>gateway/platforms/</code> (api_server, webhook, signal, bluebubbles, weixin, whatsapp_cloud, …) and as plugins in <code>plugins/platforms/</code> (telegram, discord, slack, whatsapp, matrix, teams, google_chat, email, sms, …).</li>
+<li><strong>Adding a platform:</strong> prefer the plugin path: <code>plugins/platforms/&lt;name&gt;/plugin.yaml</code> + <code>adapter.py</code> subclassing <code>BasePlatformAdapter</code> and calling <code>ctx.register_platform()</code>. Guide: <code>gateway/platforms/ADDING_A_PLATFORM.md</code>.</li>
+<li><strong>Gateway session hygiene</strong> compresses at a fixed 85% of the window before the agent runs.</li>
+</ul>
+</section>
+
+<!-- 11 -->
+<section class="doc" id="flow-cron">
+<h2><span class="n">11</span>Scheduled jobs (cron)</h2>
+<ol class="steps">
+<li><div><strong>Create:</strong> via CLI <code>hermes cron</code>, the <code>/cron</code> command, the <code>cronjob_manage</code> tool, or REST <code>/api/cron/*</code>. Jobs are stored in <code>&lt;HERMES_HOME&gt;/cron/jobs.json</code> (<code>cron/jobs.py::create_job</code>).</div></li>
+<li><div><strong>Schedule syntax</strong> (<code>parse_schedule</code>): <code>30m</code>, <code>every 2h</code>, <code>every monday 9am</code>, 5-field cron, or an ISO timestamp for one-shots.</div></li>
+<li><div><strong>Tick:</strong> <code>cron/scheduler_tick.py::tick()</code> advances <code>next_run_at</code> <em>before</em> dispatching. One ticker iterates every served profile.</div></li>
+<li><div><strong>Where it runs:</strong> inside the messaging gateway, or inside the desktop's <code>serve</code> backend when <code>HERMES_DESKTOP=1</code> (unless a gateway already owns that profile).</div></li>
+<li><div><strong>Run:</strong> an agent turn with <code>skip_memory=True</code>; inactivity watchdog 600 s; output under <code>cron/output/</code>; delivery to the origin chat or locally.</div></li>
+</ol>
+<p><strong>Kanban</strong> (<code>hermes_cli/kanban*.py</code>, SQLite) is a task board whose dispatcher runs in the gateway every 60 s; tasks auto-block after <code>kanban.failure_limit</code> failures (default 2).</p>
+</section>
+
+<!-- 12 -->
+<section class="doc" id="flow-login">
+<h2><span class="n">12</span>Ask Dealer login &amp; endpoint setup</h2>
+<p>This is the fork's own feature. The goal (spec: <code>ASK_DEALER_LOGIN.md</code>): dealers sign in with Google, then see only chat plus a simple endpoint setup. The spec is explicit that this gate is product UX, not security, because anyone can rebuild an open-source desktop app.</p>
+<h3>What exists today (placeholder)</h3>
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> LoginScreen: app launch ($signedIn = false)
+  LoginScreen --> Chat: Continue with Google (fake) then navigate to /
+  Chat --> CheckEndpoints: gateway open
+  CheckEndpoints --> EndpointPopup: zero custom endpoints
+  CheckEndpoints --> Ready: one or more endpoints
+  EndpointPopup --> Ready: Save (closes popup)
+  EndpointPopup --> Ready: Close without saving (returns next launch)
+  Ready --> [*]
+</pre>
+</figure>
+<div class="table-wrap"><table>
+<thead><tr><th>File</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td><code>src/store/app-login.ts</code></td><td class="wrap"><code>$signedIn = atom(false)</code> and <code>signIn()</code>. In memory only, so every launch starts at login.</td></tr>
+<tr><td><code>src/app/login/login-screen.tsx</code></td><td class="wrap">Full-window mask at <code>z-(--z-setup)</code> with a drag strip. The button calls <code>signIn()</code> then <code>navigate(NEW_CHAT_ROUTE)</code>.</td></tr>
+<tr><td><code>src/app/login/endpoint-setup-dialog.tsx</code></td><td class="wrap">Once the gateway is open, calls <code>getCustomEndpoints()</code>. With zero endpoints it calls <code>dismissFirstRunOnboarding()</code> (so the generic provider picker doesn't stack on top) and opens a dialog hosting <code>&lt;CustomEndpointsSettings bare /&gt;</code>.</td></tr>
+<tr><td><code>src/app/login/ask-dealer-gate.tsx</code></td><td class="wrap"><code>!signedIn ? &lt;LoginScreen/&gt; : &lt;EndpointSetupDialog/&gt;</code>.</td></tr>
+<tr><td><code>src/app/contrib/wiring.tsx</code></td><td class="wrap">Mounts <code>&lt;AskDealerGate enabled={gatewayState === 'open'} …/&gt;</code> next to <code>DesktopOnboardingOverlay</code>, with the shared <code>onConfigSaved</code>/<code>onMainModelChanged</code> callbacks Settings also uses.</td></tr>
+<tr><td><code>src/app/settings/custom-endpoints-settings.tsx</code></td><td class="wrap">Existing form; the fork added a <code>bare</code> prop so it fits inside a dialog.</td></tr>
+<tr><td><code>src/app/login/ask-dealer-gate.test.tsx</code></td><td class="wrap">5 behaviour tests (login → chat route; no check before sign-in; popup with zero endpoints; closed when one exists; waits for the gateway).</td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="label">Gate gaps to know</span>
+<ul>
+<li>Auxiliary windows (secondary session windows, HUD, browser pop-out) skip the gate; Quick Entry, pet overlay and wake windows have separate roots and skip it too.</li>
+<li>Each peer window (Ctrl/Cmd+Shift+N) has its own <code>$signedIn</code> and shows login again.</li>
+<li>The backend boots underneath the login screen; <code>BootFailureOverlay</code> (<code>--z-crash</code>) can paint above it.</li>
+<li>The popup checks <code>endpoints.length</code>; the spec says "no endpoint marked current".</li>
+</ul></div>
+<h3>Planned (not built)</h3>
+<ul>
+<li><strong>Real Google OAuth in Electron main</strong>: <code>electron/google-auth.ts</code> + <code>google-auth-ipc.ts</code>. Authorization Code + PKCE through the system browser with a loopback redirect on <code>127.0.0.1:0</code>; ID-token verification against Google's JWKS; refresh token encrypted with safeStorage in <code>&lt;userData&gt;/ask-dealer-auth.bin</code>; 5-minute timeout; offline grace. Preload exposes <code>hermesDesktop.auth.{getSession, signIn, cancel, signOut, onChange}</code>; tokens never reach React.</li>
+<li><strong>Edition switch</strong>: <code>edition: 'dealer' | 'full'</code> in <code>product-identity.cjs</code> from <code>HERMES_DESKTOP_EDITION</code> (default <code>dealer</code>), passed to the renderer via Vite <code>define</code>; client ID/secret baked into main only, build fails if missing.</li>
+<li><strong>Hiding</strong>: <code>src/lib/edition.ts</code> allow-lists for routes, sidebar, settings sections and the palette/slash filter. Dealers see chat, <code>/endpoint</code>, and a slim Settings (Endpoint, Appearance, Account, About).</li>
+<li><strong>Endpoint UI refactor</strong>: <code>use-custom-endpoints.ts</code> + <code>endpoint-form.tsx</code> with a <code>simple</code> variant (Name, URL, API key, Model; the rest under "Advanced"), a first-run setup screen and an <code>/endpoint</code> page.</li>
+</ul>
+</section>
+
+<!-- 13 -->
+<section class="doc" id="agent-core">
+<h2><span class="n">13</span>Agent core (Python)</h2>
+<h3><code>AIAgent</code> assembly</h3>
+<p><code>run_agent.py::AIAgent</code> is built from mixins (<code>ClientLifecycleMixin</code>, <code>StreamDeliveryMixin</code>, <code>InterruptControlMixin</code>, <code>SessionPersistenceMixin</code>, <code>CompressionFacadeMixin</code>, <code>TurnFacadeMixin</code>, <code>ReasoningParamsMixin</code>, …). Many methods are lazy forwarders (<code>agent/lazy_forward.forward</code>). The constructor takes about 60 keyword arguments and hands them to <code>agent/agent_init.py::init_agent</code>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Constructor group</th><th>Arguments you usually touch</th></tr></thead>
+<tbody>
+<tr><td>Routing</td><td class="wrap"><code>base_url</code>, <code>api_key</code>, <code>provider</code>, <code>api_mode</code>, <code>model</code></td></tr>
+<tr><td>Tools</td><td class="wrap"><code>enabled_toolsets</code>, <code>disabled_toolsets</code></td></tr>
+<tr><td>Session</td><td class="wrap"><code>platform</code>, <code>session_id</code>, <code>session_db</code>, <code>parent_session_id</code>, <code>iteration_budget</code>, <code>run_budget_seconds</code>, <code>max_iterations</code></td></tr>
+<tr><td>Context and memory</td><td class="wrap"><code>skip_context_files</code>, <code>load_soul_identity</code>, <code>skip_memory</code>, <code>skip_background_review</code></td></tr>
+<tr><td>Failover</td><td class="wrap"><code>fallback_model</code>, <code>credential_pool</code></td></tr>
+<tr><td>Callbacks</td><td class="wrap"><code>stream_delta_callback</code>, <code>tool_progress_callback</code>, <code>clarify_callback</code>, <code>status_callback</code>, <code>step_callback</code>, <code>reasoning_callback</code></td></tr>
+</tbody></table></div>
+<p><strong><code>init_agent</code> phases, in order:</strong> resolve API mode → finalize routing → prompt-cache config → build client → fallback chain → load tools → session state → memory → apply <code>agent:</code> config → compression config → context length → context engine (and its tools) → usage state → snapshot primary runtime.</p>
+<p><strong>Entry points:</strong> <code>chat(message) -&gt; str</code> and <code>run_conversation(user_message, system_message=None, conversation_history=None, task_id=None, …) -&gt; dict</code>.</p>
+<h4>API modes (<code>agent/transports/</code>)</h4>
+<ul>
+<li><code>chat_completions</code>: any OpenAI-compatible endpoint, including custom endpoints.</li>
+<li><code>codex_responses</code>: OpenAI Responses API.</li>
+<li><code>anthropic_messages</code>: native Anthropic (<code>agent/anthropic_adapter.py</code>).</li>
+<li><code>bedrock_converse</code>: AWS Bedrock.</li>
+<li><code>codex_app_server</code>: hands the whole turn to a Codex subprocess.</li>
+</ul>
+</section>
+
+<!-- 14 -->
+<section class="doc" id="prompt">
+<h2><span class="n">14</span>System prompt &amp; caching</h2>
+<p>Assembly: <code>agent/system_prompt.py::build_system_prompt_parts</code>. Content and loaders: <code>agent/prompt_builder.py</code>. The prompt is built in three tiers, ordered from most to least stable so the cacheable prefix is as long as possible.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Tier</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><strong>Stable</strong></td><td class="wrap">Identity (<code>SOUL.md</code> from the profile home, else <code>DEFAULT_AGENT_IDENTITY</code>), agent-help guidance, model/tool guidance (gated per model family), auto-loaded pinned skills.</td></tr>
+<tr><td><strong>Context</strong></td><td class="wrap">Caller's <code>system_message</code>, project context files, worktree snapshot, workspace guidance, platform hints.</td></tr>
+<tr><td><strong>Volatile</strong></td><td class="wrap">Skills index (first), <code>MEMORY.md</code>/<code>USER.md</code> snapshot, external memory block, plugin prompt sections, active-profile line, timestamp, runtime-environment block.</td></tr>
+</tbody></table></div>
+<p>The built prompt is cached on the agent and persisted to <code>sessions.system_prompt</code>. Each later turn restores it byte-for-byte when the runtime still matches, which is what keeps the provider's prefix cache warm.</p>
+<h3>Project context files</h3>
+<p><code>build_context_files_prompt</code> loads <em>one</em> type; the first match wins:</p>
+<ol>
+<li><code>.hermes.md</code> / <code>HERMES.md</code> (nearest, walking up to the git root)</li>
+<li>The <code>AGENTS.md</code> chain from git root down to cwd (<code>AGENTS.override.md</code> wins per directory)</li>
+<li><code>CLAUDE.md</code> (cwd only)</li>
+<li><code>.cursorrules</code> + <code>.cursor/rules/*.mdc</code> (cwd only)</li>
+</ol>
+<p>Each file is security-scanned and capped at 20,000 chars (or 6% of the context window, up to 500K; <code>context_file_max_chars</code> overrides). Subdirectory <code>AGENTS.md</code> files found later are appended to <em>tool results</em> (<code>agent/subdirectory_hints.py</code>), never to the system prompt.</p>
+<h3>What may change mid-conversation</h3>
+<div class="grid-2">
+  <div class="card"><h4>Never</h4><ul><li>System prompt bytes</li><li>Toolsets</li><li>Memory snapshot</li><li>Past messages</li><li>Two same-role messages in a row</li></ul></div>
+  <div class="card"><h4>Allowed channels</h4><ul><li>Skill slash commands inject a user message</li><li><code>pre_llm_call</code> plugin context and memory prefetch ride the current user message (<code>api_content</code> sidecar)</li><li>Surface-switch notes on the user channel</li><li>Prefills added at API-call time only</li></ul></div>
+</div>
+<p>Memory written mid-session goes to disk but doesn't change the prompt until the next session. The prompt is rebuilt only after compression (<code>invalidate_system_prompt</code>).</p>
+<h3>Anthropic prompt caching</h3>
+<p><code>agent/prompt_caching.py</code> places four <code>cache_control</code> breakpoints: after the static prefix, at the end of the system prompt, and on the last two messages. TTL from <code>prompt_caching.cache_ttl</code> (<code>5m</code> default, <code>1h</code>, or <code>auto</code>). A rotation-stable <code>prompt_cache_key</code> comes from <code>agent/prompt_cache_scope.py</code>.</p>
+</section>
+
+<!-- 15 -->
+<section class="doc" id="compression">
+<h2><span class="n">15</span>Context compression</h2>
+<h4>When it triggers</h4>
+<ol>
+<li>Turn start: optional idle compaction (<code>idle_compact_after_seconds</code>), then a preflight threshold check.</li>
+<li>Before each API call (<code>run_preflight_gate</code>).</li>
+<li>After tool results (<code>compress_after_tool_results</code>).</li>
+<li>Provider overflow / 413 (<code>turn_overflow</code>, up to <code>max_compression_attempts</code> = 3).</li>
+<li>Manual <code>/compress</code>.</li>
+<li>Gateway session hygiene at 85%.</li>
+</ol>
+<h4>Thresholds</h4>
+<p><code>compression.threshold</code> defaults to 0.50 of the main model's window; windows under 512K are floored at 0.75. Overrides: <code>threshold_tokens</code>, <code>model_thresholds</code> (substring match). Token counts come from the usage anchor (real provider usage plus an estimate of the delta).</p>
+<h4>What <code>compress()</code> does (<code>agent/context_compressor.py</code>)</h4>
+<ol class="steps">
+<li><div>Prune old tool outputs (&gt;200 chars, outside the tail) to placeholders. No LLM call.</div></li>
+<li><div>Pick boundaries: protect the head, keep a token-budget tail (<code>tail_mode: lean</code>, <code>protect_last_n</code> 20), never split a tool call from its result.</div></li>
+<li><div>Summarize the middle with the <strong>auxiliary</strong> <code>compression</code> model into Goal / Constraints / Progress / Decisions / Files / Next Steps / Critical Context. Later compactions update the previous summary.</div></li>
+<li><div>Assemble head + summary + tail; repair orphaned tool pairs; rebuild the system prompt (the one sanctioned cache break).</div></li>
+</ol>
+<p>With <code>compression.in_place: true</code> (default) the session id stays the same; old rows are soft-archived (<code>active=0, compacted=1</code>). Failures back off 60 s → 300 s → 900 s. A different engine can be plugged in through <code>context.engine</code> and <code>plugins/context_engine/</code>.</p>
+</section>
+
+<!-- 16 -->
+<section class="doc" id="providers">
+<h2><span class="n">16</span>Providers &amp; models</h2>
+<p><code>hermes_cli/runtime_provider.py::resolve_runtime_provider</code> turns config and flags into <code>{provider, api_mode, base_url, api_key, source}</code>. Precedence: explicit CLI/runtime request &gt; <code>config.yaml</code> &gt; env vars &gt; provider defaults. The resolution ladder order is itself behaviour:</p>
+<ol>
+<li>Disabled-provider guard (<code>providers.&lt;name&gt;.enabled: false</code>)</li>
+<li>Shortcuts: <code>moa</code>, Anthropic on Azure, Azure Foundry, Vertex</li>
+<li>Named custom provider / llama.cpp alias</li>
+<li>Local endpoint bypass</li>
+<li><code>auth.resolve_provider</code> and explicit <code>--api-key</code>/<code>--base-url</code></li>
+<li>Credential pool</li>
+<li>OAuth providers (Nous, Codex, xAI, Qwen), external process, Anthropic env, Bedrock, registry API-key providers</li>
+<li>OpenRouter / bare custom fallback</li>
+</ol>
+<h3>Config keys</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>model.default</code>, <code>model.provider</code>, <code>model.base_url</code>, <code>model.context_length</code>, <code>model.streaming</code></td><td class="wrap">Main model routing.</td></tr>
+<tr><td><code>providers:</code></td><td class="wrap">Named custom providers (<code>base_url</code>, <code>api_key: ${ENV}</code>, <code>api_mode</code>, <code>extra_body</code>, <code>enabled</code>). <strong>The desktop Custom Endpoints form writes here</strong> via <code>/api/providers/custom-endpoints</code>; keys go to <code>.env</code> as <code>HERMES_CUSTOM_&lt;SLUG&gt;_API_KEY</code>. Legacy <code>custom_providers</code> list is still read.</td></tr>
+<tr><td><code>fallback_providers: [{provider, model}]</code></td><td class="wrap">Fallback chain walked by <code>try_activate_fallback</code>; restored to primary next turn.</td></tr>
+<tr><td><code>auxiliary.&lt;task&gt;</code></td><td class="wrap">Side-LLM per task: <code>vision</code>, <code>compression</code>, <code>title_generation</code>, <code>approval</code>, <code>curator</code>, <code>background_review</code>, <code>mcp</code>, … Routed by <code>agent/auxiliary_client.py</code> (<code>call_llm</code>).</td></tr>
+<tr><td><code>delegation.{model, provider, base_url}</code></td><td class="wrap">Model for subagents.</td></tr>
+</tbody></table></div>
+<h3>Provider profiles</h3>
+<p><code>providers/__init__.py</code> (<code>register_provider</code>, <code>get_provider_profile</code>) lazily discovers profiles from <code>plugins/model-providers/&lt;name&gt;/</code> (41 bundled), then <code>$HERMES_HOME/plugins/model-providers/</code> (user wins), then pip entry points. A profile is <code>plugin.yaml</code> (<code>kind: model-provider</code>) plus <code>__init__.py</code> registering a <code>ProviderProfile</code> dataclass (<code>providers/base.py</code>): name, api_mode, env vars, base URL, auth type, capabilities, default headers, hooks like <code>build_api_kwargs_extras</code> and <code>classify_api_error</code>. Context lengths and capabilities: <code>agent/model_metadata.py</code>.</p>
+</section>
+
+<!-- 17 -->
+<section class="doc" id="tools">
+<h2><span class="n">17</span>Tools, approvals, delegation</h2>
+<h3>Registry</h3>
+<p><code>tools/registry.py::discover_builtin_tools</code> finds every <code>tools/*.py</code> with a top-level <code>registry.register(...)</code> (by AST) and imports it. A tool is exposed to the model only if a toolset names it.</p>
+<pre><code>from agent.secret_scope import get_secret
+from tools.registry import registry
+
+def check_requirements() -&gt; bool:
+    return bool(get_secret("EXAMPLE_API_KEY"))
+
+def example_tool(param: str, task_id: str = None) -&gt; str:
+    return json.dumps({"success": True})
+
+registry.register(
+    name="example_tool", toolset="example",
+    schema={"name": "example_tool", "description": "...", "parameters": {...}},
+    handler=lambda args, **kw: example_tool(param=args.get("param", ""), task_id=kw.get("task_id")),
+    check_fn=check_requirements, requires_env=["EXAMPLE_API_KEY"])</code></pre>
+<ul>
+<li><strong><code>check_fn</code></strong> answers "is this reachable / opted in for this profile". Results are cached for 30 s per home. Read secrets with <code>get_secret</code>, never <code>os.getenv</code>. It must never answer "which surface is this session on"; GUI-only tools go in session-scoped toolsets instead.</li>
+<li><strong>Handlers</strong> return a JSON string, or a multimodal envelope <code>{"_multimodal": True, "content": [...], "text_summary": str}</code>.</li>
+<li><strong>Toolsets</strong> (<code>toolsets.py</code>): <code>_HERMES_CORE_TOOLS</code> (web search/extract, terminal, files, vision, image generation, skills, browser, TTS, todo, memory, session search, clarify, execute_code, delegate_task, cron, kanban, computer use…) and platform bundles (<code>hermes-cli</code>, <code>hermes-telegram</code>, …). Per-platform overrides: <code>hermes tools</code> or <code>platform_toolsets</code> in config.</li>
+<li><strong>Agent-level tools</strong> that need agent state (memory, todo, delegate, clarify, session search) live in <code>agent/inline_tool_executors.py::INLINE_TOOL_EXECUTORS</code>.</li>
+<li><strong>Prefer a plugin</strong> (<code>ctx.register_tool</code>) over editing core for new tools.</li>
+</ul>
+<h3>Execution backends</h3>
+<p><code>tools/environments/</code>: <code>local</code> (default), <code>docker</code>, <code>ssh</code>, <code>modal</code>, <code>daytona</code>, <code>singularity</code>, <code>vercel_sandbox</code>, plus plugin backends. Selected by <code>terminal.backend</code>. Every subprocess environment must come from <code>environments/local.py::build_subprocess_env</code> or <code>served_profile_child_env</code>.</p>
+<h3>Approvals</h3>
+<p><code>tools/approval.py::check_all_command_guards</code>, in order:</p>
+<ol>
+<li>Container backends skip guards (except the user deny list)</li>
+<li>Hardline floor patterns (always blocked)</li>
+<li><code>approvals.mode</code>: <code>smart</code> (default; an auxiliary LLM judges risk), <code>manual</code>, or <code>off</code>; and <code>/yolo</code> per session</li>
+<li>Permanent allowlist</li>
+<li>Dangerous patterns → prompt the user (CLI prompt or the <code>approval</code> server request)</li>
+</ol>
+<p>Config <code>approvals.*</code>: <code>timeout</code> 300, <code>cron_mode</code>/<code>unattended_mode</code> = <code>deny</code>, <code>deny</code> globs that block even under yolo.</p>
+<h3>Delegation (subagents)</h3>
+<p><code>tools/delegate_tool.py</code> spawns child <code>AIAgent</code>s with a fresh context and a focused prompt. Children can't use <code>delegate_task</code>, <code>clarify</code>, <code>memory</code>, <code>send_message</code>, <code>cronjob_manage</code>, <code>start_chat</code>. Defaults (<code>config_defaults.py</code>): <code>delegation.max_iterations</code> 250, <code>max_concurrent_children</code> 10, <code>max_spawn_depth</code> 1. <code>background=true</code> returns results asynchronously.</p>
+<h3>Major tools</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Tool area</th><th>File</th></tr></thead>
+<tbody>
+<tr><td>Terminal</td><td><code>tools/terminal_tool.py</code> + <code>terminal_tool_*</code></td></tr>
+<tr><td>Files</td><td><code>tools/file_tools.py</code>, <code>file_operations*.py</code></td></tr>
+<tr><td>Web search / extract</td><td><code>tools/web_tools.py</code>; vendors in <code>plugins/web/</code> (<code>web.backend</code>)</td></tr>
+<tr><td>Browser</td><td><code>tools/browser_tool.py</code>; Browserbase/Browser Use/Firecrawl in <code>plugins/browser/</code></td></tr>
+<tr><td>Code execution</td><td><code>tools/code_execution_tool.py</code> (persistent kernel; iterations refunded)</td></tr>
+<tr><td>MCP client</td><td><code>tools/mcp_tool.py</code> + <code>mcp_tool_*</code></td></tr>
+<tr><td>Tool search</td><td><code>tools/tool_search.py</code> (<code>tool_search</code>/<code>tool_describe</code>/<code>tool_call</code>)</td></tr>
+<tr><td>Checkpoints</td><td><code>tools/checkpoint_manager.py</code> (shadow git store, not a tool)</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 18 -->
+<section class="doc" id="memory">
+<h2><span class="n">18</span>Memory, skills, persona</h2>
+<h3>Built-in memory</h3>
+<p><code>tools/memory_tool.py</code> + <code>memory_tool_store.py</code> store two files in <code>&lt;HERMES_HOME&gt;/memories/</code>: <code>MEMORY.md</code> (agent notes, 2,200-char limit) and <code>USER.md</code> (user profile, 1,375). They are snapshotted into the prompt at session start. A background review (<code>agent/background_review.py</code>) can update memory and skills after a turn when the nudge interval fires (<code>memory.nudge_interval</code> 10).</p>
+<p><strong>External memory providers</strong> implement <code>agent/memory_provider.py::MemoryProvider</code>; <code>MemoryManager</code> runs the built-in store plus at most one external provider (<code>memory.provider</code>). In-tree: <code>plugins/memory/{byterover, holographic, retaindb}</code>.</p>
+<h3>Skills</h3>
+<ul>
+<li>A skill is a folder with <code>SKILL.md</code> (frontmatter: <code>name</code>, <code>description</code> ≤ 60 chars, <code>version</code>, <code>platforms</code>, <code>prerequisites</code>, <code>metadata.hermes.{tags, category, related_skills, config, requires_toolsets…}</code>) plus scripts and templates.</li>
+<li><code>skills/</code> is synced into <code>&lt;HERMES_HOME&gt;/skills/</code> by <code>tools/skills_sync.py</code> (user edits preserved). <code>optional-skills/</code> install on demand (<code>hermes skills install</code>).</li>
+<li>The model sees a <strong>skills index</strong> in the prompt; it loads details with <code>skills_list</code>/<code>skill_view</code> and edits with <code>skill_manage</code>. <code>/skill-name</code> injects the skill as a user message.</li>
+<li>The <strong>curator</strong> (<code>agent/curator.py</code>) archives stale agent-created skills to <code>skills/.archive/</code> (never deletes; pinned skills exempt).</li>
+</ul>
+<h3>Persona (Gideon)</h3>
+<p>The identity is the first thing in the stable tier. Sources, in priority order:</p>
+<ol>
+<li><code>&lt;HERMES_HOME&gt;/SOUL.md</code> for the active profile (replaces the default identity entirely)</li>
+<li><code>agent/prompt_builder.py::DEFAULT_AGENT_IDENTITY</code>: "You are Gideon, Acme Corp's private AI assistant. Never refer to yourself as Hermes or Hermes Agent. Be direct…"</li>
+</ol>
+<p><code>hermes_cli/default_soul.py::DEFAULT_SOUL_MD</code> seeds <code>SOUL.md</code> on first run. The repo-root <code>SOUL.md</code> holds the behaviour spec with the Gideon opener.</p>
+<h3>The PDF skill (fork)</h3>
+<p><code>skills/productivity/pdf/</code> v2.0.0 generates designed reports with ReportLab. <code>scripts/pdf_create.py</code> takes a JSON spec of elements (title, heading, paragraph, bullets, callout, metrics, chart, table, image, spacer, pagebreak), offers three themes (<code>corporate</code> default, <code>modern</code>, <code>classic</code>), status-coloured KPI cards (red first), bar/line/pie charts, auto-sized wrapping tables, and <code>--preview DIR</code> to render PNGs for a required visual QA loop. Templates: <code>department_daily_report.json</code> (dealership service KPIs, placeholder data) and <code>general_report.json</code>.</p>
+</section>
+
+<!-- 19 -->
+<section class="doc" id="storage">
+<h2><span class="n">19</span>Sessions, home, profiles</h2>
+<h3><code>SessionDB</code> (<code>state.db</code>)</h3>
+<p><code>hermes_state.py::SessionDB</code> is a facade over SQLite (WAL mode) built from mixins in <code>hermes_state_*.py</code>. Schema in <code>hermes_state_common.SCHEMA_SQL</code>, <code>SCHEMA_VERSION = 31</code>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Table</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>sessions</code></td><td class="wrap">One row per conversation, including the persisted <code>system_prompt</code>. Ids look like <code>YYYYMMDD_HHMMSS_&lt;hex&gt;</code>.</td></tr>
+<tr><td><code>messages</code></td><td class="wrap">Transcript rows; <code>active</code>/<code>compacted</code> for compaction generations, <code>api_content</code> (exact bytes sent, for cache-stable replay), reasoning sidecars.</td></tr>
+<tr><td><code>messages_fts</code>, <code>_trigram</code>, <code>_cjk</code></td><td class="wrap">FTS5 search indexes (<code>session_search</code> tool makes no LLM calls). CJK tokenizer in <code>native/fts5_cjk/</code>.</td></tr>
+<tr><td><code>session_turn_leases</code>, <code>compression_locks</code></td><td class="wrap">Cross-process coordination.</td></tr>
+<tr><td><code>gateway_routing</code>, <code>gateway_heartbeats</code>, <code>async_delegations</code>, <code>session_model_usage</code>, <code>system_prompts</code>, <code>state_meta</code></td><td class="wrap">Gateway state, background subagents, usage accounting.</td></tr>
+</tbody></table></div>
+<h3>Home and profiles</h3>
+<ul>
+<li><code>get_hermes_home()</code> resolves: context-local override → <code>HERMES_HOME</code> → platform default (<code>~/.hermes</code>; Windows <code>%LOCALAPPDATA%\hermes</code>).</li>
+<li>A profile is an isolated home at <code>&lt;root&gt;/profiles/&lt;name&gt;/</code> with its own <code>config.yaml</code>, <code>.env</code>, <code>state.db</code>, <code>SOUL.md</code>, <code>skills/</code>, <code>memories/</code>, <code>logs/</code>. Profiles are islands on purpose; <code>--clone</code> copies one but strips messaging channels.</li>
+<li>Choose a profile with <code>hermes -p &lt;name&gt;</code> or the sticky <code>active_profile</code> file.</li>
+<li>One process (gateway, <code>serve</code>) can serve several profiles: it binds a context-local home override per activity. <code>agent.secret_scope.get_secret</code> fails closed once multiplex mode is active.</li>
+</ul>
+</section>
+
+<!-- 20 -->
+<section class="doc" id="plugins">
+<h2><span class="n">20</span>Plugins</h2>
+<p>A plugin is a folder with <code>plugin.yaml</code> and an <code>__init__.py</code> exposing <code>register(ctx)</code>. <code>hermes_cli/plugins.py::PluginManager</code> discovers them from bundled <code>plugins/</code>, <code>&lt;HERMES_HOME&gt;/plugins/</code>, <code>./.hermes/plugins/</code> (only with <code>HERMES_ENABLE_PROJECT_PLUGINS</code>), and pip entry points. General plugins are opt-in via <code>plugins.enabled</code>.</p>
+<h4>What <code>ctx</code> can register</h4>
+<p class="small">Tools, hooks, middleware, CLI commands, slash commands, context engines, memory providers, system prompt sections, skills, auxiliary tasks, messaging platforms, locales, redaction patterns, approval transports, dashboard auth providers, automation blueprints, and scoped providers for image/video generation, web search, browser, terminal environments, secret sources, TTS and transcription.</p>
+<h4>Hooks</h4>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Hooks</th></tr></thead>
+<tbody>
+<tr><td>Tool</td><td class="wrap"><code>pre_tool_call</code>, <code>post_tool_call</code>, <code>transform_tool_result</code>, <code>transform_terminal_output</code></td></tr>
+<tr><td>LLM</td><td class="wrap"><code>pre_llm_call</code>, <code>post_llm_call</code>, <code>transform_llm_output</code>, <code>pre_api_request</code>, <code>post_api_request</code>, <code>api_request_error</code>, <code>pre/post_auxiliary_call</code>, <code>transform_api_error_classification</code></td></tr>
+<tr><td>Session</td><td class="wrap"><code>on_session_start/end/finalize/reset</code>, <code>subagent_start/stop</code></td></tr>
+<tr><td>Other</td><td class="wrap"><code>on_stream_*</code>, <code>pre_verify</code>, gateway dispatch, approvals, kanban, <code>pre_transcription</code></td></tr>
+</tbody></table></div>
+<h4>Bundled plugin folders</h4>
+<div class="table-wrap"><table>
+<thead><tr><th>Folder</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><code>model-providers/</code></td><td class="wrap">~40 provider profiles: anthropic, openrouter, openai-codex, bedrock, vertex, gemini, nous, ollama-cloud, lmstudio, deepseek, xai, zai, qwen-oauth, copilot, custom, router…</td></tr>
+<tr><td><code>platforms/</code></td><td class="wrap">Messaging adapters: telegram, discord, slack, whatsapp, matrix, mattermost, teams, google_chat, email, sms, line, irc, feishu, dingtalk, wecom…</td></tr>
+<tr><td><code>web/</code>, <code>browser/</code></td><td class="wrap">Search backends (brave, ddgs, exa, firecrawl, tavily, searxng, perplexity…); browser providers (browser_use, browserbase, firecrawl).</td></tr>
+<tr><td><code>image_gen/</code>, <code>video_gen/</code></td><td class="wrap">fal, openai, openrouter, xai, deepinfra, krea…</td></tr>
+<tr><td><code>memory/</code>, <code>context_engine/</code></td><td class="wrap">External memory providers; alternative compression engines.</td></tr>
+<tr><td>Other</td><td class="wrap"><code>kanban</code>, <code>observability/langfuse</code>, <code>dashboard_auth</code>, <code>cron_providers</code>, <code>computer_use</code>, <code>google_meet</code>, <code>spotify</code>, <code>disk-cleanup</code>, <code>security-guidance</code></td></tr>
+</tbody></table></div>
+<p>Policy: plugins never modify core files; new third-party plugins go into <code>plugin-catalog/*.yaml</code> with a pinned SHA, not into the core tree. <code>plugins.isolation: host</code> runs non-bundled plugins in a separate per-profile process.</p>
+</section>
+
+<!-- 21 -->
+<section class="doc" id="serve">
+<h2><span class="n">21</span><code>hermes serve</code> backend</h2>
+<p><code>hermes serve</code> and <code>hermes dashboard</code> both run <code>cmd_dashboard</code> → <code>hermes_cli/web_server.py::start_server</code>, a FastAPI app on uvicorn. <code>serve</code> is <strong>headless</strong>: it never serves the SPA (<code>HERMES_SERVE_HEADLESS=1</code>), only REST, WebSocket and JSON-RPC.</p>
+<ul>
+<li><strong>Flags:</strong> <code>--host 127.0.0.1</code>, <code>--port 9119</code> (0 = OS picks), <code>--stop</code>, <code>--status</code>.</li>
+<li><strong>Ready signal:</strong> prints <code>HERMES_BACKEND_READY port=&lt;n&gt;</code> (and legacy <code>HERMES_DASHBOARD_READY</code>) on stdout.</li>
+<li><strong>Lifespan:</strong> state.db reconcile, cron ticker when <code>HERMES_DESKTOP=1</code>, deferred MCP discovery, parent-death watchdog (<code>HERMES_PARENT_PID</code>).</li>
+<li><strong>Auth:</strong> session token from <code>HERMES_DASHBOARD_SESSION_TOKEN</code> (or random). REST sends header <code>X-Hermes-Session-Token</code>; WebSockets use <code>?token=</code>. Public binds need an auth provider (password or Nous OAuth) from <code>hermes_cli/dashboard_auth/</code>. WebSocket close codes: 4401 auth, 4403 host/origin, 4404 chat disabled.</li>
+</ul>
+<h3>REST route groups (<code>hermes_cli/web_routers/</code>)</h3>
+<p>Most routes accept <code>?profile=</code> to target one profile.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Router</th><th>Main routes</th></tr></thead>
+<tbody>
+<tr><td><code>config_env.py</code></td><td class="wrap"><code>/api/config</code> (+ <code>/defaults</code>, <code>/schema</code>), <code>/api/env</code> (+ <code>/reveal</code>); <strong>custom endpoints</strong>: <code>GET/POST /api/providers/custom-endpoints</code>, <code>POST …/validate</code>, <code>POST …/{id}/activate</code>, <code>DELETE …/{id}</code>; <code>/api/providers/validate</code></td></tr>
+<tr><td><code>models.py</code></td><td class="wrap"><code>/api/model/info</code>, <code>/options</code>, <code>/recommended-default</code>, <code>/auxiliary</code>, <code>POST /api/model/set</code></td></tr>
+<tr><td><code>oauth.py</code></td><td class="wrap"><code>/api/providers/oauth</code> start / submit / poll / delete</td></tr>
+<tr><td><code>sessions.py</code></td><td class="wrap"><code>/api/sessions</code> list, search, messages, timeline, export, import, delete, prune</td></tr>
+<tr><td><code>profiles.py</code></td><td class="wrap"><code>/api/profiles</code> CRUD, <code>/active</code>, <code>/{name}/soul</code>, export/import</td></tr>
+<tr><td><code>actions.py</code>, <code>ops.py</code></td><td class="wrap">Gateway start/stop/restart, updates, pairing, webhooks, memory, doctor, backup, checkpoints</td></tr>
+<tr><td><code>cron.py</code></td><td class="wrap"><code>/api/cron/jobs</code> CRUD, runs, pause/resume/trigger</td></tr>
+<tr><td><code>mcp.py</code>, <code>skills.py</code>, <code>tools.py</code>, <code>dashboard_ui.py</code></td><td class="wrap">MCP servers and catalog, skills and hub, toolsets and terminal backends, plugins and themes</td></tr>
+<tr><td><code>messaging.py</code></td><td class="wrap">Platform setup and tests</td></tr>
+<tr><td><code>status.py</code></td><td class="wrap"><code>/api/health</code>, <code>/api/status</code>, <code>/api/logs</code>, curator, learning</td></tr>
+<tr><td><code>files.py</code>, <code>git.py</code></td><td class="wrap">Files, media, git review/worktrees/PRs</td></tr>
+<tr><td><code>chat_ws.py</code></td><td class="wrap">WebSockets: <code>/api/ws</code> (JSON-RPC), <code>/api/pty</code> (real TUI), <code>/api/pub</code> + <code>/api/events</code>, <code>/api/console</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 22 -->
+<section class="doc" id="rpc">
+<h2><span class="n">22</span>JSON-RPC gateway (<code>tui_gateway/</code>)</h2>
+<p>One dispatcher serves the TUI (newline-delimited JSON-RPC over stdio, <code>python -m tui_gateway.entry</code>) and the desktop/dashboard (WebSocket <code>/api/ws</code>). Facade <code>tui_gateway/server.py</code>; routing <code>rpc_dispatch.py</code>; handlers in <code>methods_*.py</code> registered with <code>@method</code> and <code>@_profile_scoped</code>.</p>
+<p><strong>Wire contract:</strong> Pydantic models in <code>tui_gateway/contracts/*.py</code> (<code>extra="forbid"</code>). <code>scripts/gen_gateway_contracts.py</code> generates <code>apps/shared/src/gateway-contract.generated.ts</code> and <code>gateway-contract.openrpc.json</code>; a test fails when they are stale. Unknown params → error 4000; bad session → 4001.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Area</th><th>Methods (about 190 in total)</th></tr></thead>
+<tbody>
+<tr><td>Session</td><td class="wrap"><code>session.create/list/resume/activate/close/delete/history/title/undo/branch/compress/interrupt/steer/status/usage</code></td></tr>
+<tr><td>Prompt</td><td class="wrap"><code>prompt.submit</code>, <code>prompt.background</code>, <code>prompt.btw</code>, <code>image.attach</code>, <code>file.attach</code>, <code>pdf.attach</code></td></tr>
+<tr><td>Commands</td><td class="wrap"><code>commands.catalog</code>, <code>complete.slash</code>, <code>complete.path</code>, <code>slash.exec</code>, <code>command.dispatch</code>, <code>shell.exec</code></td></tr>
+<tr><td>Config / model</td><td class="wrap"><code>config.get</code>, <code>config.set</code>, <code>model.options</code>, <code>model.save_key</code></td></tr>
+<tr><td>Profiles</td><td class="wrap"><code>profiles.list/create/configure/describe</code> (reports each bot's <code>canonical_session</code>)</td></tr>
+<tr><td>Extensions</td><td class="wrap"><code>tools.*</code>, <code>toolsets.list</code>, <code>skills.manage</code>, <code>plugins.manage</code>, <code>mcp.catalog</code>, <code>cron.manage</code>, <code>subagent.*</code></td></tr>
+<tr><td>Other</td><td class="wrap"><code>approval.*</code>, <code>connectors.*</code>, <code>vault.*</code>, <code>voice.*</code>, <code>browser.*</code>, <code>onboarding.*</code>, <code>free_tier.*</code>, <code>client.capabilities</code>, <code>ping</code></td></tr>
+</tbody></table></div>
+<h4>Events (server → client)</h4>
+<p class="small"><code>gateway.ready</code>, <code>message.start</code>, <code>message.delta</code>, <code>message.interim</code>, <code>message.complete</code>, <code>reasoning.delta</code>, <code>thinking.delta</code>, <code>tool.start</code>, <code>tool.generating</code>, <code>tool.complete</code>, <code>todo.updated</code>, <code>status.update</code>, <code>session.usage</code>, <code>session.title</code>, <code>notification.show</code>, <code>error</code>, <code>background.complete</code>, <code>cron.changed</code>, <code>sessions.changed</code>, <code>voice.*</code>, <code>browser.*</code>.</p>
+<h4>Server → client requests</h4>
+<p class="small"><code>approval</code>, <code>clarify</code>, <code>sudo</code>, <code>secret</code>, <code>setup_choose</code>, <code>vault.*</code>, <code>terminal.read</code>, <code>preview.read</code>, <code>window.read</code>, <code>preview.act</code>, <code>tour</code>. Ids look like <code>srq-&lt;n&gt;</code>; they block the agent thread until answered. A client must send <code>client.capabilities {server_requests: true}</code> once per connection.</p>
+</section>
+
+<!-- 23 -->
+<section class="doc" id="cli">
+<h2><span class="n">23</span>CLI &amp; configuration</h2>
+<h3>Entry points (<code>pyproject.toml</code>)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Command</th><th>Target</th></tr></thead>
+<tbody>
+<tr><td><code>hermes</code></td><td><code>hermes_cli.main:main</code></td></tr>
+<tr><td><code>hermes-agent</code></td><td><code>agent.legacy_cli:main</code></td></tr>
+<tr><td><code>hermes-acp</code></td><td><code>acp_adapter.entry:main</code> (Agent Client Protocol for editors)</td></tr>
+</tbody></table></div>
+<h3>Startup of <code>hermes</code></h3>
+<ol class="steps">
+<li><div>At import: <code>_apply_profile_override()</code> reads <code>-p/--profile</code> (or the sticky <code>active_profile</code>) and sets <code>HERMES_HOME</code>; <code>hermes pm …</code> short-circuits before app imports.</div></li>
+<li><div><code>load_hermes_dotenv()</code> loads <code>&lt;HERMES_HOME&gt;/.env</code>.</div></li>
+<li><div><code>main()</code>: UTF-8 stdio, OS trust store, runtime checks, fast paths (<code>serve</code> on every desktop cold start, chat), build the argparse tree, run the subcommand. No subcommand means <code>cmd_chat</code>.</div></li>
+</ol>
+<p><strong>Subcommands</strong> live in <code>hermes_cli/subcommands/&lt;group&gt;.py</code>: chat, model, fallback, gateway, setup, login/logout, cron, webhook, doctor, config, skills, plugins, mcp, memory, tools, sessions, profile, update, dashboard, serve, desktop, logs, pm, and more.</p>
+<h3>Slash commands</h3>
+<p>Declared once as a <code>CommandDef</code> in <code>hermes_cli/commands.py</code> (name, description, category, aliases, <code>cli_only</code>, <code>gateway_only</code>, <code>busy_policy</code>, <code>desktop=</code>). The <code>desktop=</code> disposition (<code>None</code> = offered; <code>"hidden"</code>; or a reason like <code>terminal</code>, <code>advanced</code>, <code>messaging</code>, <code>settings</code>) drives the desktop palette. <code>scripts/dump_desktop_slash_registry.py</code> regenerates <code>apps/desktop/src/lib/desktop-slash-registry.json</code>; drift fails both pytest and vitest. CLI dispatch uses the <code>_SLASH_DISPATCH</code> table in <code>cli.py</code>; the gateway uses <code>_handle_&lt;name&gt;_command</code> mixins in <code>gateway/slash_commands_*.py</code>.</p>
+<h3>Configuration</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Loader</th><th>Used by</th><th>Behaviour</th></tr></thead>
+<tbody>
+<tr><td><code>load_cli_config()</code></td><td>Classic CLI</td><td class="wrap">CLI defaults + YAML</td></tr>
+<tr><td><code>hermes_cli.config.load_config()</code></td><td>Subcommands, setup</td><td class="wrap"><code>DEFAULT_CONFIG</code> deep-merged with the user file, cached</td></tr>
+<tr><td><code>config_effective.load_user_config_effective()</code></td><td>Gateway, TUI gateway, cron, doctor</td><td class="wrap">Raw user file + managed overlay + <code>${VAR}</code> expansion, <strong>no defaults</strong></td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="label">Classic bug</span><p>Using the wrong loader is how "the CLI sees a key but the gateway doesn't" happens. Defaults live in <code>hermes_cli/config_defaults.py::DEFAULT_CONFIG</code> (<code>_config_version: 50</code>); a new top-level key also goes into <code>_KNOWN_ROOT_KEYS</code>.</p></div>
+<ul>
+<li><strong>Writes</strong> go through <code>atomic_config_write</code> / <code>atomic_config_replace</code> (comments preserved via ruamel). Plain <code>yaml.dump</code> on a config path is rejected by a check script.</li>
+<li><strong><code>.env</code></strong> (secrets only): <code>save_env_value</code>, <code>remove_env_value</code>; keys must be registered in <code>OPTIONAL_ENV_VARS</code>.</li>
+<li><strong>Setup wizard:</strong> <code>hermes_cli/setup.py::run_setup_wizard</code>, sections <code>model</code>, <code>tts</code>, <code>terminal</code>, <code>gateway</code>, <code>tools</code>, <code>telemetry</code>, <code>agent</code>.</li>
+<li><strong>Update:</strong> <code>hermes update</code> is transactional (plan → snapshot → apply → restart → verify). Never remove names from <code>update_handoff.py</code> / <code>update_serve_obligations.py</code> (frozen compat surface).</li>
+</ul>
+</section>
+
+<!-- 24 -->
+<section class="doc" id="electron">
+<h2><span class="n">24</span>Desktop: Electron main</h2>
+<p><code>electron/main.ts</code> is a ~19.8k-line monolith with about 131 inline IPC handlers; most logic lives in ~250 pure sibling modules, each with a <code>.test.ts</code>. Find a topic by its module name first.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Concern</th><th>Modules</th></tr></thead>
+<tbody>
+<tr><td>Identity</td><td class="wrap"><code>product-identity.ts</code> (reads <code>product-identity.cjs</code>)</td></tr>
+<tr><td>Backend spawn and readiness</td><td class="wrap"><code>backend-command.ts</code>, <code>backend-serve-support.ts</code>, <code>backend-resolution.ts</code>, <code>backend-env.ts</code>, <code>backend-ready.ts</code>, <code>backend-health.ts</code>, <code>backend-claim.ts</code>, <code>payload-backend.ts</code></td></tr>
+<tr><td>Pool and recovery</td><td class="wrap"><code>pool-limits.ts</code>, <code>pool-retire.ts</code>, <code>pool-stop.ts</code>, <code>pool-spawn-coordinator.ts</code>, <code>backend-recycle.ts</code>, <code>backend-exit-recovery.ts</code></td></tr>
+<tr><td>First-run install</td><td class="wrap"><code>bootstrap-runner.ts</code>, <code>bootstrap-state.ts</code>, <code>bootstrap-*.ts</code></td></tr>
+<tr><td>Connections (local, SSH, URL+token, Cloud, OAuth)</td><td class="wrap"><code>connection-config.ts</code>, <code>connection-registry.ts</code>, <code>ssh-connection.ts</code>, <code>cloud-discovery.ts</code>, <code>remote-oauth-ticket.ts</code>, <code>native-oauth*.ts</code>, <code>oauth-partition.ts</code>, <code>desktop-remote-route.ts</code></td></tr>
+<tr><td>Windows</td><td class="wrap"><code>session-windows.ts</code>, <code>hud-*.ts</code>, <code>quick-entry.ts</code>, <code>browser-windows.ts</code>, <code>pet-overlay.ts</code>, <code>wake-indicator-window.ts</code></td></tr>
+<tr><td>Native capabilities</td><td class="wrap"><code>terminal-ipc.ts</code> (node-pty), fs and git registrars, <code>notification-ipc.ts</code>, <code>external-open.ts</code></td></tr>
+<tr><td>Updates</td><td class="wrap"><code>updater/mac*.ts</code> (electron-updater), <code>app-updater.ts</code> (Windows App Installer), <code>updater/store*.ts</code>, <code>update-gate.ts</code>, <code>update-feed.cjs</code></td></tr>
+<tr><td>Tray and quit</td><td class="wrap"><code>minimize-to-tray.ts</code>, <code>tray-host.ts</code>, <code>quit-guard.ts</code></td></tr>
+<tr><td>Security</td><td class="wrap"><code>window-open-policy.ts</code>, <code>hardening.ts</code>, preview guest preload (<code>preview-guest-preload-entry.ts</code>)</td></tr>
+</tbody></table></div>
+<h3>The <code>window.hermesDesktop</code> bridge (<code>electron/preload.ts</code>)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td>Connection and backend</td><td class="wrap"><code>getConnection</code>, <code>getGatewayWsUrl(For)</code>, <code>touchBackend</code>, <code>recycleBackend</code>, <code>getBootProgress</code>, <code>onBackendExit</code></td></tr>
+<tr><td>REST proxy</td><td class="wrap"><code>api(request)</code> → IPC <code>hermes:api</code></td></tr>
+<tr><td>Connections config</td><td class="wrap"><code>connections.*</code>, <code>getConnectionConfig</code>, <code>oauthLoginConnectionConfig</code>, <code>cloud.*</code></td></tr>
+<tr><td>Bootstrap</td><td class="wrap"><code>getBootstrapState</code>, <code>repairBootstrap</code>, <code>onBootstrapEvent</code></td></tr>
+<tr><td>Windows</td><td class="wrap"><code>openSessionWindow</code>, <code>openBrowserWindow</code>, <code>hud</code>, <code>quickEntry</code>, <code>windowControls</code>, <code>zoom</code></td></tr>
+<tr><td>Files, git, terminal</td><td class="wrap"><code>readDir</code>, <code>readFileText</code>, <code>writeTextFile</code>, <code>selectPaths</code>, <code>watchDirectory</code>, <code>git.*</code>, <code>terminal.*</code></td></tr>
+<tr><td>Preview and links</td><td class="wrap"><code>openExternal</code>, <code>capturePreview</code>, <code>fetchLinkTitle</code></td></tr>
+<tr><td>App</td><td class="wrap"><code>updates.*</code>, <code>getVersion</code>, <code>relaunchApp</code>, <code>uninstall.*</code>, <code>notify</code>, <code>setActiveWork</code></td></tr>
+</tbody></table></div>
+<h3>Window kinds</h3>
+<p>The renderer picks its root from the <code>?win=</code> query: main window (<code>ContribController</code>), session/peer windows, <code>hud</code> (floating chat bar), <code>quick</code> (global hotkey entry), <code>browser</code> (pop-out), <code>overlay</code> (pet), <code>wake</code> (wake-word indicator).</p>
+<h3>Security model</h3>
+<ul>
+<li><code>setWindowOpenHandler</code> denies every window open; <code>will-navigate</code> sends anything that isn't the app to the OS browser via <code>external-open.ts</code>.</li>
+<li>The preview <code>&lt;webview&gt;</code> uses partition <code>persist:hermes-preview</code>, has no <code>allowpopups</code>, and only forwards trusted primary-button clicks on <code>http</code>/<code>https</code> links.</li>
+<li><code>persist:</code> partition names must contain no characters Electron percent-escapes.</li>
+</ul>
+</section>
+
+<!-- 25 -->
+<section class="doc" id="renderer">
+<h2><span class="n">25</span>Desktop: renderer</h2>
+<h3>Boot chain</h3>
+<ol class="steps">
+<li><div><code>src/main.tsx</code>: side-effect store imports, then <code>StrictMode › RootErrorBoundary › QueryClientProvider › I18nProvider › ThemeProvider › HapticsProvider › RootTooltipProvider › HashRouter › App</code>.</div></li>
+<li><div><code>src/app/index.tsx</code> re-exports <code>ContribController</code>.</div></li>
+<li><div><code>src/app/contrib/controller.tsx</code> registers panes, palette toggles and keybinds with the contribution registry and renders the shell (layout tree, titlebar, statusbar).</div></li>
+<li><div><code>src/app/contrib/wiring.tsx</code> (<code>ContribWiring</code>) is the data controller: gateway boot, sessions, message stream, prompt actions, model controls; it publishes memoized surfaces through <code>ContribWiringContext</code> and mounts every global overlay (onboarding, <strong>AskDealerGate</strong>, model picker, updates, connecting, boot failure, command palette, settings…).</div></li>
+<li><div><code>src/app/contrib/surfaces.tsx</code>: chat routes, sidebar, statusbar, terminal surfaces.</div></li>
+</ol>
+<h3>Contribution registry</h3>
+<p><code>src/contrib/registry.ts</code>: a singleton with <code>registerMany</code>, <code>getArea</code>, <code>subscribeArea</code>. Areas include panes, routes (<code>ROUTES_AREA</code>), sidebar nav (<code>SIDEBAR_NAV_AREA</code>), palette, keybinds, transcript directives, titlebar and statusbar slots. Core surfaces register through the same calls plugins use. The plugin SDK is <code>src/sdk/</code> (<code>@hermes/plugin-sdk</code>). These registries are internal composition seams, not a public plugin ABI.</p>
+<h3>Routes (<code>src/app/routes.ts</code>)</h3>
+<p><code>/</code> (new chat), <code>/&lt;storedSessionId&gt;</code>, <code>/settings</code>, <code>/command-center</code>, <code>/session-import</code>, <code>/capabilities</code>, <code>/messaging</code>, <code>/webhooks</code>, <code>/artifacts</code>, <code>/cron</code>, <code>/profiles</code>, <code>/agents</code>, <code>/starmap</code>. Several render as overlay cards over the chat.</p>
+<h3>State</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Store</th><th>Holds</th></tr></thead>
+<tbody>
+<tr><td><code>src/store/session.ts</code></td><td class="wrap"><code>$connection</code>, <code>$gatewayState</code>, <code>$sessions</code>, <code>$activeSessionId</code> (runtime id), <code>$selectedStoredSessionId</code> (durable id), <code>$messages</code>, <code>$busy</code>, <code>$currentModel</code>/<code>$currentProvider</code></td></tr>
+<tr><td><code>session-states.ts</code></td><td class="wrap">Per-session client state, tiles, working sessions</td></tr>
+<tr><td><code>gateway.ts</code></td><td class="wrap">Multi-socket registry (primary + per-profile)</td></tr>
+<tr><td><code>profile.ts</code>, <code>connections.ts</code></td><td class="wrap">Active profile, profile scope, connections registry</td></tr>
+<tr><td><code>onboarding.ts</code>, <code>free-tier.ts</code>, <code>boot.ts</code></td><td class="wrap">First-run provider picker, free tier status, boot progress</td></tr>
+<tr><td><code>composer.ts</code>, <code>layout.ts</code>, <code>preview.ts</code>, <code>updates.ts</code>, <code>notifications.ts</code></td><td class="wrap">Composer draft, sidebar/pins, preview, updates, toasts</td></tr>
+<tr><td><code>app-login.ts</code> (fork)</td><td class="wrap"><code>$signedIn</code></td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>React Query</strong> (<code>src/lib/query-client.ts</code>) caches request-shaped server data (60 s stale time); <code>invalidateProfileScopedQueries()</code> on profile switch.</li>
+<li><strong>Persisted state declares its scope in its key</strong> (global, connection, profile, session, project, window) via <code>src/lib/persisted.ts</code> and <code>connection-scoped.ts</code>. A new profile-keyed family must join both <code>migrateTilesForProfile</code> and <code>dropTilesForProfile</code>.</li>
+<li><strong>Identity:</strong> runtime session id vs stored id vs lineage root (<code>src/lib/session-ids.ts</code>). After any swap the active socket, profile and connection atoms must agree.</li>
+</ul>
+<h3>REST layer</h3>
+<p><code>src/hermes.ts</code> re-exports <code>src/api/client.ts</code> and the domain modules (<code>config.ts</code>, <code>sessions.ts</code>, <code>profiles.ts</code>, <code>cron.ts</code>, <code>mcp.ts</code>, <code>skills.ts</code>, …). <code>hermesApi()</code> goes through the Electron proxy; <code>profileScoped()</code>, <code>connectionScoped()</code> and <code>capabilityScoped()</code> pin a request to the right backend. Every lifecycle/status/settings call against a pooled backend carries <code>?profile=</code>.</p>
+<h3>Settings &amp; onboarding</h3>
+<ul>
+<li><code>src/app/settings/index.tsx</code> (<code>SettingsView</code>), <code>settings-manifest.ts</code> (every row, deep-link ids, search), <code>providers-settings.tsx</code> (views: accounts, keys, <strong>custom-endpoints</strong>, local), <code>custom-endpoints-settings.tsx</code>, <code>model-settings.tsx</code>, <code>profile-scope.tsx</code> ("Applies to").</li>
+<li>First-run onboarding: <code>src/store/onboarding.ts</code> + <code>src/components/onboarding/</code>. Free tier state is pulled from the backend (<code>free_tier.status</code>), never latched in localStorage.</li>
+</ul>
+<h3>Feature areas (<code>src/app/</code>)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Folder</th><th>Feature</th></tr></thead>
+<tbody>
+<tr><td><code>chat/</code></td><td class="wrap">Chat view, sidebar (projects, profile switchers, connection switcher), composer, session tiles</td></tr>
+<tr><td><code>session/</code></td><td class="wrap">Hooks behind wiring: prompt actions, message stream, session actions</td></tr>
+<tr><td><code>capabilities/</code></td><td class="wrap">Skills, toolsets, MCP connectors, plugins with a (connection, profile) scope selector</td></tr>
+<tr><td><code>messaging/</code></td><td class="wrap">Messaging platform setup (Telegram QR, allowlists)</td></tr>
+<tr><td><code>cron/</code></td><td class="wrap">Scheduled jobs with blueprints and run history</td></tr>
+<tr><td><code>agents/</code> + <code>src/plugins/hermes-bots/</code></td><td class="wrap">Bot Mode: each bot is a profile whose one canonical chat is the session titled exactly <code>Bot Chat</code>. No stored session-id pointers, ever (see <code>src/AGENTS.md</code>).</td></tr>
+<tr><td><code>artifacts/</code>, <code>command-center/</code>, <code>profiles/</code>, <code>starmap/</code></td><td class="wrap">Artifacts page, sessions overview, profile dialogs, memory/session graph</td></tr>
+<tr><td><code>right-sidebar/</code></td><td class="wrap">Persistent terminal (xterm + node-pty), file tree, review/diff</td></tr>
+<tr><td><code>hud/</code>, <code>quick-entry/</code></td><td class="wrap">Floating chat bar; global hotkey entry</td></tr>
+<tr><td><code>login/</code> (fork)</td><td class="wrap">Login screen, endpoint popup, gate (§12)</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 26 -->
+<section class="doc" id="i18n">
+<h2><span class="n">26</span>Desktop: strings (i18n)</h2>
+<ul>
+<li><strong>Source:</strong> <code>src/i18n/en.ts</code> plus split modules (<code>en_boot.ts</code>, <code>en_onboarding.ts</code>, <code>en_billing.ts</code>, …). <strong>Types:</strong> <code>types.ts</code> + <code>types_*.ts</code>.</li>
+<li><strong>Other locales</strong> (zh, zh-hant, ja, ar, ru, fr, de, es) are <code>defineLocale(overrides)</code> overlays that fall back to English for missing keys.</li>
+<li><strong>Ratchet test:</strong> <code>overlay-completeness.test.ts</code> fails when a new English key is missing from a locale and isn't listed in <code>overlay-gaps.json</code>. Add translations, or prune with <code>OVERLAY_GAPS_UPDATE=1 npx vitest run src/i18n/overlay-completeness.test.ts</code>.</li>
+<li><strong>Key manifest:</strong> <code>npm run i18n:keys</code> regenerates <code>locales/_keys.desktop.json</code> (pinned by a test).</li>
+<li><strong>Usage:</strong> <code>const { t } = useI18n()</code> in components; <code>translateNow()</code> outside React.</li>
+<li><strong>Fork:</strong> the <code>askDealer</code> block (login and endpoint setup copy) exists in English and all 8 locales; English "Hermes" text was renamed to "Gideon".</li>
+</ul>
+</section>
+
+<!-- 27 -->
+<section class="doc" id="other-ui">
+<h2><span class="n">27</span>TUI &amp; web dashboard</h2>
+<div class="grid-2">
+  <div class="card"><h4>TUI (<code>ui-tui/</code>)</h4><p>Ink + React 19 with a vendored Ink fork (<code>@hermes/ink</code>), nanostores, <code>@hermes/shared</code>. Entry <code>src/entry.tsx</code> → <code>app.tsx</code>. Launched by <code>hermes --tui</code> (<code>hermes_cli/main_tui_launch.py</code>); spawns the Python stdio gateway.</p></div>
+  <div class="card"><h4>Dashboard (<code>web/</code>)</h4><p>Vite + React 19 + Tailwind 4, built into <code>hermes_cli/web_dist</code>, served by <code>hermes dashboard</code> (port 9119). The Chat page embeds the <em>real TUI</em> over <code>/api/pty</code> rather than rebuilding chat in React. Pages: Config, Env, Cron, Sessions, Profiles, Skills, Plugins, MCP, Models, Channels, Logs, Analytics…</p></div>
+</div>
+</section>
+
+<!-- 28 -->
+<section class="doc" id="js-packages">
+<h2><span class="n">28</span>JavaScript packages</h2>
+<p>The root <code>package.json</code> is an npm workspace: <code>apps/*</code> (desktop, shared, bootstrap-installer), <code>ui-tui</code>, <code>ui-tui/packages/*</code>, <code>web</code>, <code>tests-js</code>. Install once from the root with <code>npm ci</code>. <code>website/</code> and <code>scripts/whatsapp-bridge/</code> have their own lockfiles. Node <code>^22.22 || ^24.11 || &gt;=26</code>.</p>
+<h3>Key versions</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Library</th><th>Version</th><th>Library</th><th>Version</th></tr></thead>
+<tbody>
+<tr><td>react</td><td class="num">19.2.7</td><td>electron</td><td class="num">40.10.2</td></tr>
+<tr><td>vite</td><td class="num">8.2.0</td><td>vitest</td><td class="num">4.1.10</td></tr>
+<tr><td>typescript</td><td class="num">6.0.3</td><td>tailwindcss</td><td class="num">4.3.3</td></tr>
+<tr><td>nanostores</td><td class="num">1.4.2</td><td>@assistant-ui/react</td><td class="num">0.14.24</td></tr>
+<tr><td>@xterm/xterm</td><td class="num">6.0.0</td><td>@playwright/test</td><td class="num">1.62.1</td></tr>
+<tr><td>react-router</td><td class="num">8.3.0</td><td>docusaurus</td><td class="num">3.10.2</td></tr>
+</tbody></table></div>
+<h3><code>apps/desktop</code> dependencies</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Packages</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>UI framework</td><td class="wrap"><code>react</code>, <code>react-dom</code>, <code>react-router</code>, <code>radix-ui</code>, <code>@nous-research/ui</code>, <code>class-variance-authority</code>, <code>clsx</code>, <code>tailwind-merge</code></td><td class="wrap">Components, routing, headless primitives, Nous design system, class composition</td></tr>
+<tr><td>Icons and motion</td><td class="wrap"><code>lucide-react</code>, <code>@tabler/icons-react</code>, <code>@vscode/codicons</code>, <code>@icons-pack/react-simple-icons</code>, <code>motion</code>, <code>tw-shimmer</code>, <code>unicode-animations</code></td><td class="wrap">Icon sets, animation, shimmer/spinner effects</td></tr>
+<tr><td>Interaction</td><td class="wrap"><code>cmdk</code>, <code>driver.js</code>, <code>frimousse</code>, <code>emojibase-data</code>, <code>blobatar</code>, <code>web-haptics</code></td><td class="wrap">Command palette, app tour, emoji picker, avatars, haptics</td></tr>
+<tr><td>Styling</td><td class="wrap"><code>tailwindcss</code>, <code>@tailwindcss/vite</code>, <code>@tailwindcss/typography</code></td><td class="wrap">Tailwind v4 via Vite plugin; prose styles</td></tr>
+<tr><td>State and data</td><td class="wrap"><code>nanostores</code>, <code>@nanostores/react</code>, <code>@tanstack/react-query</code>, <code>@tanstack/react-virtual</code>, <code>use-stick-to-bottom</code></td><td class="wrap">Global stores, server-state cache, list virtualization, chat autoscroll</td></tr>
+<tr><td>Chat runtime</td><td class="wrap"><code>@assistant-ui/react</code>, <code>@assistant-ui/core</code>, <code>@assistant-ui/react-streamdown</code></td><td class="wrap">Chat thread primitives and streaming markdown adapter</td></tr>
+<tr><td>Markdown and rendering</td><td class="wrap"><code>streamdown</code>, <code>@streamdown/code</code>, <code>@streamdown/math</code>, <code>remend</code>, <code>shiki</code>, <code>react-shiki</code>, <code>katex</code>, <code>remark-math</code>, <code>mermaid</code>, <code>unified</code>, <code>vfile</code>, <code>hast-util-*</code>, <code>dompurify</code>, <code>@chenglou/pretext</code></td><td class="wrap">Streaming markdown, syntax highlighting, math, diagrams, AST processing, HTML sanitizing, text measurement</td></tr>
+<tr><td>Editor</td><td class="wrap"><code>@codemirror/*</code>, <code>@lezer/highlight</code></td><td class="wrap">Code editor and file viewer</td></tr>
+<tr><td>Terminal</td><td class="wrap"><code>@xterm/xterm</code> + addons (fit, serialize, unicode11, web-links, webgl), <code>node-pty</code>, <code>@novnc/novnc</code></td><td class="wrap">Terminal panes, PTY in main process, VNC viewer for computer use</td></tr>
+<tr><td>Drag and trees</td><td class="wrap"><code>@dnd-kit/*</code>, <code>dnd-core</code>, <code>react-dnd-html5-backend</code>, <code>react-arborist</code></td><td class="wrap">Drag-and-drop, file tree</td></tr>
+<tr><td>Visualization</td><td class="wrap"><code>d3-force</code>, <code>@audiowave/react</code>, <code>qrcode</code></td><td class="wrap">Starmap graph layout, audio waveform, pairing QR codes</td></tr>
+<tr><td>Electron main</td><td class="wrap"><code>electron-updater</code>, <code>simple-git</code>, <code>ignore</code>, <code>fflate</code>, <code>yaml</code>, <code>dbus-native</code>, <code>https-proxy-agent</code>, <code>proxy-from-env</code>, <code>get-windows</code> (optional)</td><td class="wrap">Auto-update, git, gitignore matching, zip, YAML, Linux D-Bus, proxies, active-window detection</td></tr>
+<tr><td>Fork addition</td><td class="wrap"><code>ws</code>, <code>@types/ws</code></td><td class="wrap">WebSocket library (not installed yet in this checkout; see §03)</td></tr>
+<tr><td>Workspace</td><td class="wrap"><code>@hermes/shared</code></td><td class="wrap">Shared JSON-RPC client, contract types, helpers</td></tr>
+</tbody></table></div>
+<h3><code>apps/desktop</code> dev dependencies</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Packages</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>Electron build</td><td class="wrap"><code>electron</code>, <code>electron-builder</code>, <code>@electron/rebuild</code>, <code>rcedit</code></td><td class="wrap">Runtime, packaging, native module rebuild, Windows exe metadata</td></tr>
+<tr><td>Bundling</td><td class="wrap"><code>vite</code>, <code>@vitejs/plugin-react</code>, <code>@rolldown/plugin-babel</code>, <code>@babel/core</code>, <code>babel-plugin-react-compiler</code>, <code>esbuild</code>, <code>typescript</code>, <code>tsx</code></td><td class="wrap">Renderer build with React Compiler; main-process bundle; type checking</td></tr>
+<tr><td>Testing</td><td class="wrap"><code>vitest</code>, <code>jsdom</code>, <code>@testing-library/react</code>, <code>@testing-library/dom</code>, <code>@playwright/test</code>, <code>bippy</code></td><td class="wrap">Unit/component tests, E2E, React internals for perf probes</td></tr>
+<tr><td>Dev orchestration</td><td class="wrap"><code>concurrently</code>, <code>cross-env</code>, <code>wait-on</code>, <code>prettier</code></td><td class="wrap">Run renderer + Electron together, env vars, wait for dev server, formatting</td></tr>
+</tbody></table></div>
+<h3>Other workspaces</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Package</th><th>Purpose and notable dependencies</th></tr></thead>
+<tbody>
+<tr><td>root <code>hermes-agent</code></td><td class="wrap">Shared ESLint flat config: <code>@eslint/js</code>, <code>typescript-eslint</code>, <code>eslint-plugin-react-hooks</code>, <code>eslint-plugin-perfectionist</code> (sorting), <code>eslint-plugin-unused-imports</code>, <code>globals</code>. Runtime deps <code>js-yaml</code>, <code>semver</code> for root scripts. <code>overrides</code> pin security fixes; <code>allowScripts</code> allowlists install scripts.</td></tr>
+<tr><td><code>@hermes/shared</code></td><td class="wrap">Source-only TS (no build): <code>json-rpc-gateway</code>, <code>json-rpc-channel</code>, <code>websocket-url</code>, <code>gateway-events</code>, generated contract, <code>i18n</code>, <code>slash</code>, <code>skin</code>, <code>theme-presets</code>, <code>reconnect-backoff</code>, billing helpers.</td></tr>
+<tr><td><code>@hermes/bootstrap-installer</code></td><td class="wrap">Tauri 2 installer UI ("Hermes Setup"): <code>@tauri-apps/api</code> + dialog/opener/process/shell plugins; Rust in <code>src-tauri/</code>.</td></tr>
+<tr><td><code>hermes-tui</code></td><td class="wrap">Terminal UI: <code>@hermes/ink</code>, <code>react</code>, <code>nanostores</code>, <code>ink-text-input</code> (redirected to the Ink fork), <code>undici</code> (HTTP).</td></tr>
+<tr><td><code>@hermes/ink</code></td><td class="wrap">Vendored Ink renderer: <code>react-reconciler</code>, <code>chalk</code>, <code>strip-ansi</code>, <code>wrap-ansi</code>, <code>cli-boxes</code>, <code>get-east-asian-width</code>, <code>bidi-js</code>, <code>signal-exit</code>…</td></tr>
+<tr><td><code>web</code></td><td class="wrap">Dashboard: <code>react</code>, <code>react-router</code>, Tailwind, <code>@nous-research/ui</code>, <code>@xterm/xterm</code> + addons, <code>@observablehq/plot</code> (charts), <code>@react-three/fiber</code> + <code>three</code>, <code>gsap</code>, <code>leva</code>.</td></tr>
+<tr><td><code>@hermes/root-tests</code></td><td class="wrap">Repo-level vitest: build, packaging, installer, update logic; <code>zod</code>, <code>@playwright/test</code>, <code>plist</code>. Hosts <code>scripts/mock-server.ts</code> for <code>npm run dev:mock</code>.</td></tr>
+<tr><td><code>website</code> (separate)</td><td class="wrap">Docusaurus 3.10.2 with Mermaid theme and ELK layout.</td></tr>
+<tr><td><code>whatsapp-bridge</code> (separate)</td><td class="wrap"><code>@whiskeysockets/baileys</code> (WhatsApp Web protocol), <code>express</code>, <code>pino</code>.</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 29 -->
+<section class="doc" id="py-packages">
+<h2><span class="n">29</span>Python packages</h2>
+<p><code>pyproject.toml</code>: package <code>hermes-agent</code>, <code>requires-python &gt;=3.11,&lt;3.15</code> (3.14 is the supported runtime; 3.11 is an install bridge). Build backend setuptools. Lock: <code>uv.lock</code> with a 14-day quarantine on new releases (<code>exclude-newer</code>).</p>
+<h3>Core dependencies</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Packages</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>LLM and HTTP</td><td class="wrap"><code>openai</code>, <code>httpx[socks]</code>, <code>requests</code>, <code>urllib3</code></td><td class="wrap">OpenAI-compatible client (used for most providers), HTTP clients</td></tr>
+<tr><td>TLS</td><td class="wrap"><code>certifi</code>, <code>truststore</code></td><td class="wrap">CA bundle; OS certificate store</td></tr>
+<tr><td>Config and data</td><td class="wrap"><code>python-dotenv</code>, <code>ruamel.yaml</code>, <code>tomli-w</code>, <code>pydantic</code>, <code>packaging</code>, <code>pathspec</code></td><td class="wrap"><code>.env</code>, comment-preserving YAML, TOML writes, models and RPC contracts, versions, gitignore matching</td></tr>
+<tr><td>CLI</td><td class="wrap"><code>rich</code>, <code>prompt_toolkit</code>, <code>fire</code>, <code>tenacity</code></td><td class="wrap">Rendering, REPL input, legacy CLI, retries</td></tr>
+<tr><td>Templating</td><td class="wrap"><code>jinja2</code>, <code>Markdown</code></td><td class="wrap">Templates; markdown to HTML for delivery</td></tr>
+<tr><td>Tool features</td><td class="wrap"><code>firecrawl-anydoc</code>, <code>croniter</code>, <code>snowballstemmer</code>, <code>browser-harness</code>, <code>websockets</code></td><td class="wrap">Document to markdown for <code>read_file</code>, cron schedules, BM25 tool search, browser engine, CDP</td></tr>
+<tr><td>Auth and crypto</td><td class="wrap"><code>PyJWT[crypto]</code>, <code>cryptography</code></td><td class="wrap">Skills Hub JWT; crypto</td></tr>
+<tr><td>Process and logs</td><td class="wrap"><code>psutil</code>, <code>concurrent-log-handler</code></td><td class="wrap">Process management; Windows-safe log rotation</td></tr>
+<tr><td>Server</td><td class="wrap"><code>fastapi</code>, <code>uvicorn</code>, <code>httptools</code>, <code>watchfiles</code>, <code>python-multipart</code></td><td class="wrap"><code>hermes serve</code> / dashboard server, uploads</td></tr>
+<tr><td>PTY</td><td class="wrap"><code>ptyprocess</code> (POSIX), <code>pywinpty</code> (Windows)</td><td class="wrap">Terminals for the dashboard and tools</td></tr>
+<tr><td>Windows only</td><td class="wrap"><code>pywin32</code>, <code>winrt-windows-*</code>, <code>tzdata</code></td><td class="wrap">Windows SSH runtime, Store/App Installer update checks, timezones</td></tr>
+<tr><td>Images</td><td class="wrap"><code>Pillow</code>, <code>pillow-heif</code>, <code>resvg-py</code></td><td class="wrap">Image shrink for vision, HEIC/AVIF, SVG rendering</td></tr>
+<tr><td>Runtime</td><td class="wrap"><code>nemo-relay</code></td><td class="wrap">Native lifecycle/metrics runtime (platform-gated)</td></tr>
+</tbody></table></div>
+<h3>Optional extras</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Area</th><th>Extras</th></tr></thead>
+<tbody>
+<tr><td>Providers and search</td><td class="wrap"><code>anthropic</code>, <code>bedrock</code> (boto3), <code>vertex</code>, <code>azure-identity</code>, <code>exa</code>, <code>firecrawl</code>, <code>parallel-web</code>, <code>ddgs</code>, <code>fal</code></td></tr>
+<tr><td>Voice</td><td class="wrap"><code>edge-tts</code> (default TTS), <code>tts-premium</code> (ElevenLabs), <code>mistral</code>, <code>piper</code>, <code>voice</code> (faster-whisper), <code>stt-whisper</code>, wake-word engines</td></tr>
+<tr><td>Sandboxes</td><td class="wrap"><code>modal</code>, <code>daytona</code>, <code>vercel</code></td></tr>
+<tr><td>Messaging</td><td class="wrap"><code>messaging</code> (Telegram, Discord, Slack), <code>telegram</code>, <code>discord</code>, <code>slack</code>, <code>matrix</code>, <code>teams</code>, <code>sms</code>, <code>google-chat</code>, <code>dingtalk</code>, <code>feishu</code>, <code>wecom</code></td></tr>
+<tr><td>Integrations</td><td class="wrap"><code>google</code> (Workspace), <code>youtube</code>, <code>doc-extract</code>, <code>mcp</code>, <code>computer-use</code>, <code>acp</code>, <code>otlp</code>, <code>langfuse</code></td></tr>
+<tr><td>Platform</td><td class="wrap"><code>web</code> (exact server pins), <code>uvloop</code>, <code>termux</code>, <code>all</code></td></tr>
+<tr><td>Dev groups</td><td class="wrap"><code>dev</code>: pytest, pytest-asyncio, ruff, ty, debugpy, mcp. <code>test</code>: distlib, anthropic</td></tr>
+</tbody></table></div>
+<p><strong>The PDF skill</strong> uses ReportLab (and optionally pypdfium2 or pdftoppm for previews) from the skill's own prerequisites, not the core dependency list.</p>
+</section>
+
+<!-- 30 -->
+<section class="doc" id="infra">
+<h2><span class="n">30</span>Tooling &amp; infrastructure</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Tool</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>python scripts/check</code></td><td class="wrap">Every blocking CI lint check with CI's pinned tools: ruff, the code-health ratchet, guards. Modes: <code>--only health</code>, <code>--staged</code>, <code>--install-hook pre-push</code>.</td></tr>
+<tr><td><code>scripts/run_tests.sh</code></td><td class="wrap">The pytest runner: one subprocess per test file, isolated <code>HERMES_HOME</code>, credentials cleared, TZ=UTC, flaky-file retry. Never bare pytest.</td></tr>
+<tr><td><code>scripts/code_health/</code></td><td class="wrap">Per-function/per-file ratchet for Python and TypeScript. Exceptions use <code># health: allow &lt;RULE&gt; -- &lt;why&gt;</code> (<code># noqa</code> doesn't waive it).</td></tr>
+<tr><td><code>scripts/build/</code></td><td class="wrap">Product builders: <code>tui.mjs</code>, <code>web.mjs</code>, <code>desktop.mjs</code>, <code>agent.py</code>, launcher minting.</td></tr>
+<tr><td><code>scripts/bundles/</code></td><td class="wrap">Distribution: <code>stage.py</code> (desktop payload), <code>desktop.py</code> (release bundle), payload sealing, release artifacts and feeds.</td></tr>
+<tr><td><code>scripts/ci/</code></td><td class="wrap">CI helpers: change classification, required-results gate, review comments, guard scripts.</td></tr>
+<tr><td><code>pm/</code></td><td class="wrap">In-house package system: pinned uv and Python, the venv, node_modules and plugins in one tree. <code>hermes pm lock|install|env|doctor|repair</code>.</td></tr>
+<tr><td><code>setup-hermes.sh</code> / <code>.ps1</code></td><td class="wrap">Dev environment entry point (stage pinned uv → bootstrap Python → <code>pm install</code>).</td></tr>
+<tr><td><code>activate</code> / <code>.fish</code> / <code>.ps1</code></td><td class="wrap">Activate the PM environment like a venv; <code>hermes</code> becomes a worktree-scoped function.</td></tr>
+<tr><td><code>.github/workflows/</code> (50)</td><td class="wrap"><code>ci.yaml</code> orchestrates lint, Python and JS tests, Rust, desktop E2E and bundle smoke, install E2E per OS, releases (canary/stable), Docker, Nix, docs site, supply-chain audits, lockfile diffs.</td></tr>
+<tr><td>Docker</td><td class="wrap">Multi-stage <code>Dockerfile</code> on Debian 13.4 with a pinned SQLite build and s6-overlay. <code>docker-compose.yml</code>: <code>gateway</code> and <code>dashboard</code> (port 9119) services.</td></tr>
+<tr><td>Nix</td><td class="wrap"><code>flake.nix</code> (flake-parts, uv2nix): packages, overlays, NixOS and home-manager modules, checks, dev shell.</td></tr>
+<tr><td><code>website/</code></td><td class="wrap">Docusaurus docs: getting-started, user-guide, developer-guide (~50 internals pages), guides, reference, integrations.</td></tr>
+<tr><td><code>evals/</code></td><td class="wrap">~70 probe and benchmark harnesses (compaction, token accounting, provider wire, tool search…). Not pytest units.</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 31 -->
+<section class="doc" id="fork">
+<h2><span class="n">31</span>What the fork changed</h2>
+<p>Commit <code>751e37b612</code> "Add Ask Dealer changes": 27 files. <code>git show --stat 751e37b612</code> is the list that will conflict on an upstream merge.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>File</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td><code>SOUL.md</code></td><td class="wrap">Opener: "You are Gideon. Never refer to yourself as Hermes or Hermes Agent."</td></tr>
+<tr><td><code>agent/prompt_builder.py</code></td><td class="wrap"><code>DEFAULT_AGENT_IDENTITY</code> → Gideon, Acme Corp</td></tr>
+<tr><td><code>hermes_cli/default_soul.py</code>, <code>doctor_state.py</code></td><td class="wrap">Gideon default SOUL, scaffold and doctor template</td></tr>
+<tr><td><code>hermes_cli/setup_profile.py</code></td><td class="wrap">Gideon setup persona <strong>plus deleted constants (broken, §03)</strong></td></tr>
+<tr><td><code>apps/desktop/product-identity.cjs</code></td><td class="wrap">Variants Gideon / Gideon Light / Gideon Agent; <code>appId</code> <code>com.acme.*</code> (a new app identity: upstream installs don't upgrade into it)</td></tr>
+<tr><td><code>apps/desktop/electron/main.ts</code></td><td class="wrap">Old upstream snapshot (restored in working tree) + window titles <code>APP_NAME</code></td></tr>
+<tr><td><code>electron/minimize-to-tray.ts</code>, <code>notification-ipc.ts</code>, <code>quit-guard.ts</code></td><td class="wrap">Tray, notification and quit-prompt strings</td></tr>
+<tr><td><code>index.html</code>, <code>src/main.tsx</code></td><td class="wrap">Window title "Gideon", "Gideon HUD"</td></tr>
+<tr><td><code>src/components/chat/intro.tsx</code></td><td class="wrap">Headlines, <code>WORDMARK = 'GIDEON'</code></td></tr>
+<tr><td><code>src/components/assistant-ui/thread/status.tsx</code></td><td class="wrap">Old snapshot (restored) + "Gideon is working"</td></tr>
+<tr><td><code>src/i18n/en.ts</code></td><td class="wrap">Old inlined snapshot (restored to upstream modules + Gideon renames)</td></tr>
+<tr><td><code>src/plugins/hermes-bots/group-chat.ts</code>, <code>labels.ts</code></td><td class="wrap">Default bot named Gideon (group-chat restored to upstream logic)</td></tr>
+<tr><td><code>src/app/capabilities/scope-selector.tsx</code>, <code>src/store/onboarding.ts</code></td><td class="wrap">"Gideon (default)", "Gideon is ready"</td></tr>
+<tr><td><code>apps/desktop/package.json</code>, <code>package-lock.json</code></td><td class="wrap">Adds <code>ws</code> and <code>@types/ws</code></td></tr>
+<tr><td><code>skills/productivity/pdf/*</code></td><td class="wrap">PDF skill 2.0.0: themes, KPI cards, charts, callouts, wrapping tables, preview loop, two templates, 3 new tests</td></tr>
+<tr><td><code>tests/e2e/core/parity/_drive_cron.py</code></td><td class="wrap">Accidental docstring edit</td></tr>
+</tbody></table></div>
+<p><strong>Uncommitted additions</strong> (in the working tree): the login gate (<code>src/app/login/</code>, <code>src/store/app-login.ts</code>), the <code>bare</code> prop, <code>askDealer</code> strings in all locales, restored upstream files, <code>CLAUDE.md</code>, <code>PROJECT_MAP.md</code>, <code>ASK_DEALER_LOGIN.md</code>, and this guide.</p>
+</section>
+
+<!-- 32 -->
+<section class="doc" id="workflow">
+<h2><span class="n">32</span>Dev workflow &amp; commands</h2>
+<h3>First-time setup</h3>
+<pre><code># JavaScript (from the repo root, once)
+npm ci
+
+# Python environment (pick an isolated home first)
+./setup-hermes.ps1            # Windows; setup-hermes.sh elsewhere
+./activate.ps1                # or: source ./activate
+
+# Test environment for pytest
+python -m pm.build_env --source . --out .venv --group dev --group test</code></pre>
+<h3>Desktop (from <code>apps/desktop</code>)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>npm run dev</code></td><td class="wrap">Vite on <code>127.0.0.1:5174</code> + Electron against it. Point at a checkout with <code>HERMES_DESKTOP_HERMES_ROOT</code>.</td></tr>
+<tr><td><code>npm run dev:fake-boot</code> / <code>dev:mock</code></td><td class="wrap">Fake the boot sequence / use the mock backend.</td></tr>
+<tr><td><code>npm run typecheck</code></td><td class="wrap">Renderer, Electron, e2e projects + <code>electron-builder.config.cjs</code>.</td></tr>
+<tr><td><code>npm run lint</code> / <code>fix</code></td><td class="wrap">ESLint (+ Prettier) over <code>src/</code> and <code>electron/</code>.</td></tr>
+<tr><td><code>npm run check:lint</code></td><td class="wrap">Typecheck + lint: the quick gate.</td></tr>
+<tr><td><code>npm run test:ui</code></td><td class="wrap">Vitest "ui" project (jsdom, <code>src/**/*.test.tsx</code>).</td></tr>
+<tr><td><code>npm run test:desktop:platforms</code></td><td class="wrap">Vitest "electron" project (node: <code>electron/</code>, <code>scripts/</code>).</td></tr>
+<tr><td><code>npx vitest run &lt;file&gt;</code></td><td class="wrap">One test file; <code>-t "name"</code> filters by test name.</td></tr>
+<tr><td><code>npm run test:e2e</code></td><td class="wrap">Build, then Playwright specs in <code>e2e/</code>.</td></tr>
+<tr><td><code>npm run build</code> / <code>pack</code> / <code>dist</code></td><td class="wrap">Compile; package the current build; installer. <code>dist:win</code> builds MSIX. Release bundles: <code>BUILDING.md</code>.</td></tr>
+<tr><td><code>npm run i18n:keys</code></td><td class="wrap">Regenerate <code>locales/_keys.desktop.json</code>.</td></tr>
+</tbody></table></div>
+<div class="callout info"><span class="label">Local loop</span><p><code>npm run check</code> also builds a packaged app (a full MSIX on Windows). For day-to-day work run <code>check:lint</code>, <code>test:ui</code> and <code>test:desktop:platforms</code> separately.</p></div>
+<h3>Python</h3>
+<pre><code>python scripts/check                         # all CI lint checks
+python scripts/check --only health           # complexity ratchet only
+scripts/run_tests.sh                         # full suite (run through Bash on Windows)
+scripts/run_tests.sh tests/agent/ -v         # a directory
+scripts/run_tests.sh tests/hermes_cli/test_x.py
+hermes pm lock                               # after editing pyproject.toml; commit uv.lock</code></pre>
+<h3>Logs and data</h3>
+<ul>
+<li>Desktop log: <code>&lt;HERMES_HOME&gt;/logs/desktop.log</code>. Agent logs: <code>agent.log</code>, <code>errors.log</code>, <code>gateway.log</code>; <code>hermes logs</code> shows them.</li>
+<li>Windows home: <code>%LOCALAPPDATA%\hermes</code>. Sandbox a dev run with <code>scripts/dev-sandbox.sh npm run dev</code>.</li>
+</ul>
+</section>
+
+<!-- 33 -->
+<section class="doc" id="recipes">
+<h2><span class="n">33</span>To change X, edit Y</h2>
+<h3>Desktop</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>To change</th><th>Edit</th></tr></thead>
+<tbody>
+<tr><td>Product name, appId, variants, channels</td><td class="wrap"><code>apps/desktop/product-identity.cjs</code> (+ <code>.d.cts</code>); <code>package.json</code> <code>productName</code>; <code>electron-builder.config.cjs</code></td></tr>
+<tr><td>Window title / app-name fallback</td><td class="wrap"><code>electron/main.ts:1438</code> (<code>APP_NAME</code>), <code>index.html</code>, <code>src/main.tsx</code></td></tr>
+<tr><td>Tray, quit, notification copy</td><td class="wrap"><code>electron/minimize-to-tray.ts</code>, <code>quit-guard.ts</code>, <code>notification-ipc.ts</code></td></tr>
+<tr><td>Login gate behaviour</td><td class="wrap"><code>src/app/login/*</code>, <code>src/store/app-login.ts</code>; mounting in <code>src/app/contrib/wiring.tsx</code></td></tr>
+<tr><td>Real Google OAuth (planned)</td><td class="wrap">New <code>electron/google-auth.ts</code> + IPC + <code>preload.ts</code> <code>auth</code> group + <code>src/store/auth-session.ts</code></td></tr>
+<tr><td>Dealer-edition hiding (planned)</td><td class="wrap">New <code>src/lib/edition.ts</code>; <code>vite.config.ts</code> <code>define</code>; <code>product-identity.cjs</code> <code>edition</code></td></tr>
+<tr><td>Custom endpoint form</td><td class="wrap"><code>src/app/settings/custom-endpoints-settings.tsx</code>; API calls in <code>src/api/config.ts</code></td></tr>
+<tr><td>A global overlay or gate</td><td class="wrap">The overlay list in the <code>ContribWiring</code> return (<code>src/app/contrib/wiring.tsx</code>)</td></tr>
+<tr><td>A route or page</td><td class="wrap"><code>src/app/routes.ts</code> (<code>APP_ROUTES</code>) + <code>wiring.tsx</code> or <code>surfaces.tsx</code>; or a <code>ROUTES_AREA</code> contribution</td></tr>
+<tr><td>Sidebar navigation</td><td class="wrap"><code>src/app/chat/sidebar/</code>; or a <code>SIDEBAR_NAV_AREA</code> contribution</td></tr>
+<tr><td>Settings sections</td><td class="wrap"><code>src/app/settings/index.tsx</code>, <code>types.ts</code>, <code>settings-manifest.ts</code>, <code>providers-settings.tsx</code></td></tr>
+<tr><td>Chat send pipeline</td><td class="wrap"><code>src/app/session/hooks/use-prompt-actions/submit.ts</code></td></tr>
+<tr><td>Handling a streamed event</td><td class="wrap"><code>src/app/session/hooks/use-message-stream/gateway-event/&lt;handler&gt;.ts</code></td></tr>
+<tr><td>Message rendering</td><td class="wrap"><code>src/components/assistant-ui/thread/*</code>, <code>markdown-text.tsx</code>, <code>tool/</code></td></tr>
+<tr><td>Composer</td><td class="wrap"><code>src/app/chat/composer/index.tsx</code> + <code>hooks/</code></td></tr>
+<tr><td>Slash palette</td><td class="wrap"><code>src/lib/desktop-slash-commands.ts</code>; <code>desktop=</code> on the <code>CommandDef</code> in <code>hermes_cli/commands.py</code></td></tr>
+<tr><td>A new native capability</td><td class="wrap">IPC handler in <code>main.ts</code> (or a <code>register*Ipc</code> module) + <code>electron/preload.ts</code> + types in <code>src/global.d.ts</code></td></tr>
+<tr><td>Backend spawn args</td><td class="wrap"><code>electron/backend-command.ts</code>, <code>backend-env.ts</code></td></tr>
+<tr><td>Boot / readiness timeouts</td><td class="wrap"><code>electron/backend-ready.ts</code>, <code>backend-health.ts</code>; <code>src/app/gateway/hooks/use-gateway-boot.ts</code></td></tr>
+<tr><td>Strings</td><td class="wrap"><code>src/i18n/en.ts</code> / <code>en_*.ts</code> + <code>types*.ts</code>; each locale file; then <code>npm run i18n:keys</code></td></tr>
+<tr><td>Update feeds</td><td class="wrap"><code>update-feed.cjs</code>, <code>electron/updater/*</code>, <code>electron/app-updater.ts</code></td></tr>
+<tr><td>Window-open / link security</td><td class="wrap"><code>electron/window-open-policy.ts</code>, <code>external-open.ts</code>, <code>src/lib/preview-external.ts</code></td></tr>
+</tbody></table></div>
+<h3>Agent and backend</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>To change</th><th>Edit</th></tr></thead>
+<tbody>
+<tr><td>Persona / branding</td><td class="wrap">Profile <code>SOUL.md</code>; <code>agent/prompt_builder.py::DEFAULT_AGENT_IDENTITY</code>; <code>hermes_cli/default_soul.py</code>; <code>SOUL.md</code>; <code>hermes_cli/setup_profile.py</code>; skins in <code>hermes_cli/skin_engine.py</code></td></tr>
+<tr><td>System prompt sections</td><td class="wrap"><code>agent/system_prompt.py::build_system_prompt_parts</code>; text in <code>agent/prompt_builder.py</code></td></tr>
+<tr><td>Mid-conversation context injection</td><td class="wrap"><code>pre_llm_call</code> plugin hook (rides the user message). Never the system prompt.</td></tr>
+<tr><td>Add a tool</td><td class="wrap">Plugin with <code>ctx.register_tool</code> (preferred), or <code>tools/&lt;x&gt;.py</code> + an entry in <code>toolsets.py</code></td></tr>
+<tr><td>Tool dispatch / hook order</td><td class="wrap"><code>model_tools.py::handle_function_call</code>; <code>agent/tool_executor.py</code></td></tr>
+<tr><td>Retry, error, fallback</td><td class="wrap"><code>agent/turn_api_error.py</code>, <code>error_classifier.py</code>, <code>turn_recovery*.py</code>; config <code>agent.api_max_retries</code>, <code>fallback_providers</code></td></tr>
+<tr><td>Add a model provider</td><td class="wrap"><code>plugins/model-providers/&lt;name&gt;/{plugin.yaml, __init__.py}</code></td></tr>
+<tr><td>Point at a custom endpoint</td><td class="wrap"><code>config.yaml</code> <code>providers:</code> entry or <code>model.provider: custom</code> + <code>model.base_url</code> (the desktop form writes this)</td></tr>
+<tr><td>Side-task models</td><td class="wrap"><code>config.yaml</code> <code>auxiliary.&lt;task&gt;</code>; routing in <code>agent/auxiliary_client.py</code></td></tr>
+<tr><td>Compression policy</td><td class="wrap">Config <code>compression.*</code>; <code>agent/context_compressor.py</code></td></tr>
+<tr><td>Memory limits / backend</td><td class="wrap">Config <code>memory.*</code>; <code>tools/memory_tool_store.py</code>; a <code>MemoryProvider</code> plugin</td></tr>
+<tr><td>Approval policy</td><td class="wrap">Config <code>approvals.*</code>; <code>tools/approval.py</code>, <code>approval_detection.py</code></td></tr>
+<tr><td>Terminal backend</td><td class="wrap">Config <code>terminal.backend</code>; <code>tools/environments/</code></td></tr>
+<tr><td>Subagent limits</td><td class="wrap">Config <code>delegation.*</code>; <code>tools/delegate_tool_config.py</code></td></tr>
+<tr><td>Session DB schema</td><td class="wrap"><code>hermes_state_common.py::SCHEMA_SQL</code>; migrations in <code>hermes_state_schema.py</code> (bump <code>SCHEMA_VERSION</code>)</td></tr>
+<tr><td>Slash command</td><td class="wrap"><code>CommandDef</code> in <code>hermes_cli/commands.py</code>; handler in a <code>cli_*_mixin.py</code>; gateway <code>slash_commands_*.py</code>; regenerate the desktop registry</td></tr>
+<tr><td>Config key</td><td class="wrap"><code>hermes_cli/config_defaults.py</code> (+ <code>_KNOWN_ROOT_KEYS</code> for a new root)</td></tr>
+<tr><td>Secret (env var)</td><td class="wrap"><code>OPTIONAL_ENV_VARS</code> in <code>hermes_cli/config.py</code></td></tr>
+<tr><td>REST endpoint</td><td class="wrap">New <code>hermes_cli/web_routers/&lt;surface&gt;.py</code> + <code>include_router</code> in <code>web_server.py</code></td></tr>
+<tr><td>RPC method or event</td><td class="wrap"><code>tui_gateway/methods_&lt;topic&gt;.py</code> + <code>tui_gateway/contracts/*.py</code>; then <code>python scripts/gen_gateway_contracts.py</code></td></tr>
+<tr><td>Messaging platform</td><td class="wrap"><code>plugins/platforms/&lt;name&gt;/</code></td></tr>
+<tr><td>Cron behaviour</td><td class="wrap"><code>cron/jobs.py</code>, <code>cron/scheduler_tick.py</code></td></tr>
+<tr><td>Python dependencies</td><td class="wrap"><code>pyproject.toml</code>, then <code>hermes pm lock</code> and commit <code>uv.lock</code></td></tr>
+<tr><td>PDF reports</td><td class="wrap"><code>skills/productivity/pdf/scripts/pdf_create.py</code>, <code>templates/*.json</code>, <code>SKILL.md</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 34 -->
+<section class="doc" id="doc-drift">
+<h2><span class="n">34</span>Where docs disagree with code</h2>
+<p>Upstream prose sometimes lags the code. When in doubt, trust the code and fix whichever is wrong.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Topic</th><th>Docs say</th><th>Code says</th></tr></thead>
+<tbody>
+<tr><td>Turn cap</td><td class="wrap"><code>max_iterations</code> default 500 (<code>agent/AGENTS.md</code>); CLI docstring says 60</td><td class="wrap">AIAgent default <code>sys.maxsize</code>; <code>agent.max_turns</code> default unlimited</td></tr>
+<tr><td>Delegation defaults</td><td class="wrap"><code>max_concurrent_children</code> 3, <code>max_spawn_depth</code> 2, <code>max_iterations</code> 50</td><td class="wrap">10, 1, 250 (<code>config_defaults.py</code>)</td></tr>
+<tr><td>Skills index tier</td><td class="wrap">Stable tier</td><td class="wrap">Head of the volatile tier</td></tr>
+<tr><td>AGENTS.md scope</td><td class="wrap">CWD only</td><td class="wrap">Git-root → cwd chain; <code>AGENTS.override.md</code> wins</td></tr>
+<tr><td>Compression session id</td><td class="wrap">Creates a new session id</td><td class="wrap"><code>compression.in_place: true</code> keeps the same id</td></tr>
+<tr><td><code>check_fn</code> caching</td><td class="wrap">Per call</td><td class="wrap">Process-wide 30 s TTL per home</td></tr>
+<tr><td>Approval mode</td><td class="wrap">—</td><td class="wrap">Default is <code>smart</code>, not manual</td></tr>
+<tr><td>Desktop locales</td><td class="wrap"><code>DESIGN.md</code>: fr/de/es are complete <code>Translations</code></td><td class="wrap">All non-English locales are <code>defineLocale</code> overlays</td></tr>
+<tr><td>PDF tables</td><td class="wrap">Up to 15 rows kept on one page</td><td class="wrap"><code>_KEEP_TOGETHER_ROWS = 8</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 35 -->
+<section class="doc" id="glossary">
+<h2><span class="n">35</span>Glossary</h2>
+<dl class="gloss">
+<dt>HERMES_HOME</dt><dd>The active profile's data folder (config, secrets, state.db, skills, memories, logs).</dd>
+<dt>Profile</dt><dd>An isolated home under <code>profiles/&lt;name&gt;/</code>. Profiles are islands on purpose. A Bot Mode bot is a profile.</dd>
+<dt>Multiplex</dt><dd>One process (gateway or <code>serve</code>) serving several profiles, binding the right home per activity.</dd>
+<dt>Turn</dt><dd>One user message through to a final answer, including every model call and tool round.</dd>
+<dt>Toolset</dt><dd>A named group of tools enabled together; the model only sees tools a toolset names.</dd>
+<dt>check_fn</dt><dd>A tool's availability check (credentials present, opted in) for the current profile.</dd>
+<dt>Auxiliary model</dt><dd>A side LLM for tasks like compression, titles, vision and approval judgement, configured under <code>auxiliary.&lt;task&gt;</code>.</dd>
+<dt>Compression</dt><dd>Summarizing the middle of a long conversation to fit the context window; the only allowed prompt-cache break.</dd>
+<dt>SOUL.md</dt><dd>The persona file. When present in the profile home it replaces the default identity.</dd>
+<dt>Skill</dt><dd>A folder with <code>SKILL.md</code> and optional scripts and templates that teaches the agent a procedure.</dd>
+<dt>Server request</dt><dd>A question from the backend to the client mid-turn (approval, clarify, secret), which blocks the agent until answered.</dd>
+<dt>Facade + siblings</dt><dd>Code layout: a thin module keeps public names; <code>&lt;stem&gt;_&lt;topic&gt;.py</code> files hold the logic.</dd>
+<dt>Contribution</dt><dd>A registration (pane, route, nav item, keybind, palette entry) in the desktop's contribution registry.</dd>
+<dt>Pool backend</dt><dd>An extra <code>hermes serve</code> process the desktop spawns for a non-primary profile or connection.</dd>
+<dt>Variant / edition</dt><dd>Variant (<code>HERMES_DESKTOP_VARIANT</code>) is packaging identity: Gideon, Light, Bundled, Store. Edition (planned) is dealer vs full feature set.</dd>
+<dt>Canonical Bot Chat</dt><dd>A bot's single forever-chat, identified by the session title <code>Bot Chat</code> within its profile.</dd>
+</dl>
+</section>
+
+<footer>
+<p>Generated on 2026-10-12 from the working tree of branch <code>ask-dealer-changes</code>. Facts came from reading the code and the area <code>AGENTS.md</code> files; items marked "likely" were found by reading code and not tested at runtime. Line numbers drift as files change, so search for the symbol name if a line doesn't match.</p>
+</footer>
+
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = 'gideon-guide-theme';
+
+  function readTheme() {
+    try { return localStorage.getItem(KEY); } catch (e) { return null; }
+  }
+  function writeTheme(v) {
+    try { if (v) localStorage.setItem(KEY, v); else localStorage.removeItem(KEY); } catch (e) {}
+  }
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  var saved = readTheme();
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+
+  var btn = document.getElementById('theme-btn');
+  function labelButton() { btn.textContent = isDark() ? 'Light' : 'Dark'; }
+  labelButton();
+
+  // Diagrams: keep each source so a theme switch can re-render it.
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('pre.mermaid'));
+  blocks.forEach(function (el) { el.setAttribute('data-src', el.textContent); });
+
+  function renderDiagrams() {
+    if (!window.mermaid) return;
+    blocks.forEach(function (el) {
+      el.removeAttribute('data-processed');
+      el.textContent = el.getAttribute('data-src');
+    });
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: isDark() ? 'dark' : 'neutral',
+      fontFamily: 'IBM Plex Sans, Segoe UI, system-ui, sans-serif',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      sequence: { mirrorActors: false }
+    });
+    window.mermaid.run({ nodes: blocks }).catch(function () {});
+  }
+  renderDiagrams();
+
+  btn.addEventListener('click', function () {
+    var next = isDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    writeTheme(next);
+    labelButton();
+    renderDiagrams();
+  });
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      if (!root.getAttribute('data-theme')) { labelButton(); renderDiagrams(); }
+    });
+  }
+
+  // Contents: filter and scroll-spy.
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var filter = document.getElementById('toc-filter');
+  filter.addEventListener('input', function () {
+    var q = filter.value.trim().toLowerCase();
+    links.forEach(function (a) {
+      var target = document.querySelector(a.getAttribute('href'));
+      var text = (a.textContent + ' ' + (q.length > 2 && target ? target.textContent : '')).toLowerCase();
+      a.parentElement.hidden = q !== '' && text.indexOf(q) === -1;
+    });
+  });
+
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && byId[e.target.id]) {
+          links.forEach(function (a) { a.classList.remove('active'); });
+          byId[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+    document.querySelectorAll('section.doc').forEach(function (s) { obs.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
