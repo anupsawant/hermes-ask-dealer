@@ -46,4 +46,20 @@ describe('MermaidRenderer', () => {
     ])
     expect(decodeURIComponent(images[0]?.src.split(',')[1] ?? '')).toContain('marker-end="url(#arrow)"')
   })
+
+  // HTML labels emit `<br>` inside <foreignObject>: invalid XML, so the SVG
+  // fails to load as the data-URI <img> (broken image on any multi-line label).
+  it('renders labels as SVG text so the SVG stays loadable as an image', async () => {
+    // The embed initialises mermaid once per theme at module level; a fresh
+    // module makes this test independent of the one above.
+    vi.resetModules()
+    const { default: FreshRenderer } = await import('./mermaid-embed')
+    const { container } = render(<FreshRenderer code="graph TD; A[one<br/>two]-->B" />)
+
+    await waitFor(() => expect(container.querySelector('img')).not.toBeNull())
+
+    expect(initialize).toHaveBeenCalledWith(
+      expect.objectContaining({ flowchart: { htmlLabels: false }, htmlLabels: false })
+    )
+  })
 })

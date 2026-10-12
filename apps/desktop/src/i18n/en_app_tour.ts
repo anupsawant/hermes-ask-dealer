@@ -18,6 +18,7 @@ export const enHandoffTour: Translations['handoffTour'] = {
   sessionsTitle: 'Each profile keeps its own sessions',
   sessionsText:
     'This list belongs to the default profile. New session starts one on whichever profile is selected. Switch profiles on the rail and the list changes with it.',
+
   stayTitle: 'Gideon is one click away',
   stayText: 'Switch to the setup profile and open Welcome to Gideon whenever you want a hand. It stays there.',
   localTitle: 'This machine can run models locally',

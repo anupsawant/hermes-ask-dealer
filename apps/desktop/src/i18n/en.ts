@@ -1569,6 +1569,7 @@ export const en: Translations = {
       sshErrPlatform:
         'Unsupported remote platform. Gideon Desktop SSH mode supports Linux, macOS, and Windows remote hosts.',
       sshErrTimeout: 'SSH connection timed out. The host may be unreachable or asleep.',
+
       sshErrUpdateRequired: 'Update Gideon on the remote host before connecting with Desktop SSH.',
       sshErrInteractiveAuth:
         'Tailscale SSH requires an interactive browser check. In Terminal, run `ssh <host> true`, complete the check, then retry — Gideon runs SSH non-interactively.',
