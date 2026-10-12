@@ -11,6 +11,17 @@ import { zhProjects } from './zh_projects'
 import { zhSharedMetrics } from './zh_shared_metrics'
 
 export const zhOverrides = {
+  askDealer: {
+    login: {
+      title: '欢迎使用 Gideon',
+      subtitle: '登录以继续',
+      continueWithGoogle: '使用 Google 继续'
+    },
+    endpointSetup: {
+      title: '连接你的 AI 端点',
+      description: '添加 Gideon 要使用的端点 URL、API 密钥和模型。之后可以在设置中更改。'
+    }
+  },
   externalOpenFailed: {
     title: '无法打开此链接',
     message: '没有注册用于打开此地址的浏览器。请复制链接并手动打开。',

@@ -13,6 +13,17 @@ import { zhHantDiagnostics } from './zh-hant_diagnostics'
 import { zhHantSettings } from './zh-hant_settings'
 
 export const zhHantOverrides = {
+  askDealer: {
+    login: {
+      title: '歡迎使用 Gideon',
+      subtitle: '登入以繼續',
+      continueWithGoogle: '使用 Google 繼續'
+    },
+    endpointSetup: {
+      title: '連接你的 AI 端點',
+      description: '新增 Gideon 要使用的端點 URL、API 金鑰和模型。之後可以在設定中變更。'
+    }
+  },
   skillDeepLink: {
     installTitle: (name: string) => `安裝「${name}」？`,
     installDescription: '此技能將於新的工作階段中可用。請僅安裝可信來源的內容。',
