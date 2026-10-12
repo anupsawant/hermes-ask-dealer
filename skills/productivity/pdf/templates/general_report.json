@@ -1,0 +1,34 @@
+{
+  "title": "Report title",
+  "author": "Hermes Agent",
+  "page_size": "A4",
+  "theme": "corporate",
+  "footer_text": "Report title",
+  "elements": [
+    {"type": "title", "text": "Report title", "subtitle": "One sentence on what this report covers and who it is for", "meta": "Prepared for: audience   |   Date"},
+
+    {"type": "heading", "text": "Summary", "level": 1},
+    {"type": "paragraph", "text": "Two to four sentences: the answer or conclusion first, then why it matters."},
+    {"type": "callout", "tone": "info", "title": "Key takeaway", "text": "The single most important point the reader should remember."},
+
+    {"type": "heading", "text": "Key points", "level": 1},
+    {"type": "bullets", "items": [
+      "<b>First point:</b> a short supporting sentence.",
+      "<b>Second point:</b> a short supporting sentence.",
+      "<b>Third point:</b> a short supporting sentence."
+    ]},
+
+    {"type": "heading", "text": "Details", "level": 1},
+    {"type": "heading", "text": "Subsection", "level": 2},
+    {"type": "paragraph", "text": "Body text. Keep paragraphs short and use a table when comparing items across several attributes."},
+    {"type": "table", "header": true, "col_widths": [1, 3], "rows": [
+      ["Item", "Description"],
+      ["Item one", "What it is and why it matters."],
+      ["Item two", "What it is and why it matters."]
+    ]},
+
+    {"type": "heading", "text": "Next steps", "level": 1},
+    {"type": "bullets", "numbered": true, "items": ["First action and owner", "Second action and owner"]},
+    {"type": "callout", "tone": "warning", "title": "Assumptions and limits", "text": "State what the report does not cover or where the data is uncertain."}
+  ]
+}

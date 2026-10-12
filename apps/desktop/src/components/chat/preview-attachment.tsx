@@ -251,9 +251,10 @@ export function PreviewAttachment({ target }: { target: string }) {
       <span className="min-w-0 flex-1 truncate text-[0.78rem] font-medium text-foreground/90" title={target}>
         {name}
       </span>
-      {localTarget?.type === 'file' ? (
+      {localTarget?.type === 'file' && (
         // The file already exists on this machine: reveal it in the OS file
-        // manager instead of offering to download it again (#101683).
+        // manager (#101683). Download stays beside it so a generated file can
+        // be saved to a location of the user's choosing.
         <button
           className="flex shrink-0 items-center gap-1 rounded-md border border-(--ui-stroke-tertiary) bg-background/40 px-2 py-1 text-[0.7rem] font-medium text-muted-foreground transition-colors hover:bg-accent/55 hover:text-foreground disabled:opacity-50"
           disabled={opening}
@@ -263,18 +264,17 @@ export function PreviewAttachment({ target }: { target: string }) {
           <FolderOpen className="size-3" />
           {t.fileMenu.revealFileManager}
         </button>
-      ) : (
-        <button
-          aria-label={t.fileMenu.download}
-          className="flex shrink-0 items-center gap-1 rounded-md border border-(--ui-stroke-tertiary) bg-background/40 px-2 py-1 text-[0.7rem] font-medium text-muted-foreground transition-colors hover:bg-accent/55 hover:text-foreground disabled:opacity-50"
-          disabled={downloading}
-          onClick={() => void downloadFile()}
-          type="button"
-        >
-          <Download className="size-3" />
-          {downloaded ? t.fileMenu.downloadSaved : t.fileMenu.download}
-        </button>
       )}
+      <button
+        aria-label={t.fileMenu.download}
+        className="flex shrink-0 items-center gap-1 rounded-md border border-(--ui-stroke-tertiary) bg-background/40 px-2 py-1 text-[0.7rem] font-medium text-muted-foreground transition-colors hover:bg-accent/55 hover:text-foreground disabled:opacity-50"
+        disabled={downloading}
+        onClick={() => void downloadFile()}
+        type="button"
+      >
+        <Download className="size-3" />
+        {downloaded ? t.fileMenu.downloadSaved : t.fileMenu.download}
+      </button>
       <button
         className="shrink-0 rounded-md border border-(--ui-stroke-tertiary) bg-background/40 px-2 py-1 text-[0.7rem] font-medium text-muted-foreground transition-colors hover:bg-accent/55 hover:text-foreground disabled:opacity-50"
         disabled={opening}

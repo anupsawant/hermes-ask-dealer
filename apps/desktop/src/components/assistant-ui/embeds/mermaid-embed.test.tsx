@@ -47,23 +47,21 @@ describe('MermaidRenderer', () => {
     expect(decodeURIComponent(images[0]?.src.split(',')[1] ?? '')).toContain('marker-end="url(#arrow)"')
   })
 
-  it('repairs a label mermaid returned as HTML, so the image stays loadable', async () => {
-    // `A["a<br/>b&nbsp;c"]` comes back from mermaid with an open `<br>` and an
-    // `&nbsp;` entity — malformed XML, so the data: URI fails to decode and the
-    // message shows a broken image with the alt text instead of the diagram
-    // (#133089).
-    renderMermaid.mockResolvedValueOnce({
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 260.34375 70"><foreignObject width="19.109375" height="48"><div xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>a<br>b&nbsp;c</p></span></div></foreignObject></svg>'
-    })
 
-    const { container } = render(<MermaidRenderer code='graph TD; A["a<br/>b&nbsp;c"]' />)
+  // HTML labels emit `<br>` inside <foreignObject>: invalid XML, so the SVG
+  // fails to load as the data-URI <img> (broken image on any multi-line label).
+  it('renders labels as SVG text so the SVG stays loadable as an image', async () => {
+    // The embed initialises mermaid once per theme at module level; a fresh
+    // module makes this test independent of the one above.
+    vi.resetModules()
+    const { default: FreshRenderer } = await import('./mermaid-embed')
+    const { container } = render(<FreshRenderer code="graph TD; A[one<br/>two]-->B" />)
 
-    await waitFor(() => expect(container.querySelectorAll('img')).toHaveLength(1))
+    await waitFor(() => expect(container.querySelector('img')).not.toBeNull())
 
-    const src = decodeURIComponent([...container.querySelectorAll('img')][0]?.src.split(',')[1] ?? '')
-    const doc = new DOMParser().parseFromString(src, 'image/svg+xml')
+    expect(initialize).toHaveBeenCalledWith(
+      expect.objectContaining({ flowchart: { htmlLabels: false }, htmlLabels: false })
+    )
 
-    expect(doc.documentElement.tagName).toBe('svg')
-    expect(doc.querySelector('p')?.textContent).toBe('ab c')
   })
 })

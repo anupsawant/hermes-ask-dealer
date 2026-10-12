@@ -1,0 +1,63 @@
+{
+  "title": "Sales Data Analysis",
+  "author": "Gideon",
+  "page_size": "A4",
+  "theme": "corporate",
+  "footer_text": "Sales Data Analysis",
+  "page_numbers": true,
+  "elements": [
+    {"type": "title", "text": "Sales Data Analysis", "subtitle": "Key findings from 10 orders across Jan\u2013Mar 2026", "meta": "Prepared by: Gideon   |   Source: sales_data.csv"},
+
+    {"type": "heading", "text": "Summary", "level": 1},
+    {"type": "paragraph", "text": "The dataset covers 10 orders, 179 units, and $15,197 in net revenue across four regions and three categories. Electronics drives the business: it's a minority of units sold but the large majority of revenue, led by a single high-value Laptop line. South is the top region and February was the strongest month."},
+    {"type": "callout", "tone": "info", "title": "Key takeaway", "text": "Electronics generates 75% of revenue ($11,346) from just 36 units, while Stationery sells the most units (130) but contributes only 5% of revenue ($700) \u2014 the two categories serve very different roles."},
+
+    {"type": "metrics", "columns": 4, "items": [
+      {"label": "Total revenue", "value": "$15,197", "status": "neutral"},
+      {"label": "Units sold", "value": "179", "status": "neutral"},
+      {"label": "Avg. customer rating", "value": "4.09 / 5", "status": "green"},
+      {"label": "Avg. discount", "value": "8.5%", "status": "yellow"}
+    ]},
+
+    {"type": "heading", "text": "Revenue by region", "level": 1},
+    {"type": "chart", "kind": "bar", "title": "Net revenue by region ($)", "categories": ["South", "North", "West", "East"], "series": [{"name": "Revenue", "values": [6190, 4774.7, 3052.5, 1180]}], "height": 220},
+    {"type": "paragraph", "text": "South leads with $6,190 (41% of total), more than double East's $1,180. North and West sit in between. One order per region-category combo means these totals are sensitive to individual large orders (e.g. South's Laptop sale)."},
+
+    {"type": "heading", "text": "Revenue vs. units by category", "level": 1},
+    {"type": "chart", "kind": "bar", "title": "Revenue by category ($)", "categories": ["Electronics", "Furniture", "Stationery"], "series": [{"name": "Revenue", "values": [11345.5, 3151.7, 700]}], "height": 200},
+    {"type": "table", "header": true, "col_widths": [2, 1, 1, 1], "rows": [
+      ["Category", "Revenue", "Units sold", "Avg. rating"],
+      ["Electronics", "$11,345.50", "36", "4.34"],
+      ["Furniture", "$3,151.70", "13", "4.03"],
+      ["Stationery", "$700.00", "130", "3.55"]
+    ]},
+    {"type": "callout", "tone": "success", "title": "Electronics is the quality + revenue leader", "text": "Electronics has the highest average customer rating (4.34) and the highest revenue, despite moderate unit volume \u2014 a healthy, high-value product line."},
+
+    {"type": "heading", "text": "Monthly revenue trend", "level": 1},
+    {"type": "chart", "kind": "line", "title": "Revenue by month ($)", "categories": ["Jan 2026", "Feb 2026", "Mar 2026"], "series": [{"name": "Revenue", "values": [4627.5, 7321.2, 3248.5]}], "height": 200},
+    {"type": "paragraph", "text": "Revenue peaked in February ($7,321) then dropped sharply in March ($3,249) \u2014 roughly half the January level. With only 10 orders total, this is too little data to call a trend, but it's worth watching whether March's dip continues."},
+
+    {"type": "heading", "text": "Top products", "level": 1},
+    {"type": "chart", "kind": "bar", "title": "Revenue by product ($)", "categories": ["Laptop", "Desk Chair", "Headphones", "Monitor", "Standing Desk", "Pen Set", "Notebook Pack"], "series": [{"name": "Revenue", "values": [7457.5, 2236.5, 2232.0, 1656.0, 915.2, 360.0, 340.0]}], "height": 240},
+    {"type": "paragraph", "text": "Laptop alone accounts for $7,457.50 \u2014 49% of all revenue from just 2 orders. Desk Chair and Headphones are close behind as the next-strongest performers."},
+
+    {"type": "heading", "text": "Discount and rating", "level": 1},
+    {"type": "table", "header": true, "col_widths": [2, 1, 1], "rows": [
+      ["Product", "Discount %", "Rating"],
+      ["Laptop (no discount)", "0%", "4.6"],
+      ["Desk Chair (no discount)", "0%", "3.8"],
+      ["Monitor", "8%", "4.7"],
+      ["Headphones", "20%", "3.9"],
+      ["Notebook Pack", "15%", "3.5"]
+    ]},
+    {"type": "callout", "tone": "warning", "title": "Heavier discounts line up with lower ratings", "text": "The two highest-discount orders (Headphones at 20%, Notebook Pack at 15%) have the lowest or near-lowest customer ratings (3.9 and 3.5). This is a pattern worth testing with more data, not a proven cause \u2014 discounting itself doesn't lower satisfaction, but it may correlate with lower-margin, lower-attention SKUs."},
+
+    {"type": "heading", "text": "Next steps", "level": 1},
+    {"type": "bullets", "numbered": true, "items": [
+      "Investigate the March revenue drop \u2014 check if it's seasonal, a sales-cycle gap, or data incompleteness.",
+      "Protect Laptop and Desk Chair margins; both sell well with zero discount and high ratings.",
+      "Review discounting policy on Headphones and Notebook Pack given the lower ratings at high discount levels."
+    ]},
+    {"type": "callout", "tone": "warning", "title": "Data limits", "text": "This dataset has only 10 orders. Regional, monthly, and discount patterns are directional, not statistically robust \u2014 treat them as hypotheses to test against a larger sample."}
+  ]
+}

@@ -16,7 +16,10 @@ const loadMermaid = createRetryableLoader<MermaidApi>(() => import('mermaid').th
 
 // Re-initialise only on first use / theme flip. `securityLevel: 'strict'` makes
 // mermaid sanitise label HTML and drop click handlers, so the rendered SVG is
-// safe to inject.
+// safe to inject. `htmlLabels: false` keeps labels as SVG <text>: the default
+// HTML labels put `<br>` / bare `&` inside <foreignObject>, which is not valid
+// XML, so the SVG fails to load as the data-URI <img> below (broken image for
+// any label with a line break).
 function ensureInit(mermaid: MermaidApi, dark: boolean) {
   const theme = dark ? 'dark' : 'default'
 
@@ -24,7 +27,14 @@ function ensureInit(mermaid: MermaidApi, dark: boolean) {
     return
   }
 
-  mermaid.initialize({ fontFamily: 'inherit', securityLevel: 'strict', startOnLoad: false, theme })
+  mermaid.initialize({
+    flowchart: { htmlLabels: false },
+    fontFamily: 'inherit',
+    htmlLabels: false,
+    securityLevel: 'strict',
+    startOnLoad: false,
+    theme
+  })
   lastTheme = theme
 }
 
