@@ -106,13 +106,13 @@ describe('PreviewAttachment local target classification (#101683)', () => {
     expect(openPreview).not.toHaveBeenCalled()
   })
 
-  it('reveals an existing local file in the file manager instead of offering Download', async () => {
+  it('reveals an existing local file in the file manager and still offers Download', async () => {
     const { openDir, revealPath } = mountDesktopStub(() => fileTarget('/work/report.md'))
 
     render(<PreviewAttachment target="/work/report.md" />)
 
     await screen.findByRole('button', { name: 'Open containing folder' })
-    expect(await buttons()).toEqual(['Open containing folder', 'Open preview'])
+    expect(await buttons()).toEqual(['Open containing folder', 'Download', 'Open preview'])
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Open containing folder' }))

@@ -1,0 +1,53 @@
+{
+  "title": "Hermes Agent: Overview",
+  "author": "Gideon",
+  "page_size": "A4",
+  "theme": "corporate",
+  "footer_text": "Hermes Agent Overview",
+  "page_numbers": true,
+  "elements": [
+    {"type": "title", "text": "Hermes Agent", "subtitle": "An overview of the platform, its capabilities, and trade-offs", "meta": "Prepared by: Gideon   |   October 2026"},
+
+    {"type": "heading", "text": "Summary", "level": 1},
+    {"type": "paragraph", "text": "Hermes Agent (by Nous Research) is an AI assistant runtime that pairs a language model with real tools: a browser, a terminal, file editing, code execution, scheduled jobs, delegated subagents, and an extensible skills/plugins system. It is designed to act as a working agent that completes tasks end-to-end, not just answer questions."},
+    {"type": "callout", "tone": "info", "title": "Key takeaway", "text": "Hermes trades some of the simplicity of a pure chatbot for the ability to actually do work \u2014 browse, run code, edit files, call APIs, and remember context across sessions."},
+
+    {"type": "heading", "text": "Core capabilities", "level": 1},
+    {"type": "bullets", "items": [
+      "<b>Browser automation:</b> drives a real browser (navigate, click, fill forms, read DOM, screenshots) for tasks that need the live web.",
+      "<b>Code execution:</b> runs Python/shell code in a persistent session, reads and edits files, and verifies changes with tests and builds.",
+      "<b>Skills system:</b> loads task-specific procedural knowledge (PDF generation, spreadsheets, GitHub, email, etc.) on demand instead of guessing workflows.",
+      "<b>Subagent delegation:</b> can spawn isolated subagents to parallelize independent workstreams or offload reasoning-heavy subtasks.",
+      "<b>Persistent memory:</b> retains durable facts about the user and environment across sessions, separate from per-task skill knowledge.",
+      "<b>Scheduling and automation:</b> cron jobs and background terminal processes let it run recurring or long-lived tasks unattended.",
+      "<b>Vault-mediated credentials:</b> fills passwords, payment details, and one-time codes without ever exposing secrets in the conversation."
+    ]},
+
+    {"type": "heading", "text": "Advantages", "level": 1},
+    {"type": "table", "header": true, "col_widths": [1, 3], "rows": [
+      ["Advantage", "Why it matters"],
+      ["End-to-end task completion", "Can research, write, test, and deliver a finished artifact (code, PDF, spreadsheet) instead of just describing one."],
+      ["Tool breadth", "Browser, terminal, file edits, web search/extract, image/vision analysis, and TTS are all available in one agent."],
+      ["Extensibility", "Skills and plugins let it pick up new domains (CRMs, document formats, dev workflows) without retraining."],
+      ["Parallelism", "Independent tool calls and subagents run concurrently, speeding up multi-part tasks."],
+      ["Context efficiency", "Skills and memory load only what's relevant to the current task, keeping the working context lean over long sessions."],
+      ["Credential safety", "Secrets are handled by a vault layer and never pass through the model or the visible conversation."],
+      ["Persistence", "Memory, skills, and scheduled jobs survive across sessions, so setup and preferences aren't repeated."]
+    ]},
+
+    {"type": "heading", "text": "Disadvantages", "level": 1},
+    {"type": "table", "header": true, "col_widths": [1, 3], "rows": [
+      ["Disadvantage", "Why it matters"],
+      ["Complexity", "More moving parts (tools, skills, vault, subagents) mean more ways a task can go wrong than a simple Q&A chatbot."],
+      ["Tool reliability dependence", "Browser automation and third-party APIs can fail, time out, or change, and the agent inherits those failures."],
+      ["Latency and cost", "Multi-step tool use (navigation, code runs, delegated subagents) is slower and more compute-intensive than a single model response."],
+      ["Autonomy risk", "An agent that can act (click, send, pay, delete) can cause real-world side effects if given a poorly scoped or ambiguous instruction."],
+      ["Setup overhead", "Getting full value requires configuring skills, vaults, and integrations, which is more upfront work than opening a chat window."],
+      ["Verification burden", "Because it produces real artifacts and side effects, outputs need actual verification (tests, rendered previews) rather than being taken on faith."]
+    ]},
+
+    {"type": "heading", "text": "Bottom line", "level": 1},
+    {"type": "paragraph", "text": "Hermes Agent is best suited to users who need a tool-using agent that finishes real work \u2014 code changes, documents, research, automations \u2014 and are willing to accept the added complexity and the need to verify agentic output. For simple question-answering with no side effects, a plain chatbot is lighter weight."},
+    {"type": "callout", "tone": "warning", "title": "Scope note", "text": "This overview reflects Hermes Agent's general design as described in its own documentation and system behavior; exact capabilities depend on which tools, skills, and plugins are enabled in a given profile."}
+  ]
+}

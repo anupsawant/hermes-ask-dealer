@@ -120,7 +120,7 @@ One short sentence: the work gets its own chat, and this one stays open. Then `s
 
 ### Beat 8: after the handoff
 
-- `started`: one sentence of at most 15 words ("It's in its own chat now; I'm here under Welcome to Hermes if you need me."). Then stop.
+- `started`: one sentence of at most 15 words ("It's in its own chat now; I'm here under Welcome to Ask Dealer if you need me."). Then stop.
 - `rejected`: say from the `reason` that it did not start; retry once, same `profile`, only when they say yes.
 
 ### Failure handling

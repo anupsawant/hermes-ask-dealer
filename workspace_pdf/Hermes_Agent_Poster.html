@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hermes Agent Poster</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink:#0b0f14;
+    --paper:#f3efe6;
+    --accent:#ff5a1f;
+    --accent-dim:#c94615;
+    --line:#0b0f14;
+    --muted:#5b5648;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+
+  body{
+    width:1200px;
+    height:1697px; /* A2-ish portrait ratio */
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk', system-ui, sans-serif;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .poster{
+    position:absolute;
+    inset:48px;
+    border:3px solid var(--line);
+    padding:56px 56px 44px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---- Header ---- */
+  .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--accent-dim);
+    font-weight:500;
+    margin-bottom:18px;
+  }
+
+  .title{
+    font-size:148px;
+    line-height:0.92;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin:0;
+  }
+  .title .dot{color:var(--accent);}
+
+  .subtitle{
+    margin-top:22px;
+    font-size:30px;
+    line-height:1.3;
+    font-weight:500;
+    max-width:900px;
+    color:var(--ink);
+  }
+
+  .rule{
+    height:3px;
+    background:var(--line);
+    margin:36px 0 0;
+  }
+
+  /* ---- Body grid ---- */
+  .body{
+    flex:1;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0;
+    margin-top:40px;
+  }
+
+  .col{
+    padding-right:40px;
+  }
+  .col + .col{
+    border-left:3px solid var(--line);
+    padding-left:40px;
+    padding-right:0;
+  }
+
+  .section-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:15px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--accent-dim);
+    font-weight:500;
+    margin-bottom:20px;
+  }
+
+  .caps-list{
+    list-style:none;
+    margin:0 0 36px;
+    padding:0;
+  }
+  .caps-list li{
+    display:flex;
+    gap:16px;
+    padding:14px 0;
+    border-bottom:1.5px dashed var(--muted);
+    font-size:21px;
+    line-height:1.35;
+  }
+  .caps-list li:last-child{border-bottom:none;}
+  .caps-list .idx{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--accent);
+    font-weight:600;
+    min-width:34px;
+  }
+  .caps-list b{font-weight:600;}
+
+  .pros-cons{
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+    height:100%;
+    justify-content:space-evenly;
+  }
+  .pc-block h3{
+    font-size:20px;
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin:0 0 14px;
+  }
+  .pc-block.plus h3{color:#1b6b3a;}
+  .pc-block.minus h3{color:var(--accent-dim);}
+  .pc-block ul{margin:0;padding:0;list-style:none;}
+  .pc-block li{
+    font-size:19px;
+    line-height:1.4;
+    padding:8px 0 8px 28px;
+    position:relative;
+    border-bottom:1px solid #d8d2c2;
+  }
+  .pc-block li:last-child{border-bottom:none;}
+  .pc-block.plus li::before{
+    content:"+";
+    position:absolute; left:0; top:6px;
+    font-weight:700; color:#1b6b3a; font-size:20px;
+  }
+  .pc-block.minus li::before{
+    content:"\2212";
+    position:absolute; left:0; top:6px;
+    font-weight:700; color:var(--accent-dim); font-size:20px;
+  }
+
+  /* ---- Footer ---- */
+  .footer{
+    margin-top:36px;
+    padding-top:24px;
+    border-top:3px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    color:var(--muted);
+    letter-spacing:0.05em;
+  }
+  .footer .brand{
+    color:var(--ink);
+    font-weight:600;
+    font-size:18px;
+  }
+
+  .corner-mark{
+    position:absolute;
+    width:14px;height:14px;
+    background:var(--accent);
+  }
+  .cm-tl{top:40px;left:40px;}
+  .cm-br{bottom:40px;right:40px;}
+</style>
+</head>
+<body>
+  <div class="corner-mark cm-tl"></div>
+  <div class="corner-mark cm-br"></div>
+
+  <div class="poster">
+    <div class="kicker">AI Agent Runtime &mdash; by Nous Research</div>
+    <h1 class="title">HERMES<span class="dot">.</span></h1>
+    <p class="subtitle">An AI assistant that doesn't just answer &mdash; it browses, codes, edits files, schedules work, and remembers, with real tools instead of guesses.</p>
+
+    <div class="rule"></div>
+
+    <div class="body">
+      <div class="col">
+        <div class="section-label">Core Capabilities</div>
+        <ul class="caps-list">
+          <li><span class="idx">01</span><div><b>Browser control</b> &mdash; navigates, clicks, fills forms, reads live pages.</div></li>
+          <li><span class="idx">02</span><div><b>Code execution</b> &mdash; runs, edits, and tests real code in a persistent session.</div></li>
+          <li><span class="idx">03</span><div><b>Skills on demand</b> &mdash; loads task-specific know-how instead of guessing.</div></li>
+          <li><span class="idx">04</span><div><b>Subagent delegation</b> &mdash; parallelizes independent work automatically.</div></li>
+          <li><span class="idx">05</span><div><b>Persistent memory</b> &mdash; keeps context and preferences across sessions.</div></li>
+          <li><span class="idx">06</span><div><b>Scheduled automation</b> &mdash; cron jobs and background tasks run unattended.</div></li>
+          <li><span class="idx">07</span><div><b>Vaulted credentials</b> &mdash; fills secrets without ever exposing them.</div></li>
+        </ul>
+      </div>
+
+      <div class="col">
+        <div class="section-label">Trade-offs</div>
+        <div class="pros-cons">
+          <div class="pc-block plus">
+            <h3>Advantages</h3>
+            <ul>
+              <li>Finishes real work end to end, not just advice</li>
+              <li>Wide tool coverage in a single agent</li>
+              <li>Extensible via skills and plugins</li>
+              <li>Parallel execution speeds up multi-part tasks</li>
+              <li>Secrets stay in a vault, never in the chat</li>
+            </ul>
+          </div>
+          <div class="pc-block minus">
+            <h3>Disadvantages</h3>
+            <ul>
+              <li>More moving parts than a plain chatbot</li>
+              <li>Inherits failures from flaky tools/APIs</li>
+              <li>Slower and costlier per multi-step task</li>
+              <li>Autonomy needs clear, well-scoped instructions</li>
+              <li>Output needs real verification, not blind trust</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="brand">HERMES AGENT</span>
+      <span>TOOLS &middot; MEMORY &middot; SKILLS &middot; AUTOMATION</span>
+      <span>v2026</span>
+    </div>
+  </div>
+</body>
+</html>
