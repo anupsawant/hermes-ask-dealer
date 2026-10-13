@@ -31,6 +31,17 @@ const RU_NOUN = (count: number | string, one: string, few: string, many: string)
 }
 
 export const ruOverrides = {
+  askDealer: {
+    login: {
+      title: 'Добро пожаловать в Gideon',
+      subtitle: 'Войдите, чтобы продолжить',
+      continueWithGoogle: 'Продолжить с Google'
+    },
+    endpointSetup: {
+      title: 'Подключите AI-эндпоинт',
+      description: 'Укажите URL эндпоинта, API-ключ и модель, которую должен использовать Gideon. Это можно изменить позже в настройках.'
+    }
+  },
   sharedMetrics: ruSharedMetrics,
   sessionImport: {
     title: 'Продолжить из другого приложения',

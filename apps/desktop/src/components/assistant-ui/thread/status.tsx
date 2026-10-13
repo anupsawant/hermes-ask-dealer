@@ -332,6 +332,7 @@ const TurnActivityRow: FC<TurnActivityRowProps> = ({ active, elapsed, hint, loca
       data-slot="aui_turn-activity"
       data-state={active ? 'active' : 'idle'}
       label={active ? hint || 'Hermes is working' : ''}
+
     >
       {active && (
         <>

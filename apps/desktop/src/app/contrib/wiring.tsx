@@ -22,6 +22,7 @@ import { FindBar } from '@/components/find-bar'
 import { FreeTierSignInDialog } from '@/components/free-tier/sign-in-dialog'
 import { GatewayConnectingOverlay } from '@/components/gateway-connecting-overlay'
 import { NotificationStack } from '@/components/notifications'
+import { AskDealerGate } from '@/app/login/ask-dealer-gate'
 import { DesktopOnboardingOverlay } from '@/components/onboarding'
 import { OnboardingChatGate } from '@/components/onboarding-chat/gate'
 import { $newSessionTabAction, registerPaneCloser } from '@/components/pane-shell/tree/store'
@@ -1256,6 +1257,18 @@ export function ContribWiring({ children }: { children: ReactNode }) {
     window.dispatchEvent(new CustomEvent(TITLEBAR_CHROME_CHANGED_EVENT))
   }, [controlsPos.left, controlsPos.top, titlebarToolsRight])
 
+  const onConfigSaved = () => {
+    void refreshHermesConfig()
+    void refreshCurrentModel()
+    void queryClient.invalidateQueries({ queryKey: ['model-options'] })
+  }
+
+  const onMainModelChanged = (provider: string, model: string) => {
+    applySavedMainModel(provider, model)
+    void refreshCurrentModel()
+    void queryClient.invalidateQueries({ queryKey: ['model-options'] })
+  }
+
   return (
     <ContribWiringContext.Provider value={api}>
       <div
@@ -1305,13 +1318,16 @@ export function ContribWiring({ children }: { children: ReactNode }) {
       {!isAuxiliaryWindow() && (
         <DesktopOnboardingOverlay
           enabled={gatewayState === 'open'}
-          onCompleted={() => {
-            void refreshHermesConfig()
-            void refreshCurrentModel()
-            void queryClient.invalidateQueries({ queryKey: ['model-options'] })
-          }}
+          onCompleted={onConfigSaved}
           profile={activeGatewayProfile}
           requestGateway={requestGateway}
+        />
+      )}
+      {!isAuxiliaryWindow() && (
+        <AskDealerGate
+          enabled={gatewayState === 'open'}
+          onConfigSaved={onConfigSaved}
+          onMainModelChanged={onMainModelChanged}
         />
       )}
       {!isAuxiliaryWindow() && (
@@ -1357,16 +1373,8 @@ export function ContribWiring({ children }: { children: ReactNode }) {
           <SettingsView
             gateway={gateway}
             onClose={closeOverlayToPreviousRoute}
-            onConfigSaved={() => {
-              void refreshHermesConfig()
-              void refreshCurrentModel()
-              void queryClient.invalidateQueries({ queryKey: ['model-options'] })
-            }}
-            onMainModelChanged={(provider, model) => {
-              applySavedMainModel(provider, model)
-              void refreshCurrentModel()
-              void queryClient.invalidateQueries({ queryKey: ['model-options'] })
-            }}
+            onConfigSaved={onConfigSaved}
+            onMainModelChanged={onMainModelChanged}
           />
         </Suspense>
       )}

@@ -25,6 +25,17 @@ export const en: Translations = {
       message: 'This file does not exist — it may have been deleted or moved, or it lives on another machine.'
     }
   },
+  askDealer: {
+    login: {
+      title: 'Welcome to Gideon',
+      subtitle: 'Sign in to continue',
+      continueWithGoogle: 'Continue with Google'
+    },
+    endpointSetup: {
+      title: 'Connect your AI endpoint',
+      description: 'Add the endpoint URL, API key and model Gideon should use. You can change it later in Settings.'
+    }
+  },
   sharedMetrics: enSharedMetrics,
   appTour: enAppTour,
   // English editorial copy stays in the shipped JSONL; other locales override it.
@@ -499,8 +510,8 @@ export const en: Translations = {
       rejectAction: 'Reject',
       inputTitle: 'Input needed',
       inputTitleNamed: session => `Input needed — ${session}`,
-      inputBody: 'Hermes is waiting for your response.',
-      turnDoneTitle: 'Hermes finished',
+      inputBody: 'Gideon is waiting for your response.',
+      turnDoneTitle: 'Gideon finished',
       turnDoneBody: 'Message complete.',
       turnErrorTitle: 'Turn failed',
       backgroundDoneTitle: 'Background task finished',
@@ -1558,9 +1569,10 @@ export const en: Translations = {
       sshErrPlatform:
         'Unsupported remote platform. Gideon Desktop SSH mode supports Linux, macOS, and Windows remote hosts.',
       sshErrTimeout: 'SSH connection timed out. The host may be unreachable or asleep.',
-      sshErrUpdateRequired: 'Update Hermes on the remote host before connecting with Desktop SSH.',
+
+      sshErrUpdateRequired: 'Update Gideon on the remote host before connecting with Desktop SSH.',
       sshErrInteractiveAuth:
-        'Tailscale SSH requires an interactive browser check. In Terminal, run `ssh <host> true`, complete the check, then retry — Hermes runs SSH non-interactively.',
+        'Tailscale SSH requires an interactive browser check. In Terminal, run `ssh <host> true`, complete the check, then retry — Gideon runs SSH non-interactively.',
       sshErrUnknown: 'SSH connection failed.'
     },
     keys: {
@@ -3930,7 +3942,7 @@ export const en: Translations = {
       noReturn: 'Backend didn’t come back online. The update may not have completed — check the backend host.',
       owed: steps => `Backend updated, but still owed: ${steps}. Re-run \`hermes update\` to finish them.`
     },
-    appName: 'Hermes', // Update-status overlay + version-details (mechanism-aware update UI).
+    appName: 'Gideon', // Update-status overlay + version-details (mechanism-aware update UI).
     version: (value: string) => `Version ${value}`,
     versionUnavailable: 'Version unavailable',
     checkNow: 'Check now',
@@ -4106,10 +4118,10 @@ export const en: Translations = {
     unreachableBody:
       "Gideon couldn't reach the Nous service to finish signing you in. Check your internet connection and try again. Your session is still here.",
     alreadySignedInHeading: 'Already signed in.',
-    alreadySignedInBody: 'This Hermes is already signed in to a Nous account.',
+    alreadySignedInBody: 'This Gideon is already signed in to a Nous account.',
     offer: {
-      heading: 'Keep going with Hermes',
-      body: "You're on the free allowance. If you keep using Hermes, you'll start running into limits. Sign in with a free Nous account for a bigger allowance.",
+      heading: 'Keep going with Gideon',
+      body: "You're on the free allowance. If you keep using Gideon, you'll start running into limits. Sign in with a free Nous account for a bigger allowance.",
       signIn: 'Sign in',
       notNow: 'Not now'
     },
@@ -4674,7 +4686,7 @@ export const en: Translations = {
         },
         no_reply: {
           title: "The reply didn't finish",
-          body: 'Hermes ended this turn without a reply. Retry to send it again.'
+          body: 'Gideon ended this turn without a reply. Retry to send it again.'
         },
         upstream_blocked: {
           title: 'A firewall blocked the request',

@@ -88,6 +88,18 @@ export interface Translations extends NoticeTranslations {
       message: string
     }
   }
+  /** Ask Dealer: sign-in screen + first-run endpoint setup popup. */
+  askDealer: {
+    login: {
+      title: string
+      subtitle: string
+      continueWithGoogle: string
+    }
+    endpointSetup: {
+      title: string
+      description: string
+    }
+  }
   intro: {
     stock: Record<string, string[]>
     custom: (label: string) => string[]
