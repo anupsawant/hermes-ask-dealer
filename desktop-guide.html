@@ -1,0 +1,1719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gideon Desktop Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: same blueprint manual as PROJECT_GUIDE.html. Sticky contents rail,
+   one ~72ch reading column; code, tables and diagrams scroll in their own box. */
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --sunken: #edf0f5;
+  --ink: #18202e;
+  --muted: #586274;
+  --rule: #d9dfe8;
+  --accent: #2d55c8;
+  --accent-soft: #e5ebfa;
+  --ok: #1d7448;
+  --ok-soft: #e2f3ea;
+  --warn: #9a5a06;
+  --warn-soft: #fbefd9;
+  --bad: #b02a1d;
+  --bad-soft: #fbe5e2;
+  --code: #1f2a3d;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 0.96875rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --step-3: 1.875rem;
+  --step-4: 2.625rem;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1219; --surface: #151b25; --sunken: #111721; --ink: #e3e8f0; --muted: #98a3b5;
+    --rule: #263042; --accent: #86a5ff; --accent-soft: #1b2742;
+    --ok: #63c793; --ok-soft: #143024; --warn: #e7a84f; --warn-soft: #33260f;
+    --bad: #f17a6b; --bad-soft: #3a1a17; --code: #d4dcea; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1219; --surface: #151b25; --sunken: #111721; --ink: #e3e8f0; --muted: #98a3b5;
+  --rule: #263042; --accent: #86a5ff; --accent-soft: #1b2742;
+  --ok: #63c793; --ok-soft: #143024; --warn: #e7a84f; --warn-soft: #33260f;
+  --bad: #f17a6b; --bad-soft: #3a1a17; --code: #d4dcea; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.25rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--step-0)/1.65 var(--font-body); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.shell { display: grid; grid-template-columns: 17.5rem minmax(0, 1fr); gap: 3rem; max-width: 82rem; margin: 0 auto; padding-inline: 1.5rem; }
+@media (max-width: 980px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 1rem; } }
+.rail { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 1.75rem 2rem; font-size: var(--step--1); }
+.rail .brand { display: grid; gap: 0.15rem; margin-bottom: 1.25rem; }
+.rail .brand b { font: 700 var(--step-1)/1.2 var(--font-display); }
+.rail .brand span { color: var(--muted); }
+.rail .brand a { font-size: var(--step--1); }
+.rail-tools { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.rail-tools input { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+.theme-btn { font: 500 var(--step--1)/1 var(--font-body); color: var(--ink); cursor: pointer; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; }
+.toc a { display: grid; grid-template-columns: 1.9rem 1fr; gap: 0.25rem; padding: 0.3rem 0.5rem; border-radius: 4px; color: var(--muted); text-decoration: none; line-height: 1.35; }
+.toc a .n { font: 500 var(--step--1)/1.35 var(--font-mono); opacity: 0.75; }
+.toc a:hover { background: var(--sunken); color: var(--ink); }
+.toc a.active { background: var(--accent-soft); color: var(--ink); }
+.toc a.active .n { color: var(--accent); opacity: 1; }
+.toc .grp { margin: 0.85rem 0 0.2rem 0.5rem; font: 600 0.6875rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 980px) {
+  .rail { position: static; max-height: none; border-bottom: 1px solid var(--rule); padding-bottom: 1rem; }
+  .toc { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+  .toc .grp { grid-column: 1 / -1; }
+}
+main { min-width: 0; padding-block: 2.5rem 6rem; max-width: 52rem; }
+.hero { display: grid; gap: 0.9rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule); margin-bottom: 1rem; }
+.eyebrow { font: 600 0.75rem/1 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 var(--step-4)/1.05 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 0; font-size: var(--step-1); color: var(--muted); max-width: 62ch; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip { display: inline-flex; align-items: center; font: 500 var(--step--1)/1 var(--font-mono); padding: 0.35rem 0.55rem; border-radius: 4px; background: var(--surface); border: 1px solid var(--rule); color: var(--muted); }
+section.doc { padding-top: 2.25rem; }
+section.doc > h2 { display: flex; align-items: baseline; gap: 0.75rem; margin: 0 0 1rem; font: 700 var(--step-3)/1.15 var(--font-display); text-wrap: balance; }
+section.doc > h2 .n { font: 500 var(--step-1)/1 var(--font-mono); color: var(--accent); }
+h3 { margin: 2rem 0 0.6rem; font: 600 var(--step-2)/1.25 var(--font-display); text-wrap: balance; }
+h4 { margin: 1.4rem 0 0.4rem; font: 600 var(--step-1)/1.3 var(--font-body); }
+p { margin: 0 0 0.9rem; max-width: 72ch; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; max-width: 72ch; }
+li { margin: 0.2rem 0; }
+li > ul, li > ol { margin: 0.25rem 0 0.4rem; }
+strong { font-weight: 600; }
+code { font: 400 0.86em/1.4 var(--font-mono); background: var(--sunken); color: var(--code); padding: 0.08em 0.32em; border-radius: 3px; overflow-wrap: anywhere; }
+pre { margin: 0 0 1.1rem; padding: 0.9rem 1rem; background: var(--sunken); border: 1px solid var(--rule); border-radius: var(--radius); overflow-x: auto; font: 400 var(--step--1)/1.55 var(--font-mono); color: var(--code); }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.src { display: block; margin: -0.5rem 0 1.1rem; font: 400 0.75rem/1.4 var(--font-mono); color: var(--muted); }
+.table-wrap { overflow-x: auto; margin: 0 0 1.25rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: var(--step--1); line-height: 1.5; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.75rem/1.3 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+td.wrap code { white-space: normal; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.callout { display: grid; gap: 0.35rem; margin: 0 0 1.25rem; padding: 0.85rem 1rem; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--surface); }
+.callout > :last-child { margin-bottom: 0; }
+.callout .label { font: 600 0.72rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; }
+.callout.info { background: var(--accent-soft); border-color: transparent; } .callout.info .label { color: var(--accent); }
+.callout.warn { background: var(--warn-soft); border-color: transparent; } .callout.warn .label { color: var(--warn); }
+.callout.bad { background: var(--bad-soft); border-color: transparent; } .callout.bad .label { color: var(--bad); }
+.pill { display: inline-block; font: 600 0.6875rem/1 var(--font-body); letter-spacing: 0.05em; text-transform: uppercase; padding: 0.3rem 0.45rem; border-radius: 3px; white-space: nowrap; }
+.pill.bad { background: var(--bad-soft); color: var(--bad); } .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.info { background: var(--accent-soft); color: var(--accent); }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.85rem; margin: 0 0 1.25rem; }
+.card { min-width: 0; padding: 0.9rem 1rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); }
+.card h4 { margin: 0 0 0.35rem; }
+.card p, .card ul { margin-bottom: 0; font-size: var(--step--1); }
+.diagram { margin: 0 0 1.25rem; padding: 1rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); overflow-x: auto; }
+.diagram figcaption { font-size: var(--step--1); color: var(--muted); margin-top: 0.6rem; }
+pre.mermaid { background: none; border: 0; padding: 0; margin: 0; color: var(--muted); white-space: pre; }
+pre.mermaid svg { max-width: 100%; height: auto; }
+ol.steps { counter-reset: s; list-style: none; padding-left: 0; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 0.5rem; margin: 0.45rem 0; }
+ol.steps > li::before { content: counter(s); font: 600 var(--step--1)/1.6rem var(--font-mono); color: var(--accent); text-align: center; background: var(--accent-soft); border-radius: 4px; height: 1.6rem; }
+.small { font-size: var(--step--1); color: var(--muted); }
+footer { margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: var(--step--1); color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="rail" aria-label="Contents">
+  <div class="brand"><b>Gideon Desktop Guide</b><span>apps/desktop, defined end to end</span><a href="PROJECT_GUIDE.html">Whole-project guide →</a></div>
+  <div class="rail-tools">
+    <input id="toc-filter" type="search" placeholder="Filter sections" aria-label="Filter sections">
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">Theme</button>
+  </div>
+  <ol class="toc" id="toc">
+    <li class="grp">Foundation</li>
+    <li><a href="#what"><span class="n">01</span>What the desktop app is</a></li>
+    <li><a href="#layout"><span class="n">02</span>Folder layout</a></li>
+    <li><a href="#identity"><span class="n">03</span>Product identity</a></li>
+    <li><a href="#package"><span class="n">04</span>package.json &amp; scripts</a></li>
+    <li class="grp">Build &amp; ship</li>
+    <li><a href="#build"><span class="n">05</span>Build pipeline</a></li>
+    <li><a href="#packaging"><span class="n">06</span>Packaging (electron-builder)</a></li>
+    <li><a href="#updater"><span class="n">07</span>Updates</a></li>
+    <li class="grp">Electron main</li>
+    <li><a href="#main"><span class="n">08</span>Entry &amp; main.ts map</a></li>
+    <li><a href="#modules"><span class="n">09</span>Sibling modules</a></li>
+    <li><a href="#windows"><span class="n">10</span>Windows</a></li>
+    <li><a href="#bridge"><span class="n">11</span>Preload bridge &amp; IPC</a></li>
+    <li><a href="#backend"><span class="n">12</span>Backend spawn &amp; pool</a></li>
+    <li><a href="#security"><span class="n">13</span>Security</a></li>
+    <li><a href="#paths"><span class="n">14</span>Data paths, logs, env vars</a></li>
+    <li class="grp">Renderer</li>
+    <li><a href="#boot"><span class="n">15</span>Renderer boot &amp; window roots</a></li>
+    <li><a href="#contrib"><span class="n">16</span>Contribution system</a></li>
+    <li><a href="#plugins"><span class="n">17</span>Plugins &amp; SDK</a></li>
+    <li><a href="#routes"><span class="n">18</span>Routes &amp; views</a></li>
+    <li><a href="#panes"><span class="n">19</span>Layout tree &amp; panes</a></li>
+    <li><a href="#wiring"><span class="n">20</span>Wiring &amp; data flow</a></li>
+    <li><a href="#state"><span class="n">21</span>State</a></li>
+    <li><a href="#api"><span class="n">22</span>REST/API layer</a></li>
+    <li><a href="#theme"><span class="n">23</span>Theming &amp; styles</a></li>
+    <li><a href="#design"><span class="n">24</span>Design system</a></li>
+    <li><a href="#settings"><span class="n">25</span>Settings definition</a></li>
+    <li><a href="#i18n"><span class="n">26</span>Strings (i18n)</a></li>
+    <li class="grp">Working on it</li>
+    <li><a href="#fork"><span class="n">27</span>Ask Dealer additions</a></li>
+    <li><a href="#testing"><span class="n">28</span>Testing</a></li>
+    <li><a href="#devtools"><span class="n">29</span>Dev tooling</a></li>
+    <li><a href="#recipes"><span class="n">30</span>How to add things</a></li>
+    <li><a href="#principles"><span class="n">31</span>Engineering principles</a></li>
+    <li><a href="#gotchas"><span class="n">32</span>Known issues &amp; traps</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">apps/desktop reference</div>
+  <h1>Gideon Desktop Guide</h1>
+  <p class="lede">How the Electron desktop app is defined: its identity, build and packaging, the main process, the preload bridge, how the React renderer is composed from contributions, its state, design system, tests and tooling. With real excerpts from the code.</p>
+  <div class="meta-row">
+    <span class="chip">Electron 40.10.2</span><span class="chip">React 19.2.7</span><span class="chip">Vite 8.2.0</span><span class="chip">TypeScript 6.0.3</span><span class="chip">snapshot 2026-10-12</span>
+  </div>
+</header>
+
+<!-- 01 -->
+<section class="doc" id="what">
+<h2><span class="n">01</span>What the desktop app is</h2>
+<p>The desktop app is the product the Ask Dealer fork ships, branded <strong>Gideon</strong>. It is its own native chat surface. It doesn't embed the browser dashboard or the terminal UI; it has its own composer, transcript and slash-command pipeline. The agent itself runs in a Python child process (<code>hermes serve</code>) that the app spawns and talks to over HTTP and WebSocket.</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart LR
+  subgraph App["Gideon desktop app"]
+    M["Electron main process: electron/main.ts + ~300 modules"]
+    P["Preload bridge: window.hermesDesktop"]
+    R["Renderer: React 19 in src/"]
+  end
+  B["hermes serve (Python, FastAPI)"]
+  OS["OS: files, git, terminals, windows, keychain"]
+  R -- "ipcRenderer.invoke" --> P
+  P --> M
+  M -- "spawn + stdout READY line" --> B
+  M -- "REST proxy hermes:api" --> B
+  R -- "WebSocket JSON-RPC /api/ws" --> B
+  M --> OS
+</pre>
+<figcaption>Three parties. The renderer never touches Node or Electron directly; everything native goes through the preload bridge.</figcaption>
+</figure>
+<div class="table-wrap"><table>
+<thead><tr><th>Party</th><th>Authoritative for</th><th>Code</th></tr></thead>
+<tbody>
+<tr><td>Electron main</td><td class="wrap">The machine: process lifecycle, backend spawn and pool, native fs/git/terminal/windows, install and update, secrets (safeStorage), a narrow typed capability bridge</td><td class="wrap"><code>electron/</code></td></tr>
+<tr><td>Renderer</td><td class="wrap">The experience: navigation, presentation, short-lived interaction state</td><td class="wrap"><code>src/</code></td></tr>
+<tr><td>Backend</td><td class="wrap">The work: sessions, tools, model calls, streaming, config, cron</td><td class="wrap">Python <code>hermes serve</code>, one per (connection, profile)</td></tr>
+</tbody></table></div>
+<p><strong>Decide state by authority:</strong> anything another Hermes surface can change belongs to the backend (the renderer holds a cache); machine and runtime facts belong to Electron; only this window's presentation belongs to the renderer.</p>
+<h3>Stack</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+<tbody>
+<tr><td>Shell</td><td class="wrap">Electron 40.10.2, electron-builder 27 (alpha), electron-updater 6.8.9, node-pty 1.1.0</td></tr>
+<tr><td>UI</td><td class="wrap">React 19.2.7 with the React Compiler, react-router 8.3.0 (<code>HashRouter</code>), Radix UI, <code>@nous-research/ui</code>, Tailwind 4.3.3</td></tr>
+<tr><td>State</td><td class="wrap">nanostores 1.4.2 (global stores), @tanstack/react-query 5 (server data)</td></tr>
+<tr><td>Chat</td><td class="wrap">@assistant-ui/react 0.14.24, streamdown, shiki, katex, mermaid</td></tr>
+<tr><td>Build</td><td class="wrap">Vite 8 (renderer, Rolldown), esbuild 0.28 (main and preload), TypeScript 6.0.3</td></tr>
+<tr><td>Tests</td><td class="wrap">Vitest 4.1.10 (jsdom + node projects), Playwright 1.62.1 (E2E)</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 02 -->
+<section class="doc" id="layout">
+<h2><span class="n">02</span>Folder layout</h2>
+<h3><code>apps/desktop/</code></h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>electron/</code></td><td class="wrap">Main process: <code>entry.ts</code>, <code>main.ts</code> (~19.8k lines), <code>preload.ts</code>, ~300 sibling modules each with a <code>.test.ts</code>, <code>updater/</code>, <code>native/</code> (Objective-C/C#/C helpers), mac entitlements.</td></tr>
+<tr><td><code>src/</code></td><td class="wrap">Renderer (React). Details below.</td></tr>
+<tr><td><code>scripts/</code></td><td class="wrap">Build, bundle, packaging hooks, signing, i18n keys, test harness, dev diagnostics, perf.</td></tr>
+<tr><td><code>e2e/</code></td><td class="wrap">Playwright specs: main lane, <code>core/</code> (required lane), <code>update/</code>.</td></tr>
+<tr><td><code>assets/</code>, <code>public/</code>, <code>packaging/</code></td><td class="wrap">App icons and MSIX manifest; static renderer files; DMG art.</td></tr>
+<tr><td><code>build/</code></td><td class="wrap">Generated build inputs: <code>install-stamp.json</code>, <code>native-deps/</code>, <code>agent-payload/</code> (bundled), MSIX manifests.</td></tr>
+<tr><td><code>dist/</code>, <code>release/</code></td><td class="wrap">Build output (<code>electron-main.mjs</code>, <code>electron-preload.js</code>, renderer); packaged installers.</td></tr>
+<tr><td><code>product-identity.cjs</code> (+ <code>.d.cts</code>)</td><td class="wrap">The single source of every name-shaped value (§03).</td></tr>
+<tr><td><code>update-feed.cjs</code> (+ <code>.d.cts</code>)</td><td class="wrap">macOS update feed paths and R2 base URL validation.</td></tr>
+<tr><td><code>electron-builder.config.cjs</code></td><td class="wrap">The whole packaging config (no <code>build</code> field in <code>package.json</code>).</td></tr>
+<tr><td><code>vite.config.ts</code>, <code>vitest.config.ts</code>, <code>playwright.config.ts</code></td><td class="wrap">Renderer build; test projects; E2E.</td></tr>
+<tr><td><code>tsconfig.json</code>, <code>tsconfig.electron.json</code>, <code>tsconfig.e2e.json</code></td><td class="wrap">Renderer (strict), Electron (non-strict, type output only), E2E.</td></tr>
+<tr><td><code>index.html</code></td><td class="wrap">Renderer HTML, title "Gideon", with a pre-paint script that applies the cached theme background before the bundle loads.</td></tr>
+<tr><td><code>AGENTS.md</code>, <code>src/AGENTS.md</code>, <code>DESIGN.md</code>, <code>ENGINEERING.md</code>, <code>BUILDING.md</code>, <code>README.md</code></td><td class="wrap">The rules and contracts. Read before changing code.</td></tr>
+</tbody></table></div>
+<h3><code>src/</code></h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Dir</th><th>Purpose</th><th>Key files</th></tr></thead>
+<tbody>
+<tr><td><code>main.tsx</code></td><td class="wrap">Renderer entry</td><td class="wrap">Provider tree, <code>?win=</code> branching</td></tr>
+<tr><td><code>app/</code></td><td class="wrap">Feature screens and the shell (~1,090 files)</td><td class="wrap"><code>contrib/</code> (app root), <code>chat/</code>, <code>settings/</code>, <code>routes.ts</code></td></tr>
+<tr><td><code>components/</code></td><td class="wrap">Shared UI (~580 files)</td><td class="wrap"><code>ui/</code> primitives, <code>assistant-ui/</code> transcript, <code>pane-shell/</code> layout</td></tr>
+<tr><td><code>contrib/</code></td><td class="wrap">Contribution registry and plugin host</td><td class="wrap"><code>registry.ts</code>, <code>types.ts</code>, <code>plugin.ts</code>, <code>plugins.ts</code>, <code>runtime-loader.ts</code>, <code>react/</code></td></tr>
+<tr><td><code>store/</code></td><td class="wrap">Shared nanostores (~183 files)</td><td class="wrap"><code>session.ts</code>, <code>gateway.ts</code>, <code>profile.ts</code>, <code>layout.ts</code></td></tr>
+<tr><td><code>lib/</code></td><td class="wrap">Pure helpers and adapters (~200 modules)</td><td class="wrap"><code>storage.ts</code>, <code>persisted.ts</code>, <code>query-client.ts</code>, <code>icons.ts</code>, <code>keybinds/</code></td></tr>
+<tr><td><code>api/</code></td><td class="wrap">REST/WS client by domain</td><td class="wrap"><code>client.ts</code>, <code>config.ts</code>, <code>sessions.ts</code>, …</td></tr>
+<tr><td><code>hermes.ts</code></td><td class="wrap">Compatibility barrel re-exporting <code>api/*</code></td><td class="wrap">Import from <code>@/hermes</code></td></tr>
+<tr><td><code>global.d.ts</code></td><td class="wrap">Typing of <code>window.hermesDesktop</code> (1,730 lines, hand-written)</td><td class="wrap"></td></tr>
+<tr><td><code>plugins/</code></td><td class="wrap">Bundled plugins</td><td class="wrap"><code>hermes-bots/</code>, <code>kanban/</code>, <code>radio/</code></td></tr>
+<tr><td><code>sdk/</code></td><td class="wrap"><code>@hermes/plugin-sdk</code> public API</td><td class="wrap"><code>index.ts</code> (2,107 lines)</td></tr>
+<tr><td><code>i18n/</code></td><td class="wrap">Locales and runtime</td><td class="wrap"><code>en.ts</code>, <code>types.ts</code>, <code>context.tsx</code>, <code>define-locale.ts</code></td></tr>
+<tr><td><code>themes/</code></td><td class="wrap">Theme model, presets, skins, provider</td><td class="wrap"><code>presets.ts</code>, <code>context.tsx</code> (<code>applyTheme</code>)</td></tr>
+<tr><td><code>styles.css</code></td><td class="wrap">Tailwind entry, tokens, z-ladder, glass (3,832 lines)</td><td class="wrap"></td></tr>
+<tr><td><code>hooks/</code>, <code>types/</code>, <code>fonts/</code>, <code>assets/</code></td><td class="wrap">Generic hooks; backend wire types (<code>types/hermes.ts</code>); JetBrains Mono; images</td><td class="wrap"></td></tr>
+<tr><td><code>debug/</code>, <code>test/</code></td><td class="wrap">Dev-only churn counters (no-op in prod); test helpers</td><td class="wrap"></td></tr>
+</tbody></table></div>
+<p><strong>Path aliases</strong> (Vite and <code>tsconfig.json</code>): <code>@</code> → <code>src/</code>, <code>@hermes/plugin-sdk</code> → <code>src/sdk/index.ts</code>, <code>@hermes/shared</code> → <code>../shared/src</code>.</p>
+<h3><code>src/app/</code> feature folders</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Folder</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>contrib/</code></td><td class="wrap">The app root: <code>controller.tsx</code> (registrations + <code>ContribController</code>), <code>wiring.tsx</code> (gateway boot, sessions, overlays), <code>surfaces.tsx</code> (routes), <code>panes.tsx</code>, <code>layout-presets.ts</code></td></tr>
+<tr><td><code>chat/</code></td><td class="wrap">Chat surface, composer, sidebar, session tiles, preview/route tiles, transcript windowing (199 files)</td></tr>
+<tr><td><code>session/</code></td><td class="wrap">Session hooks: prompt actions, slash dispatch, message stream, new-session route</td></tr>
+<tr><td><code>settings/</code></td><td class="wrap">Settings overlay (98 files): manifest, subpages, rows, per-section pages</td></tr>
+<tr><td><code>capabilities/</code></td><td class="wrap">Skills, toolsets, MCP, connectors, plugins page</td></tr>
+<tr><td><code>shell/</code></td><td class="wrap">Titlebar, statusbar, model menu, butterbar, overlay routing hook</td></tr>
+<tr><td><code>overlays/</code></td><td class="wrap"><code>OverlayView</code>, split layout, master-detail panel toolkit</td></tr>
+<tr><td><code>command-palette/</code></td><td class="wrap">⌘K palette; <code>contrib.ts</code> defines <code>PALETTE_AREA</code></td></tr>
+<tr><td><code>right-sidebar/</code></td><td class="wrap">File tree, review pane, terminal</td></tr>
+<tr><td><code>gateway/</code></td><td class="wrap">Gateway boot and request hooks</td></tr>
+<tr><td><code>agents/</code>, <code>cron/</code>, <code>profiles/</code>, <code>webhooks/</code>, <code>starmap/</code>, <code>command-center/</code>, <code>session-import/</code></td><td class="wrap">Overlay views</td></tr>
+<tr><td><code>messaging/</code>, <code>artifacts/</code></td><td class="wrap">Workspace pages</td></tr>
+<tr><td><code>hud/</code>, <code>quick-entry/</code>, <code>pet-overlay/</code>, <code>wake-indicator/</code></td><td class="wrap">Special window roots</td></tr>
+<tr><td><code>login/</code> (fork)</td><td class="wrap">Ask Dealer login screen and endpoint popup (§27)</td></tr>
+</tbody></table></div>
+<h3><code>src/components/</code></h3>
+<ul>
+<li><code>ui/</code> (75 files): design-system primitives (§24).</li>
+<li><code>assistant-ui/</code> (112): the transcript on @assistant-ui: markdown, directives, artifact cards, clarify, embeds, tool cards.</li>
+<li><code>chat/</code> (41): code cards, code editor, diff lines, intro, widget shell, wordmark.</li>
+<li><code>pane-shell/</code> (34): layout tree model, store, renderer, presets, zone editor (§19).</li>
+<li><code>onboarding/</code>, <code>onboarding-chat/</code>, <code>remote-setup/</code>, <code>free-tier/</code>, <code>shared-metrics/</code>: first-run and consent flows.</li>
+<li>Loose: boot/connecting/update overlays, <code>confirm-host</code>, <code>notifications</code>, error boundaries, <code>find-bar</code>, <code>brand-mark</code>, model and session pickers.</li>
+</ul>
+</section>
+
+<!-- 03 -->
+<section class="doc" id="identity">
+<h2><span class="n">03</span>Product identity</h2>
+<p><code>product-identity.cjs</code> is the one place every name-shaped value comes from: display name, appId, update channel, executable and CLI names, MSIX identity. It is read at build time by <code>electron-builder.config.cjs</code> and baked into the main bundle.</p>
+<pre><code>// product-identity.cjs
+const variants = {
+  '': { display: 'Gideon', kebab: 'gideon', pascal: 'Gideon' },
+  light: { display: 'Gideon Light', kebab: 'gideon-light', pascal: 'GideonLight' },
+  bundled: { display: 'Gideon Agent', kebab: 'gideon-bundled', pascal: 'GideonBundled' }
+}
+const variant = process.env.HERMES_DESKTOP_VARIANT || ''
+if (!['', 'light', 'bundled', 'store'].includes(variant)) {
+  throw new Error(`Unknown HERMES_DESKTOP_VARIANT ${variant}. ...`)
+}
+const store = variant === 'store'
+const light = variant === 'light'
+const name = variants[store ? 'bundled' : (variant || '')]</code></pre>
+<span class="src">apps/desktop/product-identity.cjs ~l.11–36</span>
+<pre><code>const identity = {
+  store, light, displayName,
+  appId: `com.acme.${name.kebab}${kebabSuffix}`,
+  // Store and commit builds do not publish a release feed.
+  channel: store || buildCommit ? null : light ? (canary ? 'light-canary' : 'light') : (canary ? 'canary' : 'latest'),
+  appNamePascal: `${name.pascal}${pascalSuffix}`,
+  artifactNamePascal: name.pascal,
+  windowsExecutableName: kebabSuffix ? cliName : displayName,
+  cliName,
+  msixAppIdWithOrg: `NousResearch.${name.pascal}${pascalSuffix}`,
+  ...(store ? { storeMsix: { identityName: 'NousResearchInc.HermesAgent', ... } } : {})
+}</code></pre>
+<span class="src">~l.65–88</span>
+<div class="table-wrap"><table>
+<thead><tr><th>Input</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td><code>HERMES_DESKTOP_VARIANT</code></td><td class="wrap"><code>''</code> → Gideon; <code>light</code> → Gideon Light (remote-only client); <code>bundled</code> → Gideon Agent (ships the Python payload); <code>store</code> → bundled names + Microsoft Store MSIX identity</td></tr>
+<tr><td><code>HERMES_PAYLOAD_TAG</code></td><td class="wrap">A canary tag (<code>vX.Y.Z+canary.&lt;timestamp&gt;</code>) adds a "Canary" suffix and the canary channel</td></tr>
+<tr><td><code>HERMES_BUILD_COMMIT</code></td><td class="wrap">A 40-hex commit adds a short-SHA suffix; no update channel</td></tr>
+<tr><td>Channel build request</td><td class="wrap">From <code>scripts/msix-shared.mjs</code>; can supply a whole identity with an R2 token</td></tr>
+</tbody></table></div>
+<h3>Runtime accessor</h3>
+<pre><code>// electron/product-identity.ts
+declare const __HERMES_PRODUCT_IDENTITY__: ProductIdentity
+
+/** The baked identity of this artifact (dev bundles derive it live). */
+export const PRODUCT_IDENTITY: Readonly&lt;ProductIdentity&gt; =
+  typeof __HERMES_PRODUCT_IDENTITY__ === 'undefined'
+    ? Object.freeze(nodeCreateRequire(import.meta.url)('../product-identity.cjs') as ProductIdentity)
+    : Object.freeze(__HERMES_PRODUCT_IDENTITY__)
+
+export function applyDesktopIdentity(app, identity = PRODUCT_IDENTITY): string | null {
+  if (!identity.token &amp;&amp; identity.appNamePascal === identity.artifactNamePascal) {
+    return null
+  }
+  const userData: string = path.join(app.getPath('appData'), identity.appNamePascal)
+  mkdirSync(userData, { recursive: true })
+  app.setPath('userData', userData)
+  app.setName(identity.displayName)
+  return identity.displayName
+}</code></pre>
+<span class="src">apps/desktop/electron/product-identity.ts ~l.18–48</span>
+<div class="callout warn"><span class="label">Branding trap (found by reading code, not run)</span>
+<p>For the stable variant, <code>appNamePascal === artifactNamePascal === 'Gideon'</code> and there is no token, so <code>applyDesktopIdentity</code> returns <code>null</code>. Then <code>main.ts:1438</code> sets <code>APP_NAME = IDENTITY_APP_NAME || process.env.HERMES_DESKTOP_APP_NAME || 'Hermes'</code>, and <code>main.ts:1850</code> falls back to the AUMID <code>com.nousresearch.hermes</code>. With <code>package.json</code> still saying <code>productName: "Hermes"</code>, the stable build's window titles and userData folder likely resolve to "Hermes", while the installer is named Gideon.</p></div>
+<p><strong><code>update-feed.cjs</code>:</strong> <code>darwinFeed(channel, light)</code> returns the macOS feed folder <code>releases/darwin/[light/]&lt;channel&gt;</code> and file <code>&lt;channel&gt;-mac.yml</code>; <code>feedBaseUrl()</code> validates <code>CLOUDFLARE_R2_PUBLIC_URL</code> as a clean <code>https:</code> base.</p>
+</section>
+
+<!-- 04 -->
+<section class="doc" id="package">
+<h2><span class="n">04</span>package.json &amp; scripts</h2>
+<p><code>"name": "hermes"</code>, <code>"productName": "Hermes"</code> (not rebranded), <code>"type": "module"</code>, <code>"main": "dist/electron-main.mjs"</code>, Node <code>^22.22 || ^24.11 || &gt;=26</code>. There's no <code>build</code> field: packaging config lives in <code>electron-builder.config.cjs</code>. Install from the <em>repo root</em> (<code>npm ci</code>); the app is a workspace.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Script</th><th>Runs</th></tr></thead>
+<tbody>
+<tr><td>Dev</td><td><code>dev</code></td><td class="wrap"><code>concurrently -k dev:renderer dev:electron</code></td></tr>
+<tr><td></td><td><code>dev:renderer</code></td><td class="wrap"><code>assert-root-install.mjs</code> → clean → <code>vite --host 127.0.0.1 --port 5174</code></td></tr>
+<tr><td></td><td><code>dev:electron</code></td><td class="wrap"><code>tsc --build tsconfig.electron.json</code> → <code>wait-on :5174</code> → <code>bundle-electron-main.mjs --dev</code> → <code>HERMES_DESKTOP_DEV_SERVER=http://127.0.0.1:5174 electron .</code></td></tr>
+<tr><td></td><td><code>dev:fake-boot</code></td><td class="wrap"><code>HERMES_DESKTOP_BOOT_FAKE=1</code>, 650 ms per boot step</td></tr>
+<tr><td></td><td><code>dev:mock</code></td><td class="wrap"><code>tests-js/scripts/mock-server.ts</code></td></tr>
+<tr><td></td><td><code>profile:main[:cpu]</code></td><td class="wrap">Electron with <code>--inspect=9229</code> or <code>--cpu-prof</code></td></tr>
+<tr><td>Build</td><td><code>build</code></td><td class="wrap"><code>node scripts/build.mjs</code> (§05)</td></tr>
+<tr><td></td><td><code>start</code> / <code>preview</code></td><td class="wrap">Build then run Electron; <code>vite preview</code> on 4174</td></tr>
+<tr><td>Package</td><td><code>pack</code> / <code>dist</code></td><td class="wrap">Build + electron-builder (<code>--dir</code> for pack)</td></tr>
+<tr><td></td><td><code>payload</code>, <code>dist:bundled</code></td><td class="wrap">Stage the Python agent (<code>scripts/bundles/stage.py</code>) then package with <code>HERMES_DESKTOP_VARIANT=bundled</code></td></tr>
+<tr><td></td><td><code>dist:mac[:dmg|:zip]</code>, <code>dist:win[:msix]</code>, <code>dist:linux</code></td><td class="wrap">Per-platform targets</td></tr>
+<tr><td>Test</td><td><code>test</code>, <code>test:ui</code>, <code>test:desktop:platforms</code></td><td class="wrap">Vitest: both projects / jsdom renderer / node Electron</td></tr>
+<tr><td></td><td><code>test:desktop[:all|dmg|msix|existing|fresh|lifecycle]</code></td><td class="wrap">Packaged-app harness <code>scripts/test-desktop.mjs</code></td></tr>
+<tr><td></td><td><code>test:e2e</code>, <code>test:e2e:visual</code></td><td class="wrap">Build + Playwright; visual runs under the <code>cage</code> Wayland compositor</td></tr>
+<tr><td>Check</td><td><code>typecheck</code></td><td class="wrap">tsc for renderer, electron, e2e + checkJs on <code>electron-builder.config.cjs</code></td></tr>
+<tr><td></td><td><code>lint</code>, <code>lint:fix</code>, <code>fmt</code>, <code>fix</code></td><td class="wrap">ESLint over <code>src/</code> and <code>electron/</code>; Prettier</td></tr>
+<tr><td></td><td><code>check:lint</code>, <code>check</code></td><td class="wrap">Typecheck + lint; everything including a packaged build</td></tr>
+<tr><td>Other</td><td><code>i18n:keys</code>, <code>perf</code>, <code>update:repro:*</code></td><td class="wrap">Key manifest; perf scenarios; updater reproductions</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 05 -->
+<section class="doc" id="build">
+<h2><span class="n">05</span>Build pipeline</h2>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TD
+  A["npm run build: scripts/build.mjs"] --> B["assert-root-install.mjs: every dependency installed, react = react-dom"]
+  B --> C["write-build-stamp.mjs: build/install-stamp.json"]
+  C --> D["stage-native-deps.mjs: node-pty, get-windows, native helpers"]
+  D --> E["repo-root scripts/build/desktop.mjs"]
+  E --> F["Vite build: renderer into dist/"]
+  E --> G["esbuild: bundle-electron-main.mjs"]
+  G --> H["dist/electron-main.mjs (ESM, from entry.ts)"]
+  G --> I["dist/electron-preload.js (CJS)"]
+  G --> J["dist/preview-guest-preload.js (CJS)"]
+  E --> K["copy native deps, assert-dist-built, freshness receipt"]
+</pre>
+</figure>
+<h3>The build stamp</h3>
+<p><code>write-build-stamp.mjs</code> records where the build came from (channel request → <code>HERMES_BUILD_COMMIT</code> → <code>GITHUB_SHA</code> → local git, with a dirty flag) plus the payload kind and how this build updates itself:</p>
+<pre><code>const updateMechanism = {
+  '': 'self',
+  bootstrap: 'self',
+  store: 'microsoft-store',
+  bundled: { win32: 'app-installer', darwin: 'electron-updater' }[platform] || 'external',
+  light: platform === 'darwin' ? 'electron-updater' : 'external'
+}[variant]</code></pre>
+<span class="src">scripts/write-build-stamp.mjs ~l.251–257</span>
+<h3>Native dependencies</h3>
+<p><code>stage-native-deps.mjs</code> copies the matching <code>node-pty</code> prebuild (or rebuilds with <code>@electron/rebuild</code> for another architecture), checks every <code>.node</code> binary's magic bytes against the target platform, patches asar paths, prepares <code>get-windows</code>, and compiles the native helpers in <code>electron/native/</code> (macOS command-screenshot and HUD modifier monitors).</p>
+<h3>Main and preload bundles (esbuild)</h3>
+<pre><code>const define = {}
+if (!dev) {
+  define['process.env.HERMES_DESKTOP_IS_PACKAGED'] = JSON.stringify(true)
+  define.__HERMES_INSTALL_STAMP__ = raw
+  define.__HERMES_PRODUCT_IDENTITY__ = productIdentity(source, metadata)
+}
+const common = { absWorkingDir: join(source, 'apps/desktop'), bundle: true, platform: 'node',
+  target: 'node20', external: ['electron', 'node-pty', 'get-windows', 'fs'], define, logLevel: 'info' }
+await build({ ...common, entryPoints: [join(source, 'apps/desktop/electron/entry.ts')], format: 'esm',
+  outfile: join(out, 'electron-main.mjs'), banner: { js: "import { createRequire } from 'module'; ..." + envBanner } })
+await build({ ...common, entryPoints: [join(source, 'apps/desktop/electron/preload.ts')], format: 'cjs',
+  outfile: join(out, 'electron-preload.js') })
+await build({ ...common, entryPoints: [join(source, 'apps/desktop/electron/preview-guest-preload-entry.ts')],
+  format: 'cjs', outfile: join(out, 'preview-guest-preload.js') })</code></pre>
+<span class="src">scripts/bundle-electron-main.mjs ~l.37–83</span>
+<p>In <code>--dev</code> mode the defines are skipped, so the identity is read live from <code>product-identity.cjs</code>. <code>tsconfig.electron.json</code> is only for type-checking; esbuild produces the runtime bundle.</p>
+<h3>Renderer (Vite)</h3>
+<pre><code>export default defineConfig(({ command }) =&gt; ({
+  base: './',
+  plugins: [react(), babel({ presets: [compilerPreset()] }), tailwindcss(), emojibaseAssets()],
+  css: { postcss: { plugins: [] } },
+  build: {
+    manifest: 'renderer-manifest.json',
+    chunkSizeWarningLimit: 25000,
+    rolldownOptions: { output: { advancedChunks: { groups: [
+      { name: 'vendor-react', test: /node_modules[\\/](react|react-dom|scheduler|react-router|@tanstack[\\/]react-query)[\\/]/ },
+      { name: 'vendor-md', ... }, { name: 'vendor-util', ... },
+      { name: 'mermaid', ... }, { name: 'shiki', ... }, { name: 'katex', test: /node_modules[\\/]katex[\\/]/ }
+    ] } } }
+  },</code></pre>
+<span class="src">apps/desktop/vite.config.ts ~l.119–199 (condensed)</span>
+<ul>
+<li><strong>React Compiler</strong> runs as a Babel preset on files with JSX or React imports.</li>
+<li><strong>Chunking</strong> keeps a handful of named vendor chunks: heavy libraries (mermaid, shiki, katex) load on first use; React and react-query must share one instance (two copies once broke <code>useQuery</code>).</li>
+<li><strong>PostCSS pinned empty</strong> so a stray Tailwind v3 config higher up the user's home can't break the build.</li>
+<li><strong>Aliases:</strong> <code>@/debug/dev-only</code> → a no-op outside dev; React and the JSX runtime pinned to one copy; <code>dedupe</code> for react, react-dom, react-router, react-query.</li>
+<li><strong>Dev server:</strong> <code>127.0.0.1:5174</code>, <code>strictPort</code>.</li>
+</ul>
+<h3>The three tsconfigs</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>File</th><th>Covers</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>tsconfig.json</code></td><td class="wrap"><code>src</code>, <code>../shared/src</code></td><td class="wrap">Strict, ES2023, bundler resolution, <code>noEmit</code>, same aliases as Vite</td></tr>
+<tr><td><code>tsconfig.electron.json</code></td><td class="wrap"><code>electron/</code>, identity and feed <code>.cjs</code>, three shared files</td><td class="wrap">Strict mode <strong>off</strong>; composite; type output only</td></tr>
+<tr><td><code>tsconfig.e2e.json</code></td><td class="wrap"><code>e2e/</code>, <code>playwright.config.ts</code>, smoke scripts</td><td class="wrap">Node + Playwright types</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 06 -->
+<section class="doc" id="packaging">
+<h2><span class="n">06</span>Packaging (electron-builder)</h2>
+<p><code>electron-builder.config.cjs</code> is CommonJS so the variant is decided when it's loaded; <code>scripts/run-electron-builder.mjs</code> always passes <code>--config</code>.</p>
+<pre><code>module.exports = {
+  electronVersion,                       // from devDependencies.electron
+  appId,                                 // com.acme.gideon[...]
+  productName: displayName,              // "Gideon"
+  executableName: displayName,
+  protocols: [{ name: `${displayName} Protocol`, schemes: ['hermes'] }],
+  artifactName: `${store ? 'Store-' : ''}${artifactNamePascal}-\${version}-\${os}-\${arch}.\${ext}`,
+  icon: 'assets/icon',
+  publish: channelRequest ? null : !channel ? null : [
+    publicUrl ? { provider: 'generic', url: publicUrl, channel }
+              : { provider: 'github', owner, repo, channel } ],
+  extraMetadata: {
+    name: appNamePascal,
+    ...((channelRequest &amp;&amp; token) || appNamePascal !== artifactNamePascal ? { productName: displayName } : {}),
+    desktopName: appId
+  },
+  directories: { output: 'release' },
+  files: ['dist/**', 'assets/**', 'public/**', 'package.json'],
+  beforeBuild: 'scripts/before-build.mjs',
+  beforePack: 'scripts/before-pack.mjs',
+  afterExtract: 'scripts/after-extract.mjs',
+  afterPack: 'scripts/after-pack.mjs',
+  ...(process.platform === 'darwin' ? { afterSign: 'scripts/notarize.mjs' } : {}),
+  extraResources: [
+    { from: 'build/install-stamp.json', to: 'install-stamp.json' },
+    ...(['bundled', 'store'].includes(process.env.HERMES_DESKTOP_VARIANT || '')
+      ? [{ from: 'build/agent-payload', to: 'agent-payload' }] : []),
+    { from: 'assets/icon.ico', to: 'icon.ico' }
+  ],
+  asar: { unpack: ['**/*.node', '**/prebuilds/**', 'dist/**'] },</code></pre>
+<span class="src">apps/desktop/electron-builder.config.cjs ~l.73–142 (condensed)</span>
+<h3>Lifecycle hooks</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Hook</th><th>Script</th><th>Does</th></tr></thead>
+<tbody>
+<tr><td><code>beforeBuild</code></td><td><code>before-build.mjs</code></td><td class="wrap">Skips electron-builder's node_modules collector; stages MSIX icons and extensions (CLI execution alias)</td></tr>
+<tr><td><code>beforePack</code></td><td><code>before-pack.mjs</code></td><td class="wrap">Wipes stale output; copies the admitted native tree</td></tr>
+<tr><td><code>afterExtract</code></td><td><code>after-extract.mjs</code></td><td class="wrap">Stamps the exe icon and identity with rcedit</td></tr>
+<tr><td><code>afterPack</code></td><td><code>after-pack.mjs</code></td><td class="wrap">Relocates the payload; signs nested binaries (mac) or batch-signs (Windows)</td></tr>
+<tr><td><code>afterSign</code></td><td><code>notarize.mjs</code></td><td class="wrap">macOS notarization</td></tr>
+</tbody></table></div>
+<h3>Per platform</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Platform</th><th>Targets</th><th>Details</th></tr></thead>
+<tbody>
+<tr><td>Windows</td><td>MSIX</td><td class="wrap">Identity from <code>msixAppIdWithOrg</code> (still <code>NousResearch.*</code>), min Windows 10.0.22621, custom manifest under <code>build/</code> or <code>assets/</code>, <code>unvirtualizedResources</code>. Signed with Azure Trusted Signing only when <code>AZURE_SIGN_ENDPOINT</code> and <code>AZURE_CLIENT_ID</code> are set. Updated by App Installer.</td></tr>
+<tr><td>Microsoft Store</td><td>Store MSIX</td><td class="wrap"><code>HERMES_DESKTOP_VARIANT=store</code>; identity <code>NousResearchInc.HermesAgent</code> (not rebranded); updated by the Store.</td></tr>
+<tr><td>macOS</td><td>DMG + ZIP</td><td class="wrap">Hardened runtime, entitlements in <code>electron/entitlements.mac*.plist</code>, usage descriptions built from <code>displayName</code>, DMG title still "Hermes Agent Installer". Updated by electron-updater.</td></tr>
+<tr><td>Linux</td><td>AppImage (+ deb/rpm from the script)</td><td class="wrap">Local builds only; release legs disabled. No in-app updates.</td></tr>
+</tbody></table></div>
+<p>Release bundles are built from the repo root with <code>python scripts/bundles/desktop.py --tag=vX.Y.Z [--variant store|light]</code> (<code>BUILDING.md</code>). The <code>dist:*</code> scripts only package the current build.</p>
+</section>
+
+<!-- 07 -->
+<section class="doc" id="updater">
+<h2><span class="n">07</span>Updates</h2>
+<p>The update mechanism is baked into the build stamp and resolved at runtime:</p>
+<pre><code>export function resolveUpdaterMechanism(facts: MechanismFacts): UpdaterMechanism {
+  if (facts.source === 'commit-build') { return 'external' }
+  if (facts.updateMechanism &amp;&amp; facts.updateMechanism !== 'self') { return facts.updateMechanism }
+  return facts.platform === 'win32' ? 'windows-handoff' : 'posix-handoff'
+}</code></pre>
+<span class="src">apps/desktop/electron/updater/index.ts</span>
+<div class="table-wrap"><table>
+<thead><tr><th>Mechanism</th><th>Files</th><th>Flow</th></tr></thead>
+<tbody>
+<tr><td><code>electron-updater</code> (mac)</td><td class="wrap"><code>updater/mac.ts</code>, <code>mac-client.ts</code></td><td class="wrap">Check, download, verify; prepare install before stopping the backend; <code>quitAndInstall</code>. Feed <code>releases/darwin/&lt;channel&gt;/</code>.</td></tr>
+<tr><td><code>app-installer</code> (Windows)</td><td class="wrap"><code>updater/app-installer.ts</code>, <code>app-updater.ts</code>, <code>app-installer-file.ts</code>, <code>relaunch*.ts</code></td><td class="wrap">Check via the payload Python's winrt checker; download the <code>.appinstaller</code>; start a detached PowerShell relaunch waiter; open the <code>.appinstaller</code> and quit.</td></tr>
+<tr><td><code>microsoft-store</code></td><td class="wrap"><code>updater/store.ts</code>, <code>store-client.ts</code></td><td class="wrap">StoreContext check, download, install after the relaunch waiter is registered.</td></tr>
+<tr><td><code>external</code></td><td class="wrap"><code>updater/external.ts</code></td><td class="wrap">No in-app updates (commit builds, Linux).</td></tr>
+<tr><td>Source checkout handoff</td><td class="wrap"><code>updater/checkout*.ts</code>, <code>marker-helper.ts</code>, <code>update-marker*.ts</code>, <code>update-gate.ts</code></td><td class="wrap">Hand the swap to <code>scripts/desktop-update/*</code>; a marker file <code>HERMES_HOME/.hermes-update-in-progress</code> parks backend spawns until done.</td></tr>
+<tr><td>Channel builds</td><td class="wrap"><code>updater/channel*.ts</code></td><td class="wrap">Hash-checked native artifacts; <code>channel-protocol.ts</code> is the only place that decodes untrusted JSON.</td></tr>
+</tbody></table></div>
+<p>IPC: <code>hermes:updates:check</code> / <code>apply</code> / <code>branch:get|set</code>, progress on <code>hermes:updates:progress</code>. Renderer side: <code>src/store/updates.ts</code>, <code>src/app/updates-overlay.tsx</code>.</p>
+</section>
+
+<!-- 08 -->
+<section class="doc" id="main">
+<h2><span class="n">08</span>Entry &amp; main.ts map</h2>
+<h3><code>electron/entry.ts</code></h3>
+<p>The esbuild entry. On Linux it reads <code>desktop.electron_flags</code> from <code>config.yaml</code> and may re-spawn Electron with Wayland/WSLg flags; otherwise it imports <code>main.ts</code>.</p>
+<pre><code>const args = wslgLaunchArgs(process.argv.slice(1), process.env, process.platform,
+  electronFlags, hasNvidiaProprietaryDriver())
+if (args) {
+  const child = spawnWslgLaunch(args)
+  child.once('error', error =&gt; { console.error('[hermes] Wayland ozone launch failed:', error); app.exit(1) })
+  child.once('exit', code =&gt; app.exit(code ?? 1))
+  for (const signal of ['SIGINT', 'SIGTERM'] as const) { process.once(signal, () =&gt; child.kill(signal)) }
+} else {
+  await import('./main')
+}</code></pre>
+<span class="src">apps/desktop/electron/entry.ts ~l.52–78</span>
+<h3><code>electron/main.ts</code> regions (19,786 lines)</h3>
+<p>It contains about 110 <code>ipcMain.handle</code> and 21 <code>ipcMain.on</code> calls; the logic it orchestrates lives in sibling modules. Line numbers drift, so search for the symbol.</p>
+<div class="table-wrap"><table>
+<thead><tr><th class="num">Lines (approx.)</th><th>Region</th></tr></thead>
+<tbody>
+<tr><td class="num">1–729</td><td class="wrap">Imports from ~250 sibling modules</td></tr>
+<tr><td class="num">731–1240</td><td class="wrap"><code>applyDesktopIdentity</code>, userData overrides, constants (<code>DEV_SERVER</code>, <code>IS_PACKAGED</code>, <code>PRELOAD_PATH</code>), GPU fallbacks, dev CDP port</td></tr>
+<tr><td class="num">1241–1440</td><td class="wrap">Single-instance lock, <code>HERMES_HOME</code> resolution, install paths, <code>DESKTOP_LOG_PATH</code>, boot-fake flags, <code>APP_NAME</code> (1438)</td></tr>
+<tr><td class="num">1832–1935</td><td class="wrap"><code>app.setName</code>, AUMID, media protocol, window and backend state holders</td></tr>
+<tr><td class="num">1948–2440</td><td class="wrap">Backend spawn helpers, pool limits, desktop.log buffering, <code>loadWindowUrl</code>, <code>openExternalUrl</code></td></tr>
+<tr><td class="num">2600–3610</td><td class="wrap">Bootstrap state, first-run setup choice, update mutual exclusion, <code>getBackendArgsForRuntime</code>, Python/venv helpers, git-checkout self-update</td></tr>
+<tr><td class="num">3610–4100</td><td class="wrap">Window geometry persistence; packaged update strategies</td></tr>
+<tr><td class="num">4100–5240</td><td class="wrap">Process scanning and orphan reap, backend locks, renderer index resolution</td></tr>
+<tr><td class="num">5240–5420</td><td class="wrap"><strong><code>resolveHermesBackend()</code></strong>, the runtime resolution ladder</td></tr>
+<tr><td class="num">5420–7260</td><td class="wrap">Bootstrap runner wiring, media/file reads, preview file watch, remote wait, application menu, downloads</td></tr>
+<tr><td class="num">7258–8923</td><td class="wrap">OAuth partitions, native tokens, Hermes Cloud discovery, secure token storage, remote header rules</td></tr>
+<tr><td class="num">8923–12611</td><td class="wrap">Connection registry v2, SSH, <code>ensureBackend</code> (10939), <code>ensureRegistryBackend</code> (11054), pool idle reaper, profile rename/delete</td></tr>
+<tr><td class="num">12611–13500</td><td class="wrap">One-backend-per-host attach, <strong><code>startHermes()</code></strong> (12776), spawn env (13146)</td></tr>
+<tr><td class="num">13509–13700</td><td class="wrap"><code>wireCommonWindowHandlers</code>: zoom, context menu, window-open policy, navigation guards, preview guest preload</td></tr>
+<tr><td class="num">13716–15020</td><td class="wrap">Secondary windows (<code>createSessionWindow</code>, <code>createBrowserWindow</code>), pet overlay, HUD, Quick Entry</td></tr>
+<tr><td class="num">15021–15480</td><td class="wrap"><strong><code>createWindow()</code></strong>, the primary window</td></tr>
+<tr><td class="num">15482–17100</td><td class="wrap">Connection, window, bootstrap, connection-config IPC; agent roster; Cloud and profile IPC</td></tr>
+<tr><td class="num">17100–18440</td><td class="wrap"><strong><code>hermes:api</code></strong> REST proxy (17649), file/clipboard/preview IPC, active work, theme, free-tier challenge</td></tr>
+<tr><td class="num">18441–19088</td><td class="wrap"><code>hermes:openExternal</code>, find-in-page, logs, fs/git/terminal registrars, updates IPC, uninstall, Marketplace themes</td></tr>
+<tr><td class="num">19088–19316</td><td class="wrap">Deep links (<code>hermes://</code>), lock-loser exit, <code>second-instance</code>, <code>open-url</code></td></tr>
+<tr><td class="num">19318–19465</td><td class="wrap"><strong><code>app.whenReady()</code></strong>: trust store, secrets, protocols, tray, Quick Entry, first window</td></tr>
+<tr><td class="num">19467–19786</td><td class="wrap">Quit path: <code>before-quit</code> (19633) with teardown coordinator, <code>window-all-closed</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 09 -->
+<section class="doc" id="modules">
+<h2><span class="n">09</span>Sibling modules by concern</h2>
+<p>About 300 non-test modules in <code>electron/</code>. Pure policy is split out of <code>main.ts</code> so it can be unit-tested in Node. Look here first when changing behaviour.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Concern</th><th>Modules</th></tr></thead>
+<tbody>
+<tr><td>Backend spawn and readiness</td><td class="wrap"><code>backend-command</code> (serve argv), <code>backend-serve-support</code>, <code>backend-ready</code> (READY sentinel), <code>backend-env</code>, <code>guest-onboarding</code> (spawn env), <code>backend-resolution</code>, <code>backend-health</code>, <code>backend-probes</code>, <code>backend-child</code>, <code>backend-claim</code>, <code>backend-dial-claim</code>, <code>backend-connection-state</code>, <code>payload-backend</code>, <code>source-backend</code>, <code>source-python</code></td></tr>
+<tr><td>Backend recovery and ownership</td><td class="wrap"><code>backend-exit-recovery</code>, <code>backend-ownership</code>, <code>backend-recycle</code>, <code>backend-release-gate</code>, <code>backend-start-failure</code>, <code>local-backend-lifecycle</code>, <code>host-backend-attach</code>, <code>host-backend-singleton</code>, <code>host-spawn-gate</code>, <code>primary-backend-startup</code>, <code>parent-process-identity</code></td></tr>
+<tr><td>Pool</td><td class="wrap"><code>pool-limits</code>, <code>pool-retire</code>, <code>pool-spawn-coordinator</code>, <code>pool-stop</code>, <code>pool-touch-scope</code></td></tr>
+<tr><td>Bootstrap / first run</td><td class="wrap"><code>bootstrap-runner</code>, <code>bootstrap-state</code>, <code>bootstrap-platform</code>, <code>bootstrap-repair-guard</code>, <code>first-run-setup-gate</code>, <code>desktop-installation</code>, <code>cli-provision</code></td></tr>
+<tr><td>Connections and remote</td><td class="wrap"><code>connection-config</code>, <code>connection-registry</code>, <code>connection-apply</code>, <code>desktop-remote-route</code>, <code>remote-lifecycle</code>, <code>remote-liveness</code>, <code>gateway-ws-probe</code>, <code>ssh-connection</code> (ControlMaster), <code>ssh-config</code>, <code>managed-ssh-update</code>, <code>cloud-discovery</code>, <code>cloud-boot-cascade</code>, <code>system-ca</code></td></tr>
+<tr><td>OAuth and secrets</td><td class="wrap"><code>native-oauth</code>, <code>native-oauth-login</code> (RFC 8252 loopback), <code>native-token-store</code>, <code>oauth-partition</code>, <code>oauth-navigation</code>, <code>remote-oauth-ticket</code>, <code>secret-storage-policy</code>, <code>mcp-oauth-callback-ipc</code>, <code>challenge-window</code></td></tr>
+<tr><td>Profiles</td><td class="wrap"><code>desktop-profile</code>, <code>launch-profile</code>, <code>primary-profile-pin</code>, <code>profile-*-routing</code></td></tr>
+<tr><td>Windows and chrome</td><td class="wrap"><code>session-windows</code>, <code>browser-windows</code>, <code>main-window-lifecycle</code>, <code>window-state</code>, <code>window-controls</code>, <code>window-focus-policy</code>, <code>titlebar-overlay-width</code>, <code>translucency</code>, <code>zoom</code>, <code>stream-throttle</code>, <code>renderer-bundle</code>, <code>bundle-skew</code>, <code>bundle-swap</code>, <code>find-in-page</code></td></tr>
+<tr><td>HUD, overlays, wake</td><td class="wrap"><code>hud-*</code> (ipc, geometry, drag, snap, overlay), <code>hud-modifier*</code>, <code>pet-overlay</code>, <code>wake-indicator-window</code>, <code>quick-entry</code>, <code>command-screenshot*</code></td></tr>
+<tr><td>Terminal, files, git</td><td class="wrap"><code>terminal-ipc</code> (node-pty host), <code>external-terminal</code>, <code>fs-ipc</code>, <code>fs-read-dir</code>, <code>workspace-cwd</code>, <code>git-ipc</code>, <code>git-review-ops</code>, <code>git-worktree-ops</code>, <code>desktop-plugin-install</code></td></tr>
+<tr><td>Notifications, tray, power</td><td class="wrap"><code>notification-ipc</code>, <code>notification-registry</code>, <code>notification-linux</code>, <code>minimize-to-tray</code>, <code>tray-host</code>, <code>power-save</code></td></tr>
+<tr><td>Preview, media, links</td><td class="wrap"><code>preview-guest-preload</code>, <code>preview-guest-escape</code>, <code>preview-capture</code>, <code>preview-reach</code>, <code>media-protocol</code>, <code>embed-host</code>, <code>link-title-*</code>, <code>favicon</code></td></tr>
+<tr><td>Security</td><td class="wrap"><code>window-open-policy</code>, <code>hub-iframe-policy</code>, <code>external-open</code>, <code>hardening</code>, <code>feature-flags</code></td></tr>
+<tr><td>Updater</td><td class="wrap"><code>app-updater</code>, <code>update-gate</code>, <code>update-marker*</code>, <code>update-hold-*</code>, <code>gateway-stop-before-update</code>, <code>app-installer-file</code>, <code>updater/</code></td></tr>
+<tr><td>Platform-specific</td><td class="wrap">Linux: <code>linux-gpu-fallback</code>, <code>linux-crash-diagnostics</code>, <code>singleton-lock</code>, <code>wslg-launch</code>. Windows: <code>windows-sandbox-fallback</code>, <code>windows-stack-cookie-fallback</code>, <code>windows-child-options</code>. Mac: entitlements, <code>dock-launch-order</code>, <code>window-menu</code>.</td></tr>
+<tr><td>Logging and metrics</td><td class="wrap"><code>desktop-log-line</code>, <code>log-rotation</code>, <code>crash-forensics</code>, <code>main-process-lag-watchdog</code>, <code>desktop-shared-metrics</code></td></tr>
+<tr><td>Quit</td><td class="wrap"><code>quit-guard</code>, <code>quit-teardown</code>, <code>quit-finalization</code>, <code>close-stop-kill</code></td></tr>
+<tr><td>Identity and paths</td><td class="wrap"><code>product-identity</code>, <code>install-stamp</code>, <code>app-version</code>, <code>data-paths</code>, <code>app-icon</code>, <code>shell-path</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 10 -->
+<section class="doc" id="windows">
+<h2><span class="n">10</span>Windows</h2>
+<pre><code>function createWindow() {
+  const icon = getAppIconPath()
+  const savedWindowState = readWindowState()
+  mainWindow = new BrowserWindow({
+    ...computeWindowOptions(
+      savedWindowState ?? windowSize('normal', screen.getPrimaryDisplay().workArea),
+      screen.getAllDisplays()
+    ),
+    minWidth: WINDOW_MIN_WIDTH,
+    minHeight: WINDOW_MIN_HEIGHT,
+    title: APP_NAME,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: getTitleBarOverlayOptions(),
+    trafficLightPosition: IS_MAC ? WINDOW_BUTTON_POSITION : undefined,
+    ...chatWindowSurfaceOptions(),
+    icon,
+    show: false,
+    webPreferences: chatWindowWebPreferences(PRELOAD_PATH)
+  })</code></pre>
+<span class="src">apps/desktop/electron/main.ts ~l.15021–15053</span>
+<pre><code>function chatWindowWebPreferences(preloadPath: string) {
+  return {
+    preload: preloadPath,
+    contextIsolation: true,
+    webviewTag: true,
+    sandbox: true,
+    nodeIntegration: false,
+    devTools: true,
+    autoplayPolicy: 'no-user-gesture-required' as const,
+    focusOnNavigation: false
+  }
+}</code></pre>
+<span class="src">apps/desktop/electron/session-windows.ts ~l.49–60</span>
+<p>After construction, <code>createWindow</code> registers the tray and quit guard, loads the dev server or <code>dist/index.html</code> (or an error page if the bundle is incomplete), and starts the backend <strong>in parallel</strong>: <code>const startup = defaultRoute ? connectDesktopProfileRoute(defaultRoute) : startHermes()</code>. <code>backgroundThrottling</code> is toggled at runtime while a turn streams (<code>stream-throttle.ts</code>).</p>
+<h3>Window kinds</h3>
+<p>The renderer chooses its root from the <code>?win=</code> query, which must come <em>before</em> the <code>#</code> because routing uses <code>HashRouter</code>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Kind</th><th>URL</th><th>Main side</th><th>Renderer root</th></tr></thead>
+<tbody>
+<tr><td>Main</td><td><code>index.html</code></td><td class="wrap"><code>createWindow</code></td><td class="wrap"><code>ContribController</code></td></tr>
+<tr><td>Session</td><td><code>?win=secondary[&amp;watch=1][&amp;profile=][&amp;connectionId=]#/&lt;id&gt;</code></td><td class="wrap"><code>createSessionWindow</code>; one per session</td><td class="wrap">Same shell</td></tr>
+<tr><td>Peer instance</td><td><code>?peer=1</code></td><td class="wrap"><code>buildInstanceWindowUrl</code></td><td class="wrap">Same shell</td></tr>
+<tr><td>HUD</td><td><code>?win=hud</code></td><td class="wrap"><code>openHudWindow</code>, <code>hud-*.ts</code></td><td class="wrap"><code>HudShell</code> (same wiring, no frame)</td></tr>
+<tr><td>Browser pop-out</td><td><code>?win=browser&amp;tab=</code></td><td class="wrap"><code>createBrowserWindow</code></td><td class="wrap"><code>BrowserPopoutShell</code></td></tr>
+<tr><td>Quick Entry</td><td><code>?win=quick</code></td><td class="wrap"><code>quick-entry.ts</code> (global chord)</td><td class="wrap"><code>quick-entry-root.tsx</code></td></tr>
+<tr><td>Pet overlay</td><td><code>?win=overlay</code></td><td class="wrap"><code>pet-overlay.ts</code></td><td class="wrap"><code>overlay-root.tsx</code></td></tr>
+<tr><td>Wake indicator</td><td><code>?win=wake</code></td><td class="wrap"><code>wake-indicator-window.ts</code></td><td class="wrap"><code>wake-indicator-root.tsx</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 11 -->
+<section class="doc" id="bridge">
+<h2><span class="n">11</span>Preload bridge &amp; IPC</h2>
+<p><code>electron/preload.ts</code> (716 lines, bundled to <code>dist/electron-preload.js</code>) is the <em>only</em> door from the renderer to native power. It exposes one object, <code>window.hermesDesktop</code>.</p>
+<pre><code>const translucencySupport = ipcRenderer.sendSync('hermes:translucency:support')
+const hudWindowing = ipcRenderer.sendSync('hermes:hud:windowing')
+const launchFlags = ipcRenderer.sendSync('hermes:feature-flags')
+const localSkin = ipcRenderer.sendSync('hermes:skin:local')
+
+contextBridge.exposeInMainWorld('hermesDesktop', {
+  glassSupported: translucencySupport?.glass === true,
+  translucencySupported: translucencySupport?.translucency === true,
+  localModelsEnabled: launchFlags?.localModels === true,
+  guestOnboardingEnabled: launchFlags?.guestOnboarding === true,
+  localSkin: localSkin &amp;&amp; typeof localSkin === 'object' ? localSkin : null,
+  getConnection: (profile, opts) =&gt; ipcRenderer.invoke('hermes:connection', profile, opts),
+  getConnectionFor: payload =&gt; ipcRenderer.invoke('hermes:connection:for', payload),
+  api: request =&gt; ipcRenderer.invoke('hermes:api', request).then(unwrapExpectedNotFound),
+  ...</code></pre>
+<span class="src">apps/desktop/electron/preload.ts ~l.14–49, 341</span>
+<p>The <code>sendSync</code> calls run once at load because the sandboxed preload can't import Node modules.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Members</th></tr></thead>
+<tbody>
+<tr><td>Connections and backends</td><td class="wrap"><code>getConnection</code>, <code>getConnectionFor</code>, <code>getGatewayWsUrl[For]</code>, pool limits, <code>getAgentRoster</code>, <code>connections.*</code>, <code>cloud.*</code>, <code>profile.*</code>, OAuth login/logout, <code>sshConfigHosts</code></td></tr>
+<tr><td>REST proxy</td><td class="wrap"><code>api(request)</code></td></tr>
+<tr><td>Windows</td><td class="wrap"><code>openSessionWindow</code>, <code>openWindow</code>, <code>openBrowserWindow</code>, <code>windowRelay</code>, <code>windowControls</code>, <code>hud.*</code>, <code>quickEntry.*</code>, <code>petOverlay.*</code>, <code>wakeIndicator</code>, <code>zoom.*</code>, <code>minimizeToTray.*</code>, <code>screenshot</code> (mac)</td></tr>
+<tr><td>Files</td><td class="wrap"><code>readFileText</code>, <code>readFileDataUrl*</code>, <code>selectPaths</code>, <code>selectSavePath</code>, <code>readDir</code>, <code>gitRoot</code>, <code>revealPath</code>, <code>renamePath</code>, <code>writeTextFile</code>, <code>trashPath</code>, <code>getPathForFile</code>, preview watchers, clipboard</td></tr>
+<tr><td>Git</td><td class="wrap"><code>git.*</code> including <code>review.*</code></td></tr>
+<tr><td>Terminal</td><td class="wrap"><code>terminal.{start, attach, write, resize, cwd, dispose, onData, onExit}</code> over per-id channels <code>hermes:terminal:&lt;id&gt;:data|exit</code></td></tr>
+<tr><td>Lifecycle</td><td class="wrap">Boot progress, bootstrap, <code>updateHold</code>, <code>updates.*</code>, <code>uninstall.*</code>, <code>desktopMetrics.*</code>, <code>onDeepLink</code>, <code>onBackendExit</code>, <code>onPoolBackendRetiring</code>, <code>onConnectionApplied</code>, <code>onPowerResume</code></td></tr>
+<tr><td>Misc</td><td class="wrap"><code>openExternal</code>, <code>notify</code>, <code>freeTierChallenge.run</code>, <code>mcpOauth.*</code>, find-in-page, <code>themes.*</code>, logs, <code>setActiveWork</code></td></tr>
+</tbody></table></div>
+<h3>Typing on the renderer side</h3>
+<pre><code>declare global {
+  interface Window {
+    hermesDesktop: {
+      // Resolve a backend connection. Omit `profile` for the window's backend;
+      // pass a named profile to lazily spawn/reuse that profile's backend.
+      getConnection: (
+        profile?: string | null,
+        opts?: { priority?: 'foreground' | 'background' }
+      ) =&gt; Promise&lt;HermesConnection&gt;
+      ...
+      api: &lt;T&gt;(request: HermesApiRequest) =&gt; Promise&lt;T&gt;</code></pre>
+<span class="src">apps/desktop/src/global.d.ts ~l.34–50, 291</span>
+<p>The type is hand-written, not derived from <code>preload.ts</code>, so both must change together.</p>
+<h3>Example IPC pair: <code>hermes:connection</code></h3>
+<pre><code>ipcMain.handle('hermes:connection', async (event, profile, extra) =&gt; {
+  const route = resolveDesktopConnectionRequest(
+    profile,
+    windowConnectionRoutes.get(event.sender.id),
+    primaryProfileKey()
+  )
+  return connectDesktopProfileRoute(route, spawnPriorityFrom(extra?.priority), event.sender)
+})</code></pre>
+<span class="src">apps/desktop/electron/main.ts ~l.15482</span>
+<h3>Example IPC pair: <code>hermes:api</code> (REST proxy)</h3>
+<pre><code>ipcMain.handle('hermes:api', async (_event, request) =&gt; {
+  const deletingProfile = profileNameFromDeleteRequest(request)
+  const mutatingProfile = deletingProfile || profileRenameFromRequest(request)?.oldName || null
+  const registryConnectionId = apiRequestRegistryConnectionId(request)
+  try {
+    if (deletingProfile &amp;&amp; registryConnectionId) { return await dispatchConnectionScopedProfileDelete(...) }
+    if (!mutatingProfile) { return await handleHermesApiRequest(request) }
+    const releaseProfileDeletion = profileDeletionGate.acquire(mutatingProfile)
+    return await handleHermesApiRequest(request).finally(releaseProfileDeletion)
+  } catch (error) {
+    if (isNotFoundApiError(error)) {
+      return { [HERMES_API_EXPECTED_404]: String((error as any)?.message ?? error) }
+    }
+    rememberLog(formatApiRequestFailure(request, error))
+    flushDesktopLogBufferSync()
+    throw error
+  }
+})</code></pre>
+<span class="src">apps/desktop/electron/main.ts ~l.17649–17704 (condensed)</span>
+<p>An expected 404 comes back as a sentinel so Electron doesn't log a stack trace; the preload's <code>unwrapExpectedNotFound</code> turns it back into a rejection.</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  participant C as React component
+  participant A as src/api (hermesApi)
+  participant P as preload (window.hermesDesktop.api)
+  participant M as main.ts (hermes:api)
+  participant B as hermes serve
+  C->>A: getCustomEndpoints()
+  A->>P: api({path, profile, connectionId})
+  P->>M: ipcRenderer.invoke hermes:api
+  M->>M: pick backend by profile and connection
+  M->>B: HTTP with X-Hermes-Session-Token
+  B-->>M: JSON
+  M-->>P: result or 404 sentinel
+  P-->>A: unwrapExpectedNotFound
+  A-->>C: typed data
+</pre>
+</figure>
+</section>
+
+<!-- 12 -->
+<section class="doc" id="backend">
+<h2><span class="n">12</span>Backend spawn &amp; pool</h2>
+<h3>Resolution ladder</h3>
+<p><code>resolveHermesBackend()</code> (<code>main.ts</code> ~5240) picks which Python runtime to launch. The first rung that probes as usable wins:</p>
+<ol class="steps">
+<li><div>Bundled payload (<code>payload-backend.ts</code>, from the build stamp)</div></li>
+<li><div><code>HERMES_DESKTOP_HERMES_ROOT</code>: a developer checkout</div></li>
+<li><div>The source repo, when running unpackaged</div></li>
+<li><div><code>HERMES_DESKTOP_HERMES</code>: explicit command override</div></li>
+<li><div>The active install <code>%LOCALAPPDATA%\hermes\hermes-agent</code> (skipped with <code>HERMES_DESKTOP_IGNORE_EXISTING=1</code>)</div></li>
+<li><div>A published user-bin launcher</div></li>
+<li><div>Otherwise <code>bootstrap-needed</code>: the first-run installer runs (<code>bootstrap-runner.ts</code>)</div></li>
+</ol>
+<h3>Spawn</h3>
+<pre><code>export function serveBackendArgs(profile?: string) {
+  const pinned = backendProfileArg(profile)
+  const head = pinned ? ['--profile', pinned] : []
+  return [...head, 'serve', '--host', '127.0.0.1', '--port', '0']
+}</code></pre>
+<span class="src">apps/desktop/electron/backend-command.ts ~l.20–27</span>
+<p>Older runtimes without <code>serve</code> get <code>dashboard --no-open</code> instead (detected by <code>backend-serve-support.ts</code>). The environment includes the profile's <code>HERMES_HOME</code>, a fresh <code>HERMES_DASHBOARD_SESSION_TOKEN</code>, <code>HERMES_DESKTOP=1</code>, the parent-watchdog identity, <code>HERMES_WEB_DIST</code>, and the guest-onboarding flag:</p>
+<pre><code>export function desktopBackendSpawnEnv(base: NodeJS.ProcessEnv, guestOnboarding: boolean): NodeJS.ProcessEnv {
+  return {
+    ...base,
+    [GUEST_ONBOARDING_ENV]: guestOnboarding ? '1' : '0',
+    GATEWAY_ON_ALL_ADAPTERS_DOWN: 'stay_alive'
+  }
+}</code></pre>
+<span class="src">apps/desktop/electron/guest-onboarding.ts ~l.11–23</span>
+<h3>Readiness</h3>
+<pre><code>const _READY_RE = /^HERMES_(?:BACKEND|DASHBOARD)_READY port=(\d+)/m
+export const READY_IN_MERGED_OUTPUT_RE = /(?&lt;!\w)HERMES_(?:BACKEND|DASHBOARD)_READY port=(\d+)/
+const DEFAULT_PORT_ANNOUNCE_TIMEOUT_MS = 90_000
+const MIN_PORT_ANNOUNCE_TIMEOUT_MS = 45_000</code></pre>
+<span class="src">apps/desktop/electron/backend-ready.ts</span>
+<p>The listener is attached before any await and also scans already-buffered output, so the line can't be missed. The deadline stretches (up to 30 minutes) while dependency-sync banners print. Then <code>waitForHermes</code> health-polls (180 s budget). Boot progress goes to the renderer: resolve 8% → runtime 28% → spawn 84% → ready 94%.</p>
+<h3>The pool</h3>
+<ul>
+<li>The primary backend serves the launch profile. Other profiles get pooled backends via <code>ensureBackend(profile)</code> (~10939): reuse, or evict LRU and spawn.</li>
+<li>Remote sources (SSH, URL+token, Cloud) go through <code>ensureRegistryBackend(connectionId, profile)</code> (~11054).</li>
+<li>Concurrent dials for the same scope coalesce (<code>backendDialClaims.run(backendScopeKey(...))</code>).</li>
+<li>Limits: <code>pool-limits.json</code> in userData, env fallbacks <code>HERMES_DESKTOP_POOL_MAX</code> / <code>_POOL_IDLE_MS</code>. Local profile backends are never idle-reaped.</li>
+<li>Crash supervision with a crash-loop budget; <code>recycleBackend(profile)</code> after a code-skew 503.</li>
+<li>One backend per host by default (<code>host-backend-*.ts</code>); <code>HERMES_DESKTOP_ISOLATED_BACKEND=1</code> opts out.</li>
+<li><code>hermes serve</code> dies with the app. A messaging gateway started from it is detached and survives.</li>
+</ul>
+</section>
+
+<!-- 13 -->
+<section class="doc" id="security">
+<h2><span class="n">13</span>Security</h2>
+<pre><code>export function createWindowOpenHandler(onDenied?, trusted?) {
+  return details =&gt; {
+    const openerOrigin = trusted ? safeOpenerOrigin(trusted, details) : null
+    if (trusted &amp;&amp; isHermesHubOrigin(openerOrigin) &amp;&amp; isHermesHubExternalUrl(details.url)) {
+      try { trusted.openExternalUrl(details.url) } catch {}
+    }
+    try { onDenied?.(describeDeniedUrl(details.url)) } catch {}
+    return { action: 'deny' }
+  }
+}</code></pre>
+<span class="src">apps/desktop/electron/window-open-policy.ts ~l.70–94</span>
+<ul>
+<li><strong>No window ever opens from content</strong> (advisory GHSA-9f4c-93c8-jc8g). The only exception hands a Skills Hub link to the audited opener; still no window is created.</li>
+<li><strong><code>will-navigate</code></strong> cancels anything that isn't the dev server or a <code>file:</code> URL and sends it to <code>openExternalUrl</code>; <code>will-frame-navigate</code> pins the Skills Hub iframe.</li>
+<li><strong><code>external-open.ts</code></strong> is the single path out: local paths are audited, <code>file:</code> goes to <code>openFile</code>, only <code>http:</code>, <code>https:</code> and <code>mailto:</code> reach <code>shell.openExternal</code>.</li>
+<li><strong>Preview webview:</strong> partition <code>persist:hermes-preview</code>, no <code>allowpopups</code>. The guest preload is attached only for that partition and forwards only trusted primary-button clicks on <code>_blank</code> links:</li>
+</ul>
+<pre><code>contents.on('will-attach-webview', (_attachEvent, webPreferences, params) =&gt; {
+  if (params.partition !== 'persist:hermes-preview') {
+    return
+  }
+  webPreferences.preload = PREVIEW_GUEST_PRELOAD_PATH
+})</code></pre>
+<span class="src">apps/desktop/electron/main.ts ~l.13649–13663</span>
+<ul>
+<li>Every window: <code>contextIsolation: true</code>, <code>sandbox: true</code>, <code>nodeIntegration: false</code>.</li>
+<li>The dev CDP port is loopback only and never opened in packaged builds.</li>
+<li><code>persist:</code> partition names must avoid characters Electron percent-escapes (Windows cookie stores silently fail).</li>
+</ul>
+</section>
+
+<!-- 14 -->
+<section class="doc" id="paths">
+<h2><span class="n">14</span>Data paths, logs, env vars</h2>
+<pre><code>export function platformDefaultHermesHome(home, env = process.env, platform = process.platform) {
+  const suffix = env.HERMES_DATA_DIR_SUFFIX || ''
+  if (platform === 'win32') {
+    const base = (env.LOCALAPPDATA || '').trim() || path.win32.join(home, 'AppData', 'Local')
+    return path.win32.join(base, 'hermes') + suffix
+  }
+  return path.posix.join(home, '.hermes') + suffix
+}</code></pre>
+<span class="src">apps/desktop/electron/data-paths.mjs</span>
+<div class="table-wrap"><table>
+<thead><tr><th>Location</th><th>Holds</th></tr></thead>
+<tbody>
+<tr><td><code>HERMES_HOME</code> (Windows <code>%LOCALAPPDATA%\hermes</code>)</td><td class="wrap"><code>config.yaml</code> (read before ready for Electron flags), <code>hermes-agent/</code> (installed runtime + venv), <code>logs/desktop.log</code>, <code>.hermes-update-in-progress</code></td></tr>
+<tr><td>Electron userData (<code>appData/&lt;productName&gt;</code>)</td><td class="wrap"><code>active-profile.json</code>, <code>connection.json</code> (v1), <code>connections.json</code> (v2 registry), <code>window-state.json</code>, <code>updates.json</code>, <code>backend-ownership.json</code>, <code>minimize-to-tray.json</code>, <code>pool-limits.json</code>, GPU/sandbox markers</td></tr>
+<tr><td>Renderer localStorage</td><td class="wrap">Per-window UI preferences, all routed through <code>src/lib/storage.ts</code> (§21)</td></tr>
+</tbody></table></div>
+<p><strong>Logs:</strong> <code>&lt;HERMES_HOME&gt;/logs/desktop.log</code>, buffered (120 ms flush), size-rotated; renderer errors arrive over <code>hermes:logs:renderer-error</code>. <strong>Single-instance lock</strong> is scoped to userData: a dev build next to an installed app needs <code>HERMES_DESKTOP_USER_DATA_DIR</code> or <code>HERMES_DESKTOP_APP_NAME</code>. <strong>Deep links:</strong> scheme <code>hermes://</code> (not rebranded).</p>
+<h3><code>HERMES_DESKTOP_*</code> variables</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>HERMES_DESKTOP_DEV_SERVER</code></td><td class="wrap">Renderer URL in dev; enables dev CDP</td></tr>
+<tr><td><code>HERMES_DESKTOP_IS_PACKAGED</code></td><td class="wrap">Baked <code>true</code> in non-dev bundles</td></tr>
+<tr><td><code>HERMES_DESKTOP_USER_DATA_DIR</code></td><td class="wrap">Explicit userData; also derives <code>HERMES_HOME=&lt;dir&gt;/hermes-home</code> if unset</td></tr>
+<tr><td><code>HERMES_DESKTOP_APP_NAME</code></td><td class="wrap">Fallback <code>APP_NAME</code>; E2E uses it to avoid the lock</td></tr>
+<tr><td><code>HERMES_DESKTOP_HERMES_ROOT</code></td><td class="wrap">Use this source checkout as the backend</td></tr>
+<tr><td><code>HERMES_DESKTOP_HERMES</code>, <code>HERMES_DESKTOP_PYTHON</code></td><td class="wrap">Explicit <code>hermes</code> command / interpreter</td></tr>
+<tr><td><code>HERMES_DESKTOP_IGNORE_EXISTING</code></td><td class="wrap"><code>1</code> skips installed runtimes</td></tr>
+<tr><td><code>HERMES_DESKTOP_ISOLATED_BACKEND</code></td><td class="wrap"><code>1</code> opts out of one-backend-per-host</td></tr>
+<tr><td><code>HERMES_DESKTOP_BOOT_FAKE</code> / <code>_STEP_MS</code> / <code>_ERROR</code></td><td class="wrap">Fake boot sequence for UI work</td></tr>
+<tr><td><code>HERMES_DESKTOP_SKIP_QUIT_CONFIRM</code></td><td class="wrap">Skip the "still working" quit modal</td></tr>
+<tr><td><code>HERMES_DESKTOP_POOL_MAX</code> / <code>_POOL_IDLE_MS</code></td><td class="wrap">Initial pool limits</td></tr>
+<tr><td><code>HERMES_DESKTOP_PORT_ANNOUNCE_TIMEOUT_MS</code></td><td class="wrap">Backend READY deadline (floor 45 s)</td></tr>
+<tr><td><code>HERMES_DESKTOP_REMOTE_URL</code> / <code>_REMOTE_TOKEN</code></td><td class="wrap">App-wide remote gateway override</td></tr>
+<tr><td><code>HERMES_DESKTOP_DISABLE_GPU</code>, <code>_NVIDIA_SWIFTSHADER</code></td><td class="wrap">Rendering fallbacks</td></tr>
+<tr><td><code>HERMES_DESKTOP_CDP_PORT</code></td><td class="wrap">Dev renderer CDP port (default 9222; never packaged)</td></tr>
+<tr><td><code>HERMES_DESKTOP_SHELL</code></td><td class="wrap">Embedded terminal shell override</td></tr>
+<tr><td><code>HERMES_DESKTOP_VARIANT</code></td><td class="wrap">Build variant (§03)</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 15 -->
+<section class="doc" id="boot">
+<h2><span class="n">15</span>Renderer boot &amp; window roots</h2>
+<pre><code>const winParam = new URLSearchParams(window.location.search).get('win')
+if (winParam === 'hud') { document.title = 'Gideon HUD' }
+const TRANSPARENT_WINDOWS = new Set(['hud', 'overlay', 'quick', 'wake'])
+if (winParam &amp;&amp; TRANSPARENT_WINDOWS.has(winParam)) { /* html,body,#root{background:transparent} */ }
+
+if (winParam === 'overlay') {
+  void import('./app/pet-overlay/overlay-root').then(({ mountPetOverlay }) =&gt; mountPetOverlay())
+} else if (winParam === 'quick') {
+  void import('./app/quick-entry/quick-entry-root').then(({ mountQuickEntry }) =&gt; mountQuickEntry())
+} else if (winParam === 'wake') {
+  void import('./app/wake-indicator/wake-indicator-root').then(({ mountWakeIndicator }) =&gt; mountWakeIndicator())
+} else {
+  installRendererAnimationPauseState()
+  createRoot(document.getElementById('root')!).render(
+    &lt;StrictMode&gt;&lt;RootErrorBoundary&gt;&lt;QueryClientProvider client={queryClient}&gt;&lt;I18nProvider&gt;&lt;ThemeProvider&gt;
+      &lt;HapticsProvider&gt;&lt;RootTooltipProvider&gt;
+        &lt;HashRouter useTransitions={false}&gt;&lt;App /&gt;&lt;/HashRouter&gt;
+      &lt;/RootTooltipProvider&gt;&lt;/HapticsProvider&gt;&lt;/ThemeProvider&gt;&lt;/I18nProvider&gt;&lt;/QueryClientProvider&gt;&lt;/RootErrorBoundary&gt;&lt;/StrictMode&gt;)
+}</code></pre>
+<span class="src">apps/desktop/src/main.tsx ~l.50–122 (condensed)</span>
+<ul>
+<li>Side-effect imports run first: <code>styles.css</code>, <code>store/active-work</code> (feeds the quit guard), <code>power</code>, <code>translucency</code>, <code>user-bubble-transparency</code>, <code>chat-text-scale</code>, <code>@/debug/dev-only</code>.</li>
+<li><code>useTransitions={false}</code>: route commits were starved under streaming load when wrapped in transitions.</li>
+<li>One <code>RootTooltipProvider</code> for the whole app (per-tooltip providers once cost 50k renders in a drag).</li>
+<li><code>App</code> is <code>ContribController</code> (<code>src/app/index.tsx</code>).</li>
+</ul>
+<h3><code>src/store/windows.ts</code> helpers</h3>
+<p class="small"><code>isMainWindow</code>, <code>isSecondaryWindow</code>, <code>isHudWindow</code>, <code>isBrowserWindow</code>, <code>isAuxiliaryWindow</code> (secondary, HUD or browser), <code>isPeerInstanceWindow</code>, <code>isWatchWindow</code>, <code>isProfilePinnedWindow</code>, <code>windowProfileOverride</code>, <code>windowConnectionOverride</code>, <code>canOpenSessionWindow</code>, <code>canOpenBrowserWindow</code>. All read <code>location.search</code> and are cached.</p>
+</section>
+
+<!-- 16 -->
+<section class="doc" id="contrib">
+<h2><span class="n">16</span>Contribution system</h2>
+<p>The app is <strong>composed from contributions</strong>: panes, routes, sidebar items, keybinds, palette commands, statusbar and titlebar items, layout presets, themes and transcript directives all register in one registry. Core surfaces use the same calls plugins do. It is an internal composition seam, not a public plugin ABI.</p>
+<h3>The Contribution type</h3>
+<pre><code>export interface Contribution {
+  /** Stable id, unique within its area. Re-registering the same id replaces it. */
+  id: string
+  /** Namespaced area id this contribution targets, e.g. `'secondarySidebar'`. */
+  area: string
+  /** Provenance; defaults to `'core'` when omitted. */
+  source?: ContributionSource
+  title?: string
+  /** Ascending sort key within the area; ties keep insertion order. */
+  order?: number
+  /** Dynamic visibility predicate, evaluated when the area's snapshot is (re)built */
+  when?: () =&gt; boolean
+  enabled?: boolean
+  /** Renders the contribution's content (UI contributions). */
+  render?: () =&gt; ReactNode
+  /** Declarative payload for data contributions: layout presets, themes, commands */
+  data?: unknown
+}</code></pre>
+<span class="src">apps/desktop/src/contrib/types.ts ~l.25–51</span>
+<h3>The registry</h3>
+<pre><code>class ContributionRegistry {
+  private byArea = new Map&lt;string, Contribution[]&gt;()
+  private snapshot = new Map&lt;string, readonly Contribution[]&gt;()
+
+  /** Register one contribution. Returns a disposer that removes it. */
+  register = (c: Contribution): (() =&gt; void) =&gt; this.registerMany([c])
+
+  registerMany = (cs: Contribution[]): (() =&gt; void) =&gt; {
+    cs.forEach(c =&gt; this.put(c))
+    this.invalidate(cs.map(c =&gt; c.area))
+    return () =&gt; this.removeMany(cs.map(c =&gt; ({ area: c.area, id: c.id })))
+  }
+
+  /** Resolved, sorted, filtered entries for an area. Stable ref until mutated. */
+  getArea = (area: string): readonly Contribution[] =&gt; { ...
+      .filter(c =&gt; c.enabled !== false &amp;&amp; (c.when ? c.when() : true))
+      .sort((a, b) =&gt; (a.order ?? 0) - (b.order ?? 0))
+}
+export const registry = new ContributionRegistry()</code></pre>
+<span class="src">apps/desktop/src/contrib/registry.ts ~l.34–72, 162</span>
+<p>Invalidation is per area: registering a statusbar item never re-renders the titlebar. <code>subscribeArea(area, fn)</code> notifies one area; <code>$registryVersion</code> serves non-React consumers. Note that <code>when()</code> is not reactive; it is evaluated when the area snapshot is rebuilt.</p>
+<h3>React bindings</h3>
+<pre><code>export function useContributions(area: string): readonly Contribution[] {
+  const subscribe = useCallback((onChange: () =&gt; void) =&gt; registry.subscribeArea(area, onChange), [area])
+  const getSnapshot = useCallback(() =&gt; registry.getArea(area), [area])
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
+}
+
+export function Slot({ area }: SlotProps) {
+  const items = useContributions(area)
+  if (items.length === 0) { return null }
+  return (&lt;&gt;{items.map(c =&gt; (
+    &lt;ContribBoundary id={c.id} key={`${c.source ?? 'core'}:${c.id}`} variant="chip"&gt;
+      {c.render &amp;&amp; &lt;ContribRender render={c.render} /&gt;}
+    &lt;/ContribBoundary&gt;))}&lt;/&gt;)
+}</code></pre>
+<span class="src">apps/desktop/src/contrib/react/use-contributions.ts, slot.tsx</span>
+<ul>
+<li><code>ContribRender</code> mounts <code>render</code> as a component (<code>createElement(render)</code>) so a contribution's hooks belong to it, not the host. Calling <code>render()</code> inline in JSX is a lint error.</li>
+<li><code>ContribBoundary</code> is an error boundary: a broken contribution shows a chip (or an <code>ErrorState</code> with Retry for panes) instead of crashing the app.</li>
+<li><code>&lt;Contribute area id order&gt;</code> registers for as long as it's mounted.</li>
+</ul>
+<h3>How core registers itself (<code>controller.tsx</code>)</h3>
+<pre><code>registry.registerMany([
+  {
+    id: 'sessions',
+    area: 'panes',
+    title: translateNow('sidebar.sessions'),
+    data: {
+      placement: 'left',
+      collapsible: true,
+      dock: { pane: 'workspace', pos: 'left' },
+      hideOnly: true,
+      width: `${SIDEBAR_DEFAULT_WIDTH}px`, minWidth: `${SIDEBAR_DEFAULT_WIDTH}px`, maxWidth: `${SIDEBAR_MAX_WIDTH}px`
+    },
+    render: () =&gt; &lt;WiredPane part="sidebar" /&gt;
+  },
+  { id: 'workspace', area: 'panes', title: NEW_SESSION_TITLE,
+    data: { placement: 'main', minWidth: '22vw', uncloseable: true }, render: renderWorkspacePane },
+  { id: 'terminal', area: 'panes',
+    data: { placement: 'bottom', height: '20vh', maxHeight: '80vh', lifecycleKeepAlive: true },
+    render: () =&gt; &lt;WiredPane part="terminal" /&gt; },
+  // files and review panes (placement 'right')
+])
+
+registry.registerMany([
+  { id: 'layout.editMode', area: KEYBINDS_AREA,
+    data: { id: 'layout.editMode', label: 'Toggle layout edit mode', defaults: ['mod+shift+\\'],
+            run: toggleLayoutEditMode } satisfies KeybindContribution },
+  { id: 'plugins.reload', area: PALETTE_AREA,
+    data: { id: 'plugins.reload', label: 'Reload desktop plugins', keywords: ['plugins', 'reload'],
+            run: () =&gt; void discoverRuntimePlugins() } satisfies PaletteContribution },
+  ...
+])
+
+registerLayoutPresets()
+declareDefaultTree(DEFAULT_TREE, BASIC_TREE)
+discoverBundledPlugins()
+hydrateContributedPanes()</code></pre>
+<span class="src">apps/desktop/src/app/contrib/controller.tsx ~l.192–456 (condensed)</span>
+<h3>Areas</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Area constant</th><th>What goes there</th></tr></thead>
+<tbody>
+<tr><td><code>'panes'</code> (<code>PANES_AREA</code>)</td><td class="wrap">Pane bodies with placement, size, dock data</td></tr>
+<tr><td><code>ROUTES_AREA</code></td><td class="wrap"><code>{ path }</code> + <code>render</code>: a workspace page</td></tr>
+<tr><td><code>SIDEBAR_NAV_AREA</code></td><td class="wrap"><code>{ codicon, label, path, tier? }</code>: a sidebar navigation row</td></tr>
+<tr><td><code>PALETTE_AREA</code></td><td class="wrap"><code>{ id, label, keywords, run, icon? }</code>: a ⌘K command</td></tr>
+<tr><td><code>KEYBINDS_AREA</code></td><td class="wrap"><code>{ id, label, defaults, run, category? }</code>: a rebindable shortcut</td></tr>
+<tr><td><code>STATUSBAR_AREAS.left/right</code>, <code>TITLEBAR_AREAS</code></td><td class="wrap">Chrome items</td></tr>
+<tr><td><code>'layouts'</code>, <code>THEMES_AREA</code></td><td class="wrap">Layout presets, themes (data contributions)</td></tr>
+<tr><td><code>TRANSCRIPT_DIRECTIVE_AREA</code></td><td class="wrap"><code>::directive{}</code> renderers in the transcript</td></tr>
+<tr><td><code>CHAT_EMPTY_AREA</code>, <code>SESSION_ROW_AREAS</code>, <code>COMPOSER_AREAS</code>, <code>MODEL_MENU_ROW_AREA</code>, <code>WORKSPACE_PAGE_HEADER_AREA</code>, <code>SETTINGS_PLUGINS_AREA</code></td><td class="wrap">Smaller extension points</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 17 -->
+<section class="doc" id="plugins">
+<h2><span class="n">17</span>Plugins &amp; SDK</h2>
+<p>A desktop plugin is a module exporting a <code>HermesPlugin</code>: <code>{ id, name?, description?, defaultEnabled?, register(ctx) }</code>. Real example, the bundled Kanban plugin:</p>
+<pre><code>const plugin: HermesPlugin = {
+  id: 'kanban',
+  name: 'Kanban',
+  description: 'Multi-agent task board — board page, sidebar entry, and a live in-flight count in the status bar.',
+  defaultEnabled: false,
+  register(ctx) {
+    ctx.i18n.register(KANBAN_LOCALES)
+    ctx.onDispose(bindApi(ctx.rest, ctx.storage, ctx.socket, { os: ctx.os, t: ctx.i18n.t }))
+    ctx.registerMany([
+      { id: 'page', area: ROUTES_AREA, data: { path: '/kanban' } satisfies RouteContribution,
+        render: () =&gt; &lt;KanbanBoardPage /&gt; },
+      { id: 'count', area: STATUSBAR_AREAS.right, order: 80, render: () =&gt; &lt;KanbanCount /&gt; }
+    ])
+    const registerLabels = () =&gt;
+      ctx.registerMany([
+        { id: 'nav', area: SIDEBAR_NAV_AREA, order: 50,
+          data: { codicon: 'project', label: ctx.i18n.t('nav'), path: '/kanban' } satisfies SidebarNavContribution },
+        { id: 'new-task', area: KEYBINDS_AREA,
+          data: { id: 'kanban.newTask', category: 'view', defaults: ['mod+alt+n'],
+                  label: ctx.i18n.t('newTaskCommand'), run: newTask } satisfies KeybindContribution }
+      ])
+    let disposeLabels = registerLabels()
+    ctx.i18n.onLocaleChange(() =&gt; { disposeLabels(); disposeLabels = registerLabels() })
+  }
+}
+export default plugin</code></pre>
+<span class="src">apps/desktop/src/plugins/kanban/plugin.tsx ~l.81–169</span>
+<h3>The plugin context</h3>
+<ul>
+<li><code>register</code> / <code>registerMany</code>: ids are namespaced <code>&lt;pluginId&gt;:&lt;id&gt;</code>, source stamped <code>plugin:&lt;id&gt;</code>.</li>
+<li><code>registerSettingsPage</code>, <code>onDispose</code>, <code>onEvent</code>, scoped timers and listeners (cleaned up on unload).</li>
+<li><code>rest</code> (calls <code>/api/plugins/&lt;id&gt;</code> on the backend), <code>socket</code>.</li>
+<li><code>os</code>: notify, openExternal, revealPath, file pickers, clipboard (each returns a result rather than throwing).</li>
+<li><code>storage</code> (keys <code>hermes.plugin.&lt;id&gt;.*</code>), <code>i18n</code>.</li>
+</ul>
+<h3>Discovery</h3>
+<pre><code>const modules = import.meta.glob&lt;{ default: HermesPlugin }&gt;('../plugins/*/plugin.{js,ts,tsx}', { eager: true })
+export function discoverBundledPlugins(): void {
+  if (loaded) { return }
+  loaded = true
+  for (const [path, mod] of Object.entries(modules)) { ...
+    publishPlugin({ ...record, status: 'disabled' }, { activate, deactivate })
+    if (pluginActive(plugin.id, plugin.defaultEnabled ?? true)) { activate() }
+  }
+  watchRuntimePlugins()
+}</code></pre>
+<span class="src">apps/desktop/src/contrib/plugins.ts</span>
+<ul>
+<li><strong>Bundled:</strong> every <code>src/plugins/*/plugin.{js,ts,tsx}</code>, compiled in.</li>
+<li><strong>Runtime (from disk):</strong> <code>&lt;HERMES_HOME&gt;/desktop-plugins/&lt;name&gt;/plugin.js</code> and <code>&lt;HERMES_HOME&gt;/plugins/&lt;name&gt;/desktop/plugin.js</code>, loaded by <code>src/contrib/runtime-loader.ts</code>: imports allowed only from <code>@hermes/plugin-sdk</code> and React, rewritten to shims, imported from a blob, validated, then <code>register(ctx)</code>. File-watched with a poll fallback. This is error isolation, <strong>not a security boundary</strong>.</li>
+<li><strong>Plugin fence (ESLint):</strong> files under <code>src/plugins/**</code> may import only <code>@hermes/plugin-sdk</code> and React; <code>@/*</code>, relative parent imports and <code>@hermes/shared</code> are errors.</li>
+</ul>
+<h3>Bundled plugins</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Plugin</th><th>Default</th><th>What it adds</th></tr></thead>
+<tbody>
+<tr><td><code>hermes-bots/</code></td><td><span class="pill ok">on</span></td><td class="wrap">Bot Mode: per-profile bot roster pane, avatars, routines (cron), group chats, bot-to-bot relay, composer and empty-chat contributions. One bot = one canonical chat titled <code>Bot Chat</code>; never a stored session-id pointer.</td></tr>
+<tr><td><code>kanban/</code></td><td><span class="pill info">off</span></td><td class="wrap"><code>/kanban</code> board page, sidebar row, statusbar count, palette command and keybind</td></tr>
+<tr><td><code>radio/</code></td><td><span class="pill info">off</span></td><td class="wrap">Live radio statusbar widget (plain ESM example)</td></tr>
+<tr><td><code>hello-runtime/</code></td><td>n/a</td><td class="wrap">Runtime-pipeline example; not imported anywhere (unwired fixture)</td></tr>
+</tbody></table></div>
+<h3>SDK (<code>@hermes/plugin-sdk</code> = <code>src/sdk/index.ts</code>)</h3>
+<ul>
+<li><code>host.state.*</code>: read-only atoms (active session, busy, connection, cwd, model, profile, viewport…).</li>
+<li><code>host.*</code> actions: <code>navigate</code>, <code>notify</code>, <code>openSession</code>, <code>newChat</code>, <code>revealPane</code>, <code>restartGateway</code>, profile and agent helpers; <code>host.request</code> for gateway JSON-RPC.</li>
+<li>Area constants and contribution types (§16).</li>
+<li><code>ui.*</code>: the design-system components (Button, Dialog family, Input, Select, Switch, Tabs, Tooltip, ListRow, ToggleRow, Panel family, EmptyState, ErrorState, Loader…).</li>
+<li>Utilities: <code>useI18n</code>, <code>usePluginI18n</code>, time formatting, profile colours, theme helpers, <code>queryClient</code>, <code>atom</code>/<code>computed</code>, <code>useValue</code>, <code>useQuery</code>.</li>
+</ul>
+</section>
+
+<!-- 18 -->
+<section class="doc" id="routes">
+<h2><span class="n">18</span>Routes &amp; views</h2>
+<pre><code>export const APP_ROUTES = [
+  { id: 'session-import', path: SESSION_IMPORT_ROUTE, view: 'session-import' },
+  { id: 'new', path: NEW_CHAT_ROUTE, view: 'chat' },
+  { id: 'settings', path: SETTINGS_ROUTE, view: 'settings' },
+  { id: 'command-center', path: COMMAND_CENTER_ROUTE, view: 'command-center' },
+  { id: 'capabilities', path: CAPABILITIES_ROUTE, view: 'capabilities' },
+  { id: 'messaging', path: MESSAGING_ROUTE, view: 'messaging' },
+  { id: 'webhooks', path: WEBHOOKS_ROUTE, view: 'webhooks' },
+  { id: 'artifacts', path: ARTIFACTS_ROUTE, view: 'artifacts' },
+  { id: 'cron', path: CRON_ROUTE, view: 'cron' },
+  { id: 'profiles', path: PROFILES_ROUTE, view: 'profiles' },
+  { id: 'agents', path: AGENTS_ROUTE, view: 'agents' },
+  { id: 'starmap', path: STARMAP_ROUTE, view: 'starmap' }
+] as const satisfies readonly AppRoute[]
+
+export const OVERLAY_VIEWS: ReadonlySet&lt;AppView&gt; = new Set([
+  'session-import', 'agents', 'command-center', 'cron', 'profiles', 'settings', 'starmap', 'webhooks'
+])
+
+export function appViewForPath(pathname: string): AppView {
+  const path = routePathname(pathname)
+  if (isNewChatRoute(path) || routeSessionId(path)) { return 'chat' }
+  if (isContributedPath(path)) { return 'extension' }
+  return APP_VIEW_BY_PATH.get(path) ?? 'chat'
+}</code></pre>
+<span class="src">apps/desktop/src/app/routes.ts ~l.64–80, 163–172, 237–249</span>
+<div class="grid-2">
+  <div class="card"><h4>Workspace pages</h4><p>Durable destinations rendered by <code>surfaces.tsx</code>'s <code>&lt;Routes&gt;</code>: chat (<code>/</code> and <code>/:sessionId</code>), <code>capabilities</code>, <code>messaging</code>, <code>artifacts</code>, and contributed plugin routes. Unknown paths redirect to <code>/</code>.</p></div>
+  <div class="card"><h4>Route overlays</h4><p>Short tasks drawn as <code>OverlayView</code> cards over the chat, returning to the previous route on close: settings, command center, cron, profiles, agents, starmap, webhooks, session import. Mounted lazily in <code>wiring.tsx</code> from <code>use-overlay-routing.ts</code>.</p></div>
+</div>
+<p>A session route is <code>/&lt;storedSessionId&gt;</code> (<code>sessionRoute()</code>, <code>routeSessionId()</code>). The router is a <code>HashRouter</code>, so URLs look like <code>index.html#/settings</code>.</p>
+</section>
+
+<!-- 19 -->
+<section class="doc" id="panes">
+<h2><span class="n">19</span>Layout tree &amp; panes</h2>
+<p>The window is a Dockview-style tree of <strong>splits</strong> (orientation + weights) and <strong>groups</strong> (a tab stack of pane ids). Pane bodies come from the <code>'panes'</code> contribution area.</p>
+<pre><code>export interface SplitNode { type: 'split'; id: string; orientation: Orientation; children: LayoutNode[]; weights: number[] }
+export interface GroupNode { type: 'group'; id: string; panes: string[]; active: string; minimized?: boolean; tabStrip?: TabStripMode }
+export type LayoutNode = SplitNode | GroupNode</code></pre>
+<span class="src">apps/desktop/src/components/pane-shell/tree/model.ts ~l.16–86</span>
+<pre><code>export const DEFAULT_TREE = split('row', [
+    group(['sessions'], { id: 'grp-sessions' }),
+    group(['workspace'], { id: 'grp-main' }),
+    split('column', [
+        split('row', [group(['review'], { id: 'grp-review' }), group(['files'], { id: 'grp-files' })], [1, 1.2], 'spl-rail'),
+        group(['terminal'], { id: 'grp-terminal' })
+      ], [1.6, 1], 'spl-right')
+  ], [1, 3.4, 1.25], 'spl-root')
+
+export const BASIC_TREE = split('row', [
+    group(['sessions']),
+    split('column', [group(['workspace']), group(['terminal'])], [3, 1]),
+    split('row', [group(['review']), group(['files'])], [1, 1.2])
+  ], [1, 3.4, 1.25])</code></pre>
+<span class="src">apps/desktop/src/app/contrib/layout-presets.ts</span>
+<ul>
+<li><strong>Tree operations are pure</strong>: <code>normalize</code>, <code>removePane</code>, <code>movePane</code>, <code>setActivePane</code>, <code>setSplitWeights</code>, <code>migratePersistedTree</code>.</li>
+<li><strong>Store</strong> (<code>tree/store.ts</code>): <code>$layoutTree</code> persisted per interface mode (Simple vs Advanced); secondary windows don't persist. <code>revealTreePane</code>, <code>dismissTreePane</code>, <code>registerPaneOpener</code>.</li>
+<li><strong>Renderer</strong> (<code>tree/renderer/</code>): <code>LayoutTreeRoot</code> → keep-alive panes, recursive nodes, 1 px sashes, zone editor for drag-to-rearrange.</li>
+<li><strong>Presets</strong>: simple tier <code>sidebar-left</code>, <code>sidebar-right</code>; advanced <code>default</code>, <code>basic</code>, <code>focus</code>, <code>terminal-deck</code>, <code>quad</code>.</li>
+<li><strong>Visibility is not lifecycle</strong>: the terminal pane (<code>lifecycleKeepAlive</code>) stays mounted when hidden.</li>
+</ul>
+</section>
+
+<!-- 20 -->
+<section class="doc" id="wiring">
+<h2><span class="n">20</span>Wiring &amp; data flow</h2>
+<p><code>ContribController()</code> renders the shell: <code>SidebarProvider</code> → <code>ContribWiring</code> → <code>LayoutTreeRoot</code> (with titlebar) + butterbars + statusbar. HUD windows get <code>HudShell</code>, browser windows <code>BrowserPopoutShell</code>.</p>
+<p><code>ContribWiring</code> (<code>src/app/contrib/wiring.tsx</code>, ~1,470 lines) is the data controller. It:</p>
+<ul>
+<li>boots the gateway socket (<code>useGatewayBoot</code>), routes session RPCs to the owning backend (<code>createSessionRpcDispatcher</code>);</li>
+<li>runs session state (<code>useSessionStateCache</code>), the message stream (<code>useMessageStream</code>), prompt actions (<code>usePromptActions</code>), model controls and config;</li>
+<li>publishes memoized surfaces (<code>chatRoutes</code>, <code>sidebar</code>, <code>statusbar</code>, <code>terminal</code>) through <code>ContribWiringContext</code>; panes read them with <code>&lt;WiredPane part="…"/&gt;</code>;</li>
+<li>mounts every global overlay: <code>DesktopOnboardingOverlay</code>, <strong><code>AskDealerGate</code></strong>, <code>SharedMetricsConsentDialog</code>, <code>FreeTierSignInDialog</code>, <code>ModelPickerOverlay</code>, <code>UpdatesOverlay</code>, <code>GatewayConnectingOverlay</code>, <code>BootFailureOverlay</code>, <code>CommandPalette</code>, <code>SessionSwitcher</code>, <code>FindBar</code>, and the lazy route overlays (Settings, Cron, Agents…).</li>
+</ul>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  participant U as User
+  participant CB as ChatBar (composer)
+  participant PA as usePromptActions / submit.ts
+  participant GW as JsonRpcGatewayClient
+  participant BE as hermes serve
+  participant MS as useMessageStream
+  participant TH as Thread (assistant-ui)
+  U->>CB: type and press Enter
+  CB->>PA: onSubmit(text)
+  PA->>GW: session.create (if new), then prompt.submit
+  GW->>BE: WebSocket JSON-RPC
+  BE-->>GW: message.delta, tool.start, tool.complete ...
+  GW-->>MS: gateway events
+  MS->>MS: update $sessionStates, $messages, $busy
+  MS-->>TH: re-render streaming reply
+  BE-->>GW: message.complete
+</pre>
+<figcaption>Full detail of this flow, including file paths per stage, is in PROJECT_GUIDE.html §07.</figcaption>
+</figure>
+</section>
+
+<!-- 21 -->
+<section class="doc" id="state">
+<h2><span class="n">21</span>State</h2>
+<h3>Where state goes</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Kind of state</th><th>Home</th></tr></thead>
+<tbody>
+<tr><td>Shared across distant parts of the UI</td><td class="wrap">A small nanostore in <code>src/store/</code>, owned by the feature</td></tr>
+<tr><td>Request-shaped server data that needs invalidation</td><td class="wrap">React Query (<code>src/lib/query-client.ts</code>, 60 s stale time, no refetch on focus)</td></tr>
+<tr><td>Short-lived interaction detail</td><td class="wrap">Component state</td></tr>
+<tr><td>Hot coordination that must not re-render</td><td class="wrap">A ref</td></tr>
+<tr><td>Persisted preference</td><td class="wrap"><code>persistentAtom</code> / <code>connectionScopedAtom</code>, with the scope encoded in its key</td></tr>
+</tbody></table></div>
+<h3>A plain store</h3>
+<pre><code>import { atom } from 'nanostores'
+/** Whether the global command palette (Cmd/Ctrl+K) is currently open. */
+export const $commandPaletteOpen = atom(false)
+export const $commandPalettePage = atom&lt;string | null&gt;(null)
+export function openCommandPalette(): void { $commandPaletteOpen.set(true) }
+export function openCommandPalettePage(page: string, seed?: string): void {
+  $commandPalettePage.set(page)
+  if (seed) { $commandPaletteSeed.set(seed) }
+  $commandPaletteOpen.set(true)
+}</code></pre>
+<span class="src">apps/desktop/src/store/command-palette.ts</span>
+<p>Convention: <code>useStore($atom)</code> to render, <code>$atom.get()</code> inside actions and callbacks. Action functions live next to the store.</p>
+<h3>Persisted stores</h3>
+<pre><code>export function persistentAtom&lt;T&gt;(key: string, fallback: T, codec: Codec&lt;T&gt; = Codecs.json&lt;T&gt;()): WritableAtom&lt;T&gt; {
+  const raw = readKey(key)
+  let initial = fallback
+  if (raw !== null) { try { initial = codec.decode(raw) } catch { initial = fallback } }
+  const $value = atom&lt;T&gt;(initial)
+  // Persist CHANGES only — never the creation-time value.
+  let creationEmission = true
+  $value.subscribe(value =&gt; {
+    if (creationEmission) { creationEmission = false; return }
+    writeKey(key, codec.encode(value))
+  })
+  return $value
+}</code></pre>
+<span class="src">apps/desktop/src/lib/persisted.ts ~l.13–96</span>
+<ul>
+<li>Codecs: <code>bool</code>, <code>text</code>, <code>nullableText</code>, <code>stringArray</code>, <code>stringRecord</code>, <code>json(sanitize?)</code>. All reads and writes go through <code>src/lib/storage.ts</code>.</li>
+<li><code>connectionScopedAtom</code> (<code>src/lib/connection-scoped.ts</code>): the local connection keeps the bare key; a remote one uses <code>&lt;key&gt;.remote.&lt;baseUrl&gt;.&lt;profile&gt;</code>. <code>rescopeConnectionScopedStores()</code> reloads them all on a connection switch.</li>
+<li>Mode-bound preferences (<code>modeBound</code>): effective value = session reveal ?? policy for the interface mode ?? user preference.</li>
+<li>A new profile-keyed localStorage family must join both <code>migrateTilesForProfile</code> and <code>dropTilesForProfile</code> (<code>store/session-states.ts</code>).</li>
+</ul>
+<div class="callout bad"><span class="label">Lint rule</span><p>Mirroring an atom into a ref inside <code>useEffect</code> is an ESLint error ("Read <code>$atom.get()</code> directly in callbacks instead — refs synced from atoms lag one render"). It caused a real bug where an interrupt went to the wrong session. Legitimate non-atom ref writes carry an <code>eslint-disable-next-line no-restricted-syntax -- …</code> comment explaining why.</p></div>
+<h3>Store map (~183 files)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Group</th><th>Files</th></tr></thead>
+<tbody>
+<tr><td>Session and transcript</td><td class="wrap"><code>session.ts</code> (<code>$messages</code>, <code>$busy</code>, <code>$activeSessionId</code>…), <code>session-states.ts</code>, <code>session-sync</code>, <code>session-unread*</code>, <code>session-owner-*</code>, <code>route-tiles</code>, <code>transcript-*</code>, <code>compaction</code></td></tr>
+<tr><td>Composer</td><td class="wrap"><code>composer.ts</code>, <code>composer-queue</code>, <code>composer-input-history</code>, <code>composer-suggestions</code>, <code>prompts</code>, <code>clarify</code></td></tr>
+<tr><td>Gateway, connection, profile</td><td class="wrap"><code>gateway.ts</code>, <code>gateway-reconnect</code>, <code>connections.ts</code>, <code>profile*.ts</code>, <code>pool-limits</code>, <code>server-requests</code>, <code>boot.ts</code></td></tr>
+<tr><td>Layout and chrome</td><td class="wrap"><code>layout.ts</code>, <code>panes</code>, <code>interface-mode</code>, <code>statusbar-prefs</code>, <code>sidebar-nav</code>, <code>windows.ts</code>, <code>zoom</code>, <code>command-palette</code>, <code>keybinds</code>, <code>hud</code></td></tr>
+<tr><td>Appearance</td><td class="wrap"><code>translucency</code>, <code>user-bubble-transparency</code>, <code>chat-text-scale</code>, <code>display-*</code></td></tr>
+<tr><td>Tools, preview, review</td><td class="wrap"><code>tool-*</code>, <code>preview*</code>, <code>review</code>, <code>artifacts</code>, <code>todos</code>, <code>subagents</code>, <code>projects</code>, <code>approval-mode</code></td></tr>
+<tr><td>Models</td><td class="wrap"><code>model-*</code>, <code>favorite-models</code>, <code>custom-models</code>, <code>provider-wait</code></td></tr>
+<tr><td>Feedback</td><td class="wrap"><code>notifications</code>, <code>confirm.ts</code> (the only "are you sure"), <code>agent-notices</code>, <code>tips</code>, <code>tours</code></td></tr>
+<tr><td>Onboarding, auth, billing</td><td class="wrap"><code>onboarding*.ts</code>, <code>free-tier*.ts</code>, <code>billing-block</code>, <code>shared-metrics</code>, <strong><code>app-login.ts</code></strong> (fork)</td></tr>
+<tr><td>Plugins, MCP, voice, system</td><td class="wrap"><code>agent-plugins</code>, <code>mcp-health</code>, <code>voice-*</code>, <code>wake-word</code>, <code>updates</code>, <code>power</code>, <code>active-work</code>, <code>cron</code></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 22 -->
+<section class="doc" id="api">
+<h2><span class="n">22</span>REST/API layer</h2>
+<ul>
+<li><code>src/api/client.ts</code>: <code>HermesGateway</code> (JSON-RPC client subclass), <code>hermesApi()</code> (REST through the Electron proxy), timeouts (<code>STARTUP_REQUEST_TIMEOUT_MS = 60_000</code>, <code>PROMPT_SUBMIT_REQUEST_TIMEOUT_MS = 1_800_000</code>).</li>
+<li>Scoping helpers pin a request to the right backend: <code>profileScoped()</code> (adds foreground priority), <code>connectionScoped()</code>, <code>ownerScoped()</code>, <code>capabilityScoped({connectionId, profile})</code>.</li>
+<li>Domain modules: <code>config.ts</code> (config, env, providers, <strong>custom endpoints</strong>, OAuth), <code>sessions.ts</code>, <code>profiles.ts</code>, <code>cron.ts</code>, <code>mcp.ts</code>, <code>models.ts</code>, <code>skills.ts</code>, <code>plugins.ts</code>, <code>messaging.ts</code>, <code>toolsets.ts</code>, <code>system.ts</code>, <code>local-models.ts</code>.</li>
+<li>Import them from <code>@/hermes</code> (barrel).</li>
+<li>Every lifecycle/status/settings call against a pooled backend must carry <code>?profile=</code>.</li>
+<li><code>src/lib/gateway-rpc.ts</code> detects a missing method (-32601) or endpoint on older backends, so the UI can degrade instead of erroring.</li>
+<li>Wire types live in <code>src/types/hermes.ts</code>; JSON-RPC event types are generated into <code>apps/shared/src/gateway-contract.generated.ts</code>.</li>
+</ul>
+</section>
+
+<!-- 23 -->
+<section class="doc" id="theme">
+<h2><span class="n">23</span>Theming &amp; styles</h2>
+<p>A theme is a <code>DesktopTheme</code> (<code>src/themes/types.ts</code>): <code>{ name, label, description, colors, darkColors?, typography?, terminal?, customCSS? }</code>. Built-in presets live in <code>themes/presets.ts</code> (nous [default], github, catppuccin, everforest, solarized, classic, midnight, ember, mono, slate, cyberpunk…). Other sources: CLI/TUI YAML skins from <code>$HERMES_HOME/skins/</code>, converted VS Code themes, and <code>THEMES_AREA</code> contributions.</p>
+<pre><code>root.style.setProperty('color-scheme', rendered)
+root.dataset.hermesTheme = skinName
+root.dataset.hermesMode = rendered
+root.classList.toggle('dark', isDark)
+const seeds = {
+  '--theme-foreground': c.foreground, '--theme-primary': c.primary, '--theme-secondary': c.secondary,
+  '--theme-background-seed': c.background, '--theme-sidebar-seed': c.sidebarBackground ?? c.background, ...
+}
+const palette = { '--dt-border': c.border, '--dt-ring': c.ring,
+  '--dt-primary-solid': ensureContrast(c.primary, PRIMARY_SOLID_FOREGROUND, 4.5),
+  '--ui-success': harmonize('#10b981', midground, 0.25), '--dt-font-sans': ..., '--dt-font-mono': typo.fontMono }
+for (const [k, v] of Object.entries({ ...seeds, ...mixesFor(isDark), ...palette })) { root.style.setProperty(k, v) }</code></pre>
+<span class="src">apps/desktop/src/themes/context.tsx ~l.273–365 (applyTheme)</span>
+<p><code>applyTheme</code> also tells Electron the titlebar colours and caches the background in localStorage for the pre-paint script in <code>index.html</code>.</p>
+<h3><code>styles.css</code></h3>
+<ul>
+<li>Imports Tailwind, typography, shimmer, KaTeX and codicons; custom variants <code>hover</code>, <code>dark</code>, <code>compact</code>.</li>
+<li>Fonts: Collapse (wordmark) and JetBrains Mono from <code>src/fonts/</code>.</li>
+<li><code>@theme inline</code> maps Tailwind <code>--color-*</code> to the <code>--dt-*</code> tokens; <code>--shadow-nous</code>, <code>--stroke-nous</code>.</li>
+<li><code>:root</code> defines seed defaults, <code>--ui-*</code> semantic colours (surfaces are <code>color-mix()</code> blends of seeds) and the z-index ladder.</li>
+<li><strong>Glass</strong>: <code>:root[data-hermes-glass]</code> makes surfaces transparent and leaves <code>&lt;body&gt;</code> as the only painter; opt out per element with <code>data-glass-opaque</code>.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead><tr><th>z-index token</th><th class="num">Value</th><th>Used by</th></tr></thead>
+<tbody>
+<tr><td><code>--z-modal-backdrop</code> / <code>--z-modal</code> / <code>--z-modal-popover</code></td><td class="num">120 / 130 / 140</td><td class="wrap">Dialogs and their popovers</td></tr>
+<tr><td><code>--z-over-modal</code> / <code>-content</code></td><td class="num">200 / 210</td><td class="wrap">Things above dialogs</td></tr>
+<tr><td><code>--z-switcher-backdrop</code> / <code>--z-switcher</code></td><td class="num">219 / 220</td><td class="wrap">Session switcher</td></tr>
+<tr><td><code>--z-connecting</code></td><td class="num">1200</td><td class="wrap">Gateway connecting overlay</td></tr>
+<tr><td><code>--z-onboarding</code> / <code>-popover</code></td><td class="num">1300 / 1310</td><td class="wrap">First-run provider onboarding</td></tr>
+<tr><td><code>--z-setup</code></td><td class="num">1400</td><td class="wrap">Setup screens; the Ask Dealer login screen</td></tr>
+<tr><td><code>--z-crash</code></td><td class="num">1500</td><td class="wrap">Boot failure / crash overlays</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 24 -->
+<section class="doc" id="design">
+<h2><span class="n">24</span>Design system</h2>
+<p><code>DESIGN.md</code> is the visual and interaction contract. Rule of thumb: <em>one source per concern, tokens over literals, flat over boxed.</em> Named contracts (tokens, Button variants, primitive names) must change in <code>DESIGN.md</code> in the same commit.</p>
+<h3>Principles</h3>
+<ol>
+<li>Flat, not boxed: no card-in-card.</li>
+<li>Floating panels use borderless elevation: <code>shadow-nous</code> + <code>--stroke-nous</code>.</li>
+<li>One primitive per concern.</li>
+<li>Tokens, not literals: never <code>bg-white</code> or <code>border-gray-*</code>.</li>
+<li>Style lives in the primitive: call sites pass <code>variant</code>/<code>size</code>, not padding or radius classes.</li>
+<li>Intent before automation: never open panes, move focus or navigate because something happened in the background.</li>
+<li>Immediate feedback: paint first, persist after, roll back visibly.</li>
+</ol>
+<h3>Information architecture</h3>
+<p>Chat is home. <strong>Pages</strong> are durable destinations (Chat, Skills, Messaging, Artifacts). <strong>Route overlays</strong> are short tasks (Settings, Command Center, Cron, Profiles, Agents, Starmap). <strong>Panes</strong> are working context. One action, one home.</p>
+<h3>Tokens</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Token</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><code>--ui-stroke-primary</code> … <code>quaternary</code></td><td class="wrap">Hairlines, strongest to weakest; <code>tertiary</code> is the default divider</td></tr>
+<tr><td><code>--stroke-nous</code></td><td class="wrap">Overlay hairline</td></tr>
+<tr><td><code>--ui-text-primary</code> / <code>secondary</code> / <code>tertiary</code></td><td class="wrap">Text hierarchy</td></tr>
+<tr><td><code>--ui-bg-quaternary</code></td><td class="wrap">Soft fill</td></tr>
+<tr><td><code>--chrome-action-hover</code></td><td class="wrap">Hover fill</td></tr>
+<tr><td><code>--theme-primary</code>, <code>--ui-accent</code></td><td class="wrap">Brand / accent</td></tr>
+</tbody></table></div>
+<h3>UI kit (<code>src/components/ui/</code>)</h3>
+<p class="small">Button, SplitButton, Badge, Checkbox, Input, Textarea, SearchField (the only search input), Select, SegmentedControl, Switch, Slider, Dialog, ConfirmDialog, Sheet, Popover, DropdownMenu, ContextMenu, Command (cmdk), Tabs, Tooltip, Kbd, Loader, GlyphSpinner, Progress, Skeleton, EmptyState, ErrorState, LogView, ScrollArea, FadeScroll, CardStack, FanMenu, Codicon, CopyButton, DecodeText, SandboxedFrame and more (75 files).</p>
+<pre><code>const buttonVariants = cva(
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[2.5px] text-xs leading-4 font-medium ...",
+  { variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive: 'bg-destructive text-white hover:bg-destructive/90 ...',
+        outline: 'bg-transparent text-(--ui-text-primary) shadow-[inset_0_0_0_1px_...] hover:bg-(--chrome-action-hover) ...',
+        secondary: 'bg-(--ui-bg-quaternary) text-(--ui-text-primary) hover:bg-(--chrome-action-hover) ...',
+        ghost: 'text-(--ui-text-secondary) hover:bg-(--chrome-action-hover) hover:text-(--ui-text-primary)',
+        floating: 'bg-popover text-(--ui-text-secondary) shadow-md hover:text-(--ui-text-primary)',
+        link: ..., text: ..., textStrong: ..., grip: ...
+      },
+      size: { default: 'px-3 py-1.5 has-[&gt;svg]:px-2.5', xs: ..., sm: 'px-2.5 py-1 has-[&gt;svg]:px-2',
+        lg: 'px-5 py-2 text-sm leading-5 has-[&gt;svg]:px-4', inline: ..., micro: ...,
+        icon: 'size-9 rounded-[4px]', 'icon-xs': ..., 'icon-sm': 'size-8 rounded-[4px]', 'icon-lg': ..., 'icon-titlebar': ... } },
+    defaultVariants: { variant: 'default', size: 'default' } })</code></pre>
+<span class="src">apps/desktop/src/components/ui/button.tsx ~l.14–77 (condensed)</span>
+<h3>Rules that come up often</h3>
+<ul>
+<li>Text buttons are square; only icon buttons have a 4 px radius.</li>
+<li>No native <code>title=</code> on buttons (a test enforces it); tooltips only when hover teaches something.</li>
+<li>Icons: Tabler aliases from <code>src/lib/icons.ts</code>, <code>Codicon</code> for editor/tool vocabulary. No third icon set.</li>
+<li><code>ConfirmDialog</code> via <code>confirm()</code> from <code>src/store/confirm.ts</code> is the only "are you sure"; never <code>window.confirm</code>.</li>
+<li>Loading uses <code>Loader</code>, never the text "Loading…".</li>
+<li>Motion ~100 ms on controls; "motion follows state, it never delays state"; respect reduced motion; no <code>transition-all</code> on hot paths.</li>
+<li><code>Esc</code> closes every dismissable overlay; one cancel gesture does one thing.</li>
+</ul>
+<h3>Checklist before adding UI</h3>
+<p class="small">Reuse a primitive · tokens only · no className overrides of padding/size/radius · tips only where hover teaches · no native <code>title=</code> · keybind hints via <code>useKeybindHint</code> · overlays use <code>shadow-nous</code> + <code>--stroke-nous</code> · flat, no row dividers · no automatic navigation or focus from background events · paint first, roll back visibly · no broad subscriptions on hot paths · correct keyboard ownership · all locales updated · cursor, focus ring and Esc behave · <code>DESIGN.md</code> entry updated in the same change.</p>
+</section>
+
+<!-- 25 -->
+<section class="doc" id="settings">
+<h2><span class="n">25</span>Settings definition</h2>
+<p>Every hand-built settings row is declared once in <code>src/app/settings/settings-manifest.ts</code>. The manifest drives deep-link ids, subpages and ⌘K settings search.</p>
+<pre><code>export interface SettingDefinition {
+  available?: () =&gt; boolean
+  copy: (t: Translations) =&gt; SettingCopy
+  keywords: readonly string[]
+  subpage?: string
+}
+
+export const SETTINGS_MANIFEST = {
+  appearance: {
+    language: { subpage: 'general', keywords: ['locale'],
+      copy: t =&gt; ({ label: t.language.label, description: t.language.description }) },
+    tips: appearanceSetting('general', ['tips', 'hints', 'coach marks', 'onboarding', 'help'], 'tips'),
+    theme: appearanceSetting('theme', ['color mode', 'skin', 'light', 'dark'], 'theme'),
+    minimizeToTray: { subpage: 'window-layout', keywords: ['tray', 'background', 'minimize'],
+      available: () =&gt; Boolean(window.hermesDesktop?.minimizeToTray),
+      copy: t =&gt; ({ label: t.settings.config.minimizeToTrayTitle, description: t.settings.config.minimizeToTrayDesc }) },
+    ...
+  },
+  about: { updates: { subpage: 'updates', keywords: [...], copy: t =&gt; ({ label: t.settings.about.updates }) } }
+} as const satisfies Record&lt;string, Record&lt;string, SettingDefinition&gt;&gt;</code></pre>
+<span class="src">apps/desktop/src/app/settings/settings-manifest.ts ~l.14, 54–104</span>
+<pre><code>const ids = SETTING_IDS.appearance
+&lt;ToggleRow checked={tipsEnabled} description={a.tipsDesc} id={settingElementId(ids.tips)}
+  label={a.tipsTitle} onChange={setTipsEnabled} /&gt;</code></pre>
+<span class="src">apps/desktop/src/app/settings/appearance-settings.tsx (a row in use)</span>
+<pre><code>export type SettingsView = | 'about' | 'billing' | 'connections' | 'gateway' | 'keybinds' | 'keys'
+  | 'notifications' | 'plugins' | 'providers' | 'sessions' | 'vault' | `config:${string}`</code></pre>
+<span class="src">apps/desktop/src/app/settings/types.ts</span>
+<ul>
+<li><code>settingId(view, key)</code> → <code>&lt;view&gt;.&lt;kebab-key&gt;</code>; <code>settingElementId(id)</code> → <code>setting-field-&lt;id&gt;</code> for deep-link highlighting.</li>
+<li>Subpages: <code>subpages.ts</code>, <code>appearance-subpages.ts</code>, <code>config-subpages.ts</code>, <code>other-subpages.ts</code>.</li>
+<li>Providers page views: <code>accounts</code>, <code>keys</code>, <code>custom-endpoints</code>, <code>local</code> (<code>providers-settings.tsx</code>).</li>
+<li>Plugin settings pages arrive via <code>SETTINGS_PLUGINS_AREA</code>.</li>
+<li>"Applies to" profile scope selector: <code>profile-scope.tsx</code> / <code>$settingsRequestProfile</code>.</li>
+</ul>
+</section>
+
+<!-- 26 -->
+<section class="doc" id="i18n">
+<h2><span class="n">26</span>Strings (i18n)</h2>
+<ul>
+<li><code>src/i18n/types.ts</code> declares <code>interface Translations</code> (4,400+ lines); <code>en.ts</code> is <code>export const en: Translations = {…}</code> plus split modules <code>en_*.ts</code>.</li>
+<li><code>catalog.ts</code>: <code>TRANSLATIONS = { en, zh, 'zh-hant', ja, ar, ru, fr, de, es }</code>. Runtime language packs layer on top via <code>registry.ts</code>.</li>
+</ul>
+<pre><code>export type TranslationOverrides = TranslationOverride&lt;Translations&gt;
+export const defineLocale = (overrides: TranslationOverrides): Translations =&gt;
+  mergeTranslations&lt;Translations&gt;(en, overrides)
+
+// i18n/ar.ts
+export const arOverrides = { askDealer: { ... }, ... } satisfies TranslationOverrides
+export const ar = defineLocale(arOverrides)</code></pre>
+<span class="src">apps/desktop/src/i18n/define-locale.ts, ar.ts</span>
+<pre><code>export function ExternalOpenFailedDialog() {
+  const { t } = useI18n()
+  const copy = t.externalOpenFailed
+  ...
+  &lt;DialogTitle&gt;{header.title}&lt;/DialogTitle&gt;
+  &lt;Button onClick={() =&gt; setFailure(null)} variant="ghost"&gt;{copy.close}&lt;/Button&gt;</code></pre>
+<span class="src">apps/desktop/src/components/external-open-failed-dialog.tsx (typical use)</span>
+<ul>
+<li>Outside React: <code>translateNow('sidebar.sessions')</code>; live tab titles: <code>&lt;LocalizedTabTitle select={t =&gt; …}/&gt;</code>; plugins: <code>ctx.i18n</code>.</li>
+<li>Adding a key: type in <code>types.ts</code>, English in <code>en.ts</code>, translations in each locale (or <code>overlay-completeness.test.ts</code> fails), then <code>npm run i18n:keys</code>.</li>
+</ul>
+</section>
+
+<!-- 27 -->
+<section class="doc" id="fork">
+<h2><span class="n">27</span>Ask Dealer additions</h2>
+<p>Uncommitted in the working tree. Design spec: <code>ASK_DEALER_LOGIN.md</code>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>File</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td><code>src/store/app-login.ts</code></td><td class="wrap"><code>$signedIn = atom(false)</code>, <code>signIn()</code>; in memory, so every launch starts at login</td></tr>
+<tr><td><code>src/app/login/login-screen.tsx</code></td><td class="wrap">Full-window mask at <code>z-(--z-setup)</code> with a drag strip; "Continue with Google" is fake: <code>signIn()</code> then <code>navigate('/')</code></td></tr>
+<tr><td><code>src/app/login/endpoint-setup-dialog.tsx</code></td><td class="wrap">Once the gateway is open, checks <code>getCustomEndpoints()</code>; if there are none, dismisses the generic provider picker and opens a dialog with <code>&lt;CustomEndpointsSettings bare /&gt;</code></td></tr>
+<tr><td><code>src/app/login/ask-dealer-gate.tsx</code></td><td class="wrap"><code>!signedIn ? &lt;LoginScreen/&gt; : &lt;EndpointSetupDialog/&gt;</code></td></tr>
+<tr><td><code>src/app/contrib/wiring.tsx</code></td><td class="wrap">Mounts <code>&lt;AskDealerGate enabled={gatewayState === 'open'} …/&gt;</code> for non-auxiliary windows; shares <code>onConfigSaved</code>/<code>onMainModelChanged</code> with Settings</td></tr>
+<tr><td><code>src/app/settings/custom-endpoints-settings.tsx</code></td><td class="wrap">New <code>bare</code> prop so the form fits a dialog</td></tr>
+<tr><td><code>src/i18n/*.ts</code></td><td class="wrap"><code>askDealer</code> strings in English and all 8 locales</td></tr>
+<tr><td><code>src/app/login/ask-dealer-gate.test.tsx</code></td><td class="wrap">5 behaviour tests</td></tr>
+</tbody></table></div>
+<p><strong>Planned:</strong> real Google OAuth in Electron main (<code>electron/google-auth.ts</code>, PKCE + loopback, safeStorage refresh token) exposed as <code>hermesDesktop.auth.*</code>; an <code>edition</code> field in <code>product-identity.cjs</code> (<code>HERMES_DESKTOP_EDITION</code>, default <code>dealer</code>) passed to the renderer through Vite <code>define</code>; <code>src/lib/edition.ts</code> allow-lists that hide routes, sidebar entries, settings sections and palette commands; a simplified endpoint form and <code>/endpoint</code> page.</p>
+<div class="callout warn"><span class="label">Gate gaps</span><ul>
+<li>Auxiliary windows skip the gate; each peer window has its own <code>$signedIn</code>.</li>
+<li>The backend boots underneath the login screen; the crash overlay (z 1500) can paint above it.</li>
+<li>The popup checks for zero endpoints, while the spec says "no endpoint marked current".</li>
+</ul></div>
+</section>
+
+<!-- 28 -->
+<section class="doc" id="testing">
+<h2><span class="n">28</span>Testing</h2>
+<pre><code>const reactUi = { extends: './vite.config.ts', test: { name: 'ui', environment: 'jsdom',
+    css: { include: [/status-stack\.css$/] }, setupFiles: ['./vitest.setup.ts'],
+    include: ['src/**/*.test.{ts,tsx}'], globals: true, env: { NODE_ENV: 'development' },
+    testTimeout: 15_000, hookTimeout: 30_000 } }
+const electronNative = { test: { name: 'electron', environment: 'node',
+    include: ['electron/**/*.test.ts', 'scripts/**.test.{ts,mjs}', 'e2e/**/*.unit.test.ts'],
+    testTimeout: 30_000 } }</code></pre>
+<span class="src">apps/desktop/vitest.config.ts ~l.4–44 (condensed)</span>
+<ul>
+<li><strong><code>vitest.setup.ts</code></strong>: inert ResizeObserver, in-memory localStorage (Node 26 shadows jsdom's), IntersectionObserver / requestIdleCallback / CSS.supports / scrollTo stubs, <code>IS_REACT_ACT_ENVIRONMENT</code>, 12 s async util timeout.</li>
+<li><strong><code>src/test/</code> helpers</strong>: <code>deferred()</code>, <code>reactRoot()</code>, <code>FakeWebSocket</code>, window-state bridge, session-info and OAuth fixtures.</li>
+<li><strong>Global setup</strong> <code>vitest.run-tmp.ts</code> points TMP at one temp root per run.</li>
+</ul>
+<pre><code>it('returns the same array reference across repeated calls until the area mutates', () =&gt; {
+  dispose = registry.register({ area: 'test.stability', id: 'a' })
+  const first = registry.getArea('test.stability')
+  const second = registry.getArea('test.stability')
+  expect(second).toBe(first)
+  dispose()
+  dispose = registry.register({ area: 'test.stability', id: 'b' })
+  expect(registry.getArea('test.stability')).not.toBe(first)
+})</code></pre>
+<span class="src">apps/desktop/src/contrib/registry.test.ts (store-level contract test)</span>
+<pre><code>it('lets the contribution boundary contain a render-time plugin failure', () =&gt; {
+  vi.spyOn(console, 'error').mockImplementation(() =&gt; undefined)
+  render(&lt;Slot area={area} /&gt;)
+  act(() =&gt; {
+    disposers.push(registry.register({ area, id, render: () =&gt; { throw new Error('plugin render failed') }, source: 'disk' }))
+  })
+  expect(screen.getByRole('button', { name: id })).toBeTruthy()
+})</code></pre>
+<span class="src">apps/desktop/src/contrib/react/slot.test.tsx (component test)</span>
+<h3>E2E (Playwright)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Lane</th><th>Config</th><th>Specs</th></tr></thead>
+<tbody>
+<tr><td>Main</td><td class="wrap"><code>playwright.config.ts</code>: 90 s, 1 retry on CI, screenshots and trace on, reduced motion</td><td class="wrap">boot, boot-failure, chat, onboarding, batch-clarify, group-turn-integrity, image-attachment-resume, large-session-resume, markdown-overflow, remote-oauth-recovery, sidebar-states, submit-drift, unread-dot-restart… (~32)</td></tr>
+<tr><td>Core (required)</td><td class="wrap"><code>e2e/core/playwright.config.ts</code>: 0 retries, 1 worker, 180 s</td><td class="wrap">boot-lifecycle, interactive-prompts, interrupted-reply, lineage-compaction, no-idle-reap, onboarding-first-chat, packaged-smoke, remote-topology, transcript-integrity… with a fake LLM provider</td></tr>
+<tr><td>Update</td><td class="wrap"><code>e2e/update/playwright.config.ts</code></td><td class="wrap">app-update, build-fail, first-run, gates, update-concurrency</td></tr>
+</tbody></table></div>
+<p>The E2E fixture launches Electron with an isolated <code>HERMES_HOME</code> and userData, <code>HERMES_DESKTOP_IGNORE_EXISTING=1</code>, <code>HERMES_DESKTOP_ISOLATED_BACKEND=1</code>, the repo as backend root, a unique <code>HERMES_DESKTOP_APP_NAME</code>, and strips other inherited <code>HERMES_*</code> variables.</p>
+<p><strong>Packaged-app harness</strong> <code>scripts/test-desktop.mjs</code> (modes existing, fresh, dmg, msix, all, lifecycle) validates the asar layout, native bindings and payload, and drives a real <code>serve</code> backend through quit and relaunch. It hardcodes <code>Hermes.app</code> paths for macOS, which may not match a Gideon-named build.</p>
+<p><strong>Repo-level tests</strong> in <code>tests-js/</code> cover the builder, notarization, mac entitlements, window-open policy, React/ReactDOM pairing and Node engine alignment.</p>
+</section>
+
+<!-- 29 -->
+<section class="doc" id="devtools">
+<h2><span class="n">29</span>Dev tooling</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Tool</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><code>npm run dev</code></td><td class="wrap">Vite on 5174 + Electron. Point at a checkout with <code>HERMES_DESKTOP_HERMES_ROOT</code>; sandbox with <code>../../scripts/dev-sandbox.sh npm run dev</code>.</td></tr>
+<tr><td><code>npm run dev:fake-boot</code></td><td class="wrap">Work on boot/onboarding UI without a backend.</td></tr>
+<tr><td><code>scripts/dev-no-hmr.mjs</code></td><td class="wrap">Renderer with HMR off (works around a Vite 8 refresh-preamble bug).</td></tr>
+<tr><td><code>scripts/reload-renderer.mjs</code>, <code>eval.mjs</code></td><td class="wrap">Reload the renderer or evaluate an expression over CDP (port 9222).</td></tr>
+<tr><td><code>scripts/live-drive.mjs</code></td><td class="wrap">Drive the running app: status, fps, drag, type, switch, send, eval.</td></tr>
+<tr><td><code>scripts/probe-*.mjs</code>, <code>diag-*.mjs</code></td><td class="wrap">Latency probes (⌘K, model picker, thread) and CDP diagnostics (drag churn, key latency, scroll reset, switch traces).</td></tr>
+<tr><td><code>scripts/perf/</code></td><td class="wrap"><code>npm run perf</code>: scenarios (cold start, first token, keystroke, session switch, stream, transcript…) against a baseline.</td></tr>
+<tr><td><code>src/debug/</code></td><td class="wrap">Dev-only render and atom churn counters; aliased to a no-op in production.</td></tr>
+<tr><td><code>scripts/gen-msix-manifest.mjs</code></td><td class="wrap">Inspect the MSIX manifest without Windows.</td></tr>
+</tbody></table></div>
+<p><strong>Logs while developing:</strong> <code>&lt;HERMES_HOME&gt;/logs/desktop.log</code> (main process and backend output) and the DevTools console (renderer).</p>
+</section>
+
+<!-- 30 -->
+<section class="doc" id="recipes">
+<h2><span class="n">30</span>How to add things</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>To add</th><th>Do this</th></tr></thead>
+<tbody>
+<tr><td>A workspace page</td><td class="wrap">Core: add to <code>APP_ROUTES</code> in <code>src/app/routes.ts</code> and render it in <code>surfaces.tsx</code>. Feature/plugin: register <code>{ area: ROUTES_AREA, data: { path }, render }</code>.</td></tr>
+<tr><td>A route overlay</td><td class="wrap">Add the view to <code>APP_ROUTES</code> and <code>OVERLAY_VIEWS</code>, then mount it lazily in <code>wiring.tsx</code> with <code>onClose={closeOverlayToPreviousRoute}</code>.</td></tr>
+<tr><td>A sidebar entry</td><td class="wrap">Register <code>{ area: SIDEBAR_NAV_AREA, data: { codicon, label, path } }</code>.</td></tr>
+<tr><td>A pane</td><td class="wrap">Register in <code>'panes'</code> with <code>data.placement</code> and sizes; add it to a layout preset if it should appear by default.</td></tr>
+<tr><td>A keyboard shortcut</td><td class="wrap">Register a <code>KeybindContribution</code> in <code>KEYBINDS_AREA</code> (rebindable in Settings → Keybinds).</td></tr>
+<tr><td>A ⌘K command</td><td class="wrap">Register a <code>PaletteContribution</code> in <code>PALETTE_AREA</code>, or use <code>paletteToggle()</code> for on/off settings.</td></tr>
+<tr><td>A statusbar / titlebar item</td><td class="wrap">Register in <code>STATUSBAR_AREAS.left|right</code> or <code>TITLEBAR_AREAS</code>.</td></tr>
+<tr><td>A global overlay or gate</td><td class="wrap">Add a component to the overlay list in the <code>ContribWiring</code> return (<code>wiring.tsx</code>); pick a z-index token.</td></tr>
+<tr><td>A settings row</td><td class="wrap">Declare it in <code>settings-manifest.ts</code>, render a <code>ListRow</code>/<code>ToggleRow</code> with <code>id={settingElementId(...)}</code>, add strings.</td></tr>
+<tr><td>Shared state</td><td class="wrap">A small nanostore in <code>src/store/</code> with colocated actions; persist with <code>persistentAtom</code> (scope in the key).</td></tr>
+<tr><td>A backend REST call</td><td class="wrap">Add a function to the right <code>src/api/&lt;domain&gt;.ts</code> using <code>hermesApi</code> + a scoping helper; export through <code>@/hermes</code>.</td></tr>
+<tr><td>A native capability</td><td class="wrap">Pure logic in a new <code>electron/&lt;topic&gt;.ts</code> with a <code>.test.ts</code>; <code>ipcMain.handle('hermes:&lt;topic&gt;:&lt;verb&gt;')</code> in <code>main.ts</code> or a <code>register*Ipc</code> module; expose it in <code>preload.ts</code>; type it in <code>src/global.d.ts</code>.</td></tr>
+<tr><td>A UI string</td><td class="wrap"><code>types.ts</code> + <code>en.ts</code> + each locale; <code>npm run i18n:keys</code>.</td></tr>
+<tr><td>A theme</td><td class="wrap">Add a preset to <code>src/themes/presets.ts</code>; no other code changes needed.</td></tr>
+<tr><td>A desktop plugin</td><td class="wrap">Bundled: <code>src/plugins/&lt;name&gt;/plugin.tsx</code> exporting a <code>HermesPlugin</code>. Runtime: <code>&lt;HERMES_HOME&gt;/desktop-plugins/&lt;name&gt;/plugin.js</code>. Import only from <code>@hermes/plugin-sdk</code> and React.</td></tr>
+<tr><td>A layout preset</td><td class="wrap">Define a tree with <code>split()</code>/<code>group()</code> in <code>layout-presets.ts</code> and register it.</td></tr>
+<tr><td>A transcript directive</td><td class="wrap">Register in <code>TRANSCRIPT_DIRECTIVE_AREA</code> with a <code>name</code> and <code>render</code>.</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 31 -->
+<section class="doc" id="principles">
+<h2><span class="n">31</span>Engineering principles</h2>
+<p>From <code>ENGINEERING.md</code> and <code>AGENTS.md</code>, with the reasons behind them.</p>
+<div class="grid-2">
+  <div class="card"><h4>Identity is not incidental</h4><p>Sessions have durable, runtime and lineage-root ids. Conflating them causes "session not found" and vanishing history. <code>prompt.submit</code> writes the session and user rows before the turn so a crash still leaves a resumable transcript.</p></div>
+  <div class="card"><h4>Server truth is cached, not owned</h4><p>Merge, don't clobber. Paint optimistically and roll back visibly. Guard against stale async results with generation counters. Only the foreground surface publishes into the shared view. Keep reference identity on no-ops.</p></div>
+  <div class="card"><h4>Switching is a re-home, not a reboot</h4><p>Connection apply = soft re-home (wipe gateway-bound stores, reconnect). <code>HERMES_HOME</code> change = hard reload. Profile swap = merge lists. Afterwards the socket, profile and connection atoms must agree.</p></div>
+  <div class="card"><h4>Cross everything as an observable ladder</h4><p>One resolver per policy; precedence as data; candidates trusted only after probing; a failed read falls to the next rung, a failed write surfaces or rolls back; retries bounded and ending in a recovery affordance.</p></div>
+  <div class="card"><h4>Guest content opens nothing</h4><p>Window opens are denied; only trusted clicks in the preview partition reach the OS browser, and only for http/https.</p></div>
+  <div class="card"><h4>Compatibility without carrying the past</h4><p>The app and its Python runtime update on separate clocks. Keep fallbacks narrow, tied to an identified older runtime, and tested (the <code>serve</code> → <code>dashboard</code> fallback is the model).</p></div>
+  <div class="card"><h4>Respect the user</h4><p>Never navigate or steal focus because something happened in the background. Empty, loading, reconnecting, degraded and exhausted states each get their own copy and way out. Expensive surfaces stay alive when hidden.</p></div>
+  <div class="card"><h4>Make it feel instant</h4><p>Hot-path state local; don't subscribe heavy trees to per-frame updates; coalesce pointer work; don't read layout right after writing style. Prove speed on a long transcript, not an empty demo.</p></div>
+</div>
+</section>
+
+<!-- 32 -->
+<section class="doc" id="gotchas">
+<h2><span class="n">32</span>Known issues &amp; traps</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Status</th><th>Issue</th></tr></thead>
+<tbody>
+<tr><td><span class="pill warn">Likely bug</span></td><td class="wrap">Stable build's <code>APP_NAME</code> and userData probably resolve to "Hermes" (§03). Fix: give <code>APP_NAME</code> a Gideon fallback from <code>PRODUCT_IDENTITY.displayName</code> and/or set <code>productName</code> in <code>package.json</code>. Consider userData migration before changing it.</td></tr>
+<tr><td><span class="pill warn">Setup</span></td><td class="wrap"><code>ws</code> / <code>@types/ws</code> declared but not installed; <code>assert-root-install.mjs</code> blocks dev and build. Run <code>npm ci</code> at the repo root.</td></tr>
+<tr><td><span class="pill info">Branding</span></td><td class="wrap">Still upstream: <code>package.json</code> name/productName, MSIX <code>NousResearch.*</code> and Store identity, <code>publisherDisplayName</code>, DMG title "Hermes Agent Installer", Linux maintainer, <code>hermes://</code> scheme, GitHub publish default, ~15 user-facing strings in <code>main.ts</code>, <code>test-desktop.mjs</code> mac paths.</td></tr>
+<tr><td><span class="pill info">History</span></td><td class="wrap">The fork commit pasted old upstream copies of <code>main.ts</code>, <code>status.tsx</code>, <code>en.ts</code> and <code>group-chat.ts</code>; the working tree restored them. Rebrand by editing strings on the current upstream file; never paste a file from another revision.</td></tr>
+<tr><td><span class="pill info">Size ratchet</span></td><td class="wrap"><code>main.ts</code> and <code>wiring.tsx</code> are over the size limits; they may only shrink. Put new logic in a sibling module.</td></tr>
+<tr><td><span class="pill info">Dev</span></td><td class="wrap">A dev instance shares the single-instance lock with an installed app of the same product name; use <code>HERMES_DESKTOP_USER_DATA_DIR</code> or <code>HERMES_DESKTOP_APP_NAME</code>.</td></tr>
+</tbody></table></div>
+</section>
+
+<footer>
+<p>Generated on 2026-10-12 from the working tree of branch <code>ask-dealer-changes</code>. Excerpts are condensed from the real files; line numbers are approximate and drift as files change, so search for the symbol if a line doesn't match. Items marked "likely" were found by reading code and not tested at runtime. See <a href="PROJECT_GUIDE.html">PROJECT_GUIDE.html</a> for the Python agent, backend and whole-repo reference.</p>
+</footer>
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = 'gideon-desktop-guide-theme';
+  function readTheme() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function writeTheme(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  var saved = readTheme();
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  var btn = document.getElementById('theme-btn');
+  function labelButton() { btn.textContent = isDark() ? 'Light' : 'Dark'; }
+  labelButton();
+
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('pre.mermaid'));
+  blocks.forEach(function (el) { el.setAttribute('data-src', el.textContent); });
+  function renderDiagrams() {
+    if (!window.mermaid) return;
+    blocks.forEach(function (el) { el.removeAttribute('data-processed'); el.textContent = el.getAttribute('data-src'); });
+    window.mermaid.initialize({
+      startOnLoad: false, securityLevel: 'strict', theme: isDark() ? 'dark' : 'neutral',
+      fontFamily: 'IBM Plex Sans, Segoe UI, system-ui, sans-serif',
+      flowchart: { htmlLabels: true, curve: 'basis' }, sequence: { mirrorActors: false }
+    });
+    window.mermaid.run({ nodes: blocks }).catch(function () {});
+  }
+  renderDiagrams();
+  btn.addEventListener('click', function () {
+    var next = isDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next); writeTheme(next); labelButton(); renderDiagrams();
+  });
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      if (!root.getAttribute('data-theme')) { labelButton(); renderDiagrams(); }
+    });
+  }
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var filter = document.getElementById('toc-filter');
+  filter.addEventListener('input', function () {
+    var q = filter.value.trim().toLowerCase();
+    links.forEach(function (a) {
+      var target = document.querySelector(a.getAttribute('href'));
+      var text = (a.textContent + ' ' + (q.length > 2 && target ? target.textContent : '')).toLowerCase();
+      a.parentElement.hidden = q !== '' && text.indexOf(q) === -1;
+    });
+  });
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && byId[e.target.id]) {
+          links.forEach(function (a) { a.classList.remove('active'); });
+          byId[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+    document.querySelectorAll('section.doc').forEach(function (s) { obs.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
