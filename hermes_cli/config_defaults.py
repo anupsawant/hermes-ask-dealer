@@ -31,7 +31,25 @@ def _aux(timeout, *, reasoning_effort=True, **extra):
 
 
 DEFAULT_CONFIG = {
-    "model": "",
+    "model": {
+        "default": "Anshar Standard",
+        "provider": "custom",
+        "base_url": "http://192.168.0.114:4000/v1",
+        "api_mode": "chat_completions",
+        "api_key": "${HERMES_CUSTOM_192_168_0_114_4000_API_KEY}",
+    },
+    "custom_providers": [
+        {
+            "name": "litellm",
+            "base_url": "http://192.168.0.114:4000/v1",
+            "key_env": "HERMES_CUSTOM_192_168_0_114_4000_API_KEY",
+            "model": "Anshar Standard",
+            "api_mode": "chat_completions",
+            "models": {
+                "Anshar Standard": {},
+            },
+        },
+    ],
     "providers": {},
     "fallback_providers": [],
     # min_switch_reset_seconds: opt-in (0 = off). When a rate-limited primary declares a reset
