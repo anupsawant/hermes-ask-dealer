@@ -158,6 +158,17 @@ Note: `baoyu-infographic` requires an image generation model connected to LiteLL
 - Not changed: `agent/prompt_builder.py`'s `DEFAULT_AGENT_IDENTITY` (the fallback when there is no SOUL.md) and the persona wording. The persona still says "Gideon, Acme Corp's" and needs the Ask Dealer rename.
 - Caveat: the infographic rule sends the agent to `baoyu-infographic`, which needs an image generation key. Users without one will hit an error on that step.
 
+### Two more SOUL.md rules (2026-10-14, live `SOUL.md` and `default_soul.py`)
+
+**uncommitted. Not yet tried in the app; the test runner could not start here (no bootstrap Python), so only an import check was done.**
+
+- "User choices": when a question has distinct options, use the `clarify` tool (option cards) instead of plain text. Aim: the Standard model asked in plain text (open item 2 below).
+- Research cap in the topic-PDF paragraph: at most 3 web searches and 3 page extracts, then write the PDF. Aim: lower token use on PDF requests.
+- Windows path rule, added to the "PDFs and reports" paragraph: use forward-slash paths (`C:/Users/...`), never put a Windows path inside `python -c`, and keep the spec, images and output in one scratch folder with relative filenames. Cause (from the chat history of the 2026-10-13 15:06 run): the agent wrote `C:\Users` inside `python -c` (`SyntaxError: truncated \UXXXXXXXX escape`) and ran `pdf_create.py` with a relative spec path from the wrong folder (`FileNotFoundError`). Each failed call re-sent the whole conversation, which is where the extra tokens went. `npx mermaid-cli` itself works (tested: 19s first run, valid PNG).
+- Topic-PDF rule rewritten: Mermaid diagrams are now the main visual (at least two, rendered with the `npx mermaid-cli` command, matplotlib fallback after two failures). Web images (Wikimedia/Unsplash) are optional, tried once, never retried. Replaces "each section needs a web image; a topic PDF with no images is not acceptable". Reason: Mermaid export is tested and reliable (19s first run); web image downloads are not, and the retries cost tokens. Trade-off: less photographic richness.
+- Per-call size rule, next to the research cap: `web_search` with `limit 4`, `web_extract` with `char_limit` no higher than 6000. The call-count cap alone did not shrink results: in the 2026-10-13 17:23 run the agent used `limit: 8` (20k chars) and `char_limit: 20000` (27k chars), and a `char_limit` passed by the agent overrides `web.extract_char_limit` in config, so the config setting alone would not have applied.
+- Checked: `DEFAULT_SOUL_MD` imports, contains the new text, and its ASCII-dash variant is still recognised as a legacy template. The live file and the template are identical. Whether the model now follows the path, diagram and size rules is untested.
+
 ## 11. Local config additions (local only)
 
 | Key | File | Value | Purpose |

@@ -324,3 +324,5 @@ native/fts5_cjk/*.so
 apps/desktop/.dist-build*
 
 ask-dealer-config/
+CHANGES.md
+FileChanges.md
