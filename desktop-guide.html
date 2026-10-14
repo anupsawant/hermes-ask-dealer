@@ -137,7 +137,7 @@ footer { margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--rul
 <div class="shell">
 
 <nav class="rail" aria-label="Contents">
-  <div class="brand"><b>Gideon Desktop Guide</b><span>apps/desktop, defined end to end</span><a href="PROJECT_GUIDE.html">Whole-project guide →</a></div>
+  <div class="brand"><b>Gideon Desktop Guide</b><span>apps/desktop, defined end to end</span><a href="PROJECT_GUIDE.html">Whole-project guide →</a><a href="desktop-install-and-gateway-guide.html">Local Install vs Gateway Guide →</a></div>
   <div class="rail-tools">
     <input id="toc-filter" type="search" placeholder="Filter sections" aria-label="Filter sections">
     <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">Theme</button>
@@ -224,6 +224,10 @@ flowchart LR
 <tr><td>Backend</td><td class="wrap">The work: sessions, tools, model calls, streaming, config, cron</td><td class="wrap">Python <code>hermes serve</code>, one per (connection, profile)</td></tr>
 </tbody></table></div>
 <p><strong>Decide state by authority:</strong> anything another Hermes surface can change belongs to the backend (the renderer holds a cache); machine and runtime facts belong to Electron; only this window's presentation belongs to the renderer.</p>
+<div class="callout info">
+  <span class="label">Dedicated Architecture Deep Dive</span>
+  <p>For an in-depth walkthrough of the first-launch choice between running locally and connecting to a remote gateway, see the dedicated <a href="desktop-install-and-gateway-guide.html"><strong>Local Install vs Gateway Guide</strong></a>.</p>
+</div>
 <h3>Stack</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Layer</th><th>Technology</th></tr></thead>

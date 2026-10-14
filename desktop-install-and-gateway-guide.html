@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gideon Desktop: Local Install vs Gateway Deep Dive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --sunken: #edf0f5;
+  --ink: #18202e;
+  --muted: #586274;
+  --rule: #d9dfe8;
+  --accent: #2d55c8;
+  --accent-soft: #e5ebfa;
+  --ok: #1d7448;
+  --ok-soft: #e2f3ea;
+  --warn: #9a5a06;
+  --warn-soft: #fbefd9;
+  --bad: #b02a1d;
+  --bad-soft: #fbe5e2;
+  --code: #1f2a3d;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 0.96875rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --step-3: 1.875rem;
+  --step-4: 2.625rem;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1219; --surface: #151b25; --sunken: #111721; --ink: #e3e8f0; --muted: #98a3b5;
+    --rule: #263042; --accent: #86a5ff; --accent-soft: #1b2742;
+    --ok: #63c793; --ok-soft: #143024; --warn: #e7a84f; --warn-soft: #33260f;
+    --bad: #f17a6b; --bad-soft: #3a1a17; --code: #d4dcea; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1219; --surface: #151b25; --sunken: #111721; --ink: #e3e8f0; --muted: #98a3b5;
+  --rule: #263042; --accent: #86a5ff; --accent-soft: #1b2742;
+  --ok: #63c793; --ok-soft: #143024; --warn: #e7a84f; --warn-soft: #33260f;
+  --bad: #f17a6b; --bad-soft: #3a1a17; --code: #d4dcea; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.25rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--step-0)/1.65 var(--font-body); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.shell { display: grid; grid-template-columns: 18rem minmax(0, 1fr); gap: 3rem; max-width: 86rem; margin: 0 auto; padding-inline: 1.5rem; }
+@media (max-width: 1024px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 1rem; } }
+.rail { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 1.75rem 2rem; font-size: var(--step--1); }
+.rail .brand { display: grid; gap: 0.15rem; margin-bottom: 1.25rem; }
+.rail .brand b { font: 700 var(--step-1)/1.2 var(--font-display); }
+.rail .brand span { color: var(--muted); }
+.rail .brand a { font-size: var(--step--1); }
+.rail-tools { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.rail-tools input { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+.theme-btn { font: 500 var(--step--1)/1 var(--font-body); color: var(--ink); cursor: pointer; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; }
+.toc a { display: grid; grid-template-columns: 2rem 1fr; gap: 0.25rem; padding: 0.35rem 0.5rem; border-radius: 4px; color: var(--muted); text-decoration: none; line-height: 1.35; }
+.toc a .n { font: 500 var(--step--1)/1.35 var(--font-mono); opacity: 0.75; }
+.toc a:hover { background: var(--sunken); color: var(--ink); }
+.toc a.active { background: var(--accent-soft); color: var(--ink); }
+.toc a.active .n { color: var(--accent); opacity: 1; font-weight: 600; }
+.toc .grp { margin: 0.85rem 0 0.2rem 0.5rem; font: 600 0.6875rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 1024px) {
+  .rail { position: static; max-height: none; border-bottom: 1px solid var(--rule); padding-bottom: 1rem; }
+  .toc { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+  .toc .grp { grid-column: 1 / -1; }
+}
+main { min-width: 0; padding-block: 2.5rem 6rem; max-width: 58rem; }
+.hero { display: grid; gap: 0.9rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule); margin-bottom: 1.5rem; }
+.eyebrow { font: 600 0.75rem/1 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 var(--step-4)/1.08 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 0; font-size: var(--step-1); color: var(--muted); max-width: 66ch; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip { display: inline-flex; align-items: center; font: 500 var(--step--1)/1 var(--font-mono); padding: 0.35rem 0.55rem; border-radius: 4px; background: var(--surface); border: 1px solid var(--rule); color: var(--muted); }
+section.doc { padding-top: 2.75rem; }
+section.doc > h2 { display: flex; align-items: baseline; gap: 0.75rem; margin: 0 0 1rem; font: 700 var(--step-3)/1.15 var(--font-display); text-wrap: balance; }
+section.doc > h2 .n { font: 500 var(--step-1)/1 var(--font-mono); color: var(--accent); }
+h3 { margin: 2rem 0 0.6rem; font: 600 var(--step-2)/1.25 var(--font-display); text-wrap: balance; }
+h4 { margin: 1.4rem 0 0.4rem; font: 600 var(--step-1)/1.3 var(--font-body); }
+p { margin: 0 0 0.9rem; max-width: 76ch; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; max-width: 76ch; }
+li { margin: 0.25rem 0; }
+li > ul, li > ol { margin: 0.25rem 0 0.4rem; }
+strong { font-weight: 600; }
+code { font: 400 0.86em/1.4 var(--font-mono); background: var(--sunken); color: var(--code); padding: 0.08em 0.32em; border-radius: 3px; overflow-wrap: anywhere; }
+pre { margin: 0 0 1.1rem; padding: 0.9rem 1rem; background: var(--sunken); border: 1px solid var(--rule); border-radius: var(--radius); overflow-x: auto; font: 400 var(--step--1)/1.55 var(--font-mono); color: var(--code); }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.src { display: block; margin: -0.5rem 0 1.1rem; font: 400 0.75rem/1.4 var(--font-mono); color: var(--muted); }
+.table-wrap { overflow-x: auto; margin: 0 0 1.25rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: var(--step--1); line-height: 1.5; }
+th, td { text-align: left; vertical-align: top; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.75rem/1.3 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+td.wrap code { white-space: normal; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.callout { display: grid; gap: 0.35rem; margin: 0 0 1.25rem; padding: 0.85rem 1rem; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--surface); }
+.callout > :last-child { margin-bottom: 0; }
+.callout .label { font: 600 0.72rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; }
+.callout.info { background: var(--accent-soft); border-color: transparent; } .callout.info .label { color: var(--accent); }
+.callout.warn { background: var(--warn-soft); border-color: transparent; } .callout.warn .label { color: var(--warn); }
+.callout.bad { background: var(--bad-soft); border-color: transparent; } .callout.bad .label { color: var(--bad); }
+.callout.ok { background: var(--ok-soft); border-color: transparent; } .callout.ok .label { color: var(--ok); }
+.pill { display: inline-block; font: 600 0.6875rem/1 var(--font-body); letter-spacing: 0.05em; text-transform: uppercase; padding: 0.3rem 0.45rem; border-radius: 3px; white-space: nowrap; }
+.pill.bad { background: var(--bad-soft); color: var(--bad); } .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.info { background: var(--accent-soft); color: var(--accent); }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; margin: 0 0 1.5rem; }
+.card { min-width: 0; padding: 1.1rem 1.2rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); }
+.card h4 { margin: 0 0 0.4rem; font-size: var(--step-0); }
+.card p, .card ul { margin-bottom: 0; font-size: var(--step--1); }
+.card.highlight-local { border-left: 4px solid var(--accent); }
+.card.highlight-gateway { border-left: 4px solid var(--ok); }
+.diagram { margin: 0 0 1.5rem; padding: 1.25rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); overflow-x: auto; }
+.diagram figcaption { font-size: var(--step--1); color: var(--muted); margin-top: 0.75rem; }
+pre.mermaid { background: none; border: 0; padding: 0; margin: 0; color: var(--muted); white-space: pre; }
+pre.mermaid svg { max-width: 100%; height: auto; }
+ol.steps { counter-reset: s; list-style: none; padding-left: 0; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.75rem; margin: 0.75rem 0; }
+ol.steps > li::before { content: counter(s); font: 600 var(--step--1)/1.75rem var(--font-mono); color: var(--accent); text-align: center; background: var(--accent-soft); border-radius: 5px; height: 1.75rem; }
+.interactive-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.5rem; }
+.tab-btn { font: 600 var(--step--1)/1.4 var(--font-display); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 1rem; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--surface); color: var(--muted); cursor: pointer; transition: all 0.15s ease; }
+.tab-btn:hover { color: var(--ink); background: var(--sunken); }
+.tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: var(--step--1); color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<nav class="rail" aria-label="Contents">
+  <div class="brand">
+    <b>Gideon Desktop</b>
+    <span>Install vs Gateway Architecture</span>
+    <a href="desktop-guide.html">← Full Desktop Guide</a>
+  </div>
+  <div class="rail-tools">
+    <input id="toc-filter" type="search" placeholder="Filter topics..." aria-label="Filter sections">
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">Theme</button>
+  </div>
+  <ol class="toc" id="toc">
+    <li class="grp">Core Concepts</li>
+    <li><a href="#what-is-gateway"><span class="n">01</span>What is the Gateway?</a></li>
+    <li><a href="#the-fork"><span class="n">02</span>The First-Run Fork</a></li>
+    <li class="grp">The Two Paths</li>
+    <li><a href="#path-local"><span class="n">03</span>Path A: Local Install</a></li>
+    <li><a href="#path-gateway"><span class="n">04</span>Path B: Gateway Connect</a></li>
+    <li class="grp">Technical Comparison</li>
+    <li><a href="#head-to-head"><span class="n">05</span>Head-to-Head Comparison</a></li>
+    <li><a href="#execution-boundary"><span class="n">06</span>Where Code &amp; Tools Run</a></li>
+    <li><a href="#code-internals"><span class="n">07</span>Code Implementation Map</a></li>
+    <li><a href="#decision-helper"><span class="n">08</span>Which Should You Choose?</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">Architecture &amp; Onboarding Guide</div>
+  <h1>Local Install vs Gateway</h1>
+  <p class="lede">When you first install and launch the Gideon / Hermes Desktop app, you are given a fundamental choice: run Gideon locally on your computer, or connect to an existing Gateway. Here is exactly what the Gateway is, how both fresh install processes work under the hood, and how tool execution, state, and resources differ.</p>
+  <div class="meta-row">
+    <span class="chip">Electron 40.10.2</span>
+    <span class="chip">FastAPI &amp; JSON-RPC 2.0</span>
+    <span class="chip">DesktopInstallOverlay</span>
+    <span class="chip">FirstRunRemoteSetup</span>
+    <span class="chip">connections.json</span>
+  </div>
+</header>
+
+<!-- 01 -->
+<section class="doc" id="what-is-gateway">
+<h2><span class="n">01</span>What is the Gateway?</h2>
+<p>In the Hermes Agent ecosystem, the <strong>Gateway</strong> (represented by <code>hermes serve</code> and <code>gateway/run.py</code>) is the <strong>headless backend daemon and control plane</strong> that executes the AI agent.</p>
+<p>The Desktop application (Gideon) does <strong>not</strong> embed Python or run the LLM inference loop directly inside Electron or React. Instead, Desktop is an Electron + React 19 client that connects to a running Gateway instance over HTTP and a full-duplex WebSocket speaking <strong>JSON-RPC 2.0</strong>.</p>
+
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+  subgraph Client["Gideon Desktop (Thin Client)"]
+    R["React 19 Renderer<br>(Chat UI, Transcripts, Panes)"]
+    M["Electron Main Process<br>(Window management, IPC, Proxy)"]
+    R <-->|"IPC (Preload)"| M
+  end
+
+  subgraph Gateway["Hermes Gateway Backend (Daemon)"]
+    API["FastAPI HTTP Server<br>(/api/status, /api/auth, /api/sessions)"]
+    WS["WebSocket Server<br>(/api/ws JSON-RPC 2.0)"]
+    LOOP["Agent Turn Loop<br>(Prompt caching, tool orchestrator)"]
+    TOOLS["Core Tools & Skills<br>(Terminal, Files, Browser, Cron)"]
+    DB[("SQLite SessionDB<br>hermes_state.db")]
+    
+    API --- LOOP
+    WS --- LOOP
+    LOOP --- TOOLS
+    LOOP --- DB
+  end
+
+  M <-->|"HTTP REST Proxy"| API
+  R <-->|"WebSocket /api/ws"| WS
+  LOOP <-->|"API Calls"| LLM["Model Providers<br>(Nous, OpenAI, Anthropic, Ollama)"]
+</pre>
+<figcaption>Figure 1: Client-Server Architecture. The Gateway is the decoupled brain; Desktop is the presentation window.</figcaption>
+</figure>
+
+<h3>Responsibilities of the Gateway</h3>
+<div class="grid-2">
+  <div class="card">
+    <h4>1. Turn Loop &amp; Context</h4>
+    <p>Maintains conversation state, system prompt building, prefix caching (sacred invariant), token budgets, context compression, and LLM provider handshakes.</p>
+  </div>
+  <div class="card">
+    <h4>2. Tool Execution Engine</h4>
+    <p>Executes shell commands in a real terminal, reads/writes filesystem assets, drives headless browser sessions via Playwright, runs skills, and fires background jobs.</p>
+  </div>
+  <div class="card">
+    <h4>3. Multi-Platform Connectivity</h4>
+    <p>A Gateway instance can simultaneously connect to Discord, Telegram, Slack, and WhatsApp while simultaneously serving the Desktop app over WebSocket.</p>
+  </div>
+  <div class="card">
+    <h4>4. 24/7 Persistent Storage</h4>
+    <p>Holds the SQLite database (<code>hermes_state.db</code>), cron scheduler schedules, long-term memory, and workspace artifacts even when the desktop client is closed.</p>
+  </div>
+</div>
+
+<div class="callout info">
+  <span class="label">Key Architectural Insight</span>
+  <p><strong>A "Local Install" simply spawns a private Gateway on <code>127.0.0.1</code> managed as a child process by Electron.</strong> Connecting to an "Existing Gateway" points Desktop to an external Gateway running on a remote cloud server, homelab, VPS, or another machine on your local network (LAN / Tailscale).</p>
+</div>
+</section>
+
+<!-- 02 -->
+<section class="doc" id="the-fork">
+<h2><span class="n">02</span>The First-Run Fork: What Happens on Fresh Launch</h2>
+<p>When you download and launch Gideon Desktop on a clean machine for the very first time, the application runs a detection gate:</p>
+
+<ol class="steps">
+  <li>
+    <div>
+      <strong>Probe Existing Connections &amp; Runtimes</strong><br>
+      Electron checks <code>connections.json</code> in the app's user data directory (<code>app.getPath('userData')</code>). On a fresh install, this file does not exist or has no active connections.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Probe Local Hermes Backend (<code>resolveHermesBackend</code>)</strong><br>
+      Electron looks for an existing Python venv, a global <code>hermes</code> CLI executable in PATH, or bundled binary. If nothing is found, it returns <code>{ kind: 'bootstrap-needed' }</code>.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>FirstRunSetupGate Latches Open</strong><br>
+      Because no local runtime exists and no remote connection is saved, <code>getFirstRunSetupGate().shouldGate(backend)</code> returns <code>true</code>. The boot sequence pauses at progress 12%: <em>"Waiting for first-run setup choice"</em>.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>DesktopMounts Setup Choice Overlay</strong><br>
+      The renderer displays <code>DesktopInstallOverlay</code> with two large interactive cards.
+    </div>
+  </li>
+</ol>
+
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> FreshLaunch: User opens app
+  FreshLaunch --> CheckConfig: Read connections.json
+  CheckConfig --> ProbeLocal: No connections found
+  ProbeLocal --> SetupGate: resolveHermesBackend() -> 'bootstrap-needed'
+  
+  state SetupGate {
+    [*] --> DisplayChoice: Mount DesktopInstallOverlay
+    DisplayChoice --> PathA: Click "Install Gideon locally"
+    DisplayChoice --> PathB: Click "Connect to existing Gideon"
+  }
+
+  PathA --> LocalBootstrap: Continue bootstrap protocol (install.ps1 / sh)
+  LocalBootstrap --> SpawnLocalServe: Spawn hermes serve (127.0.0.1)
+  SpawnLocalServe --> LocalOnboarding: AskDealerGate + Provider Setup
+  LocalOnboarding --> ReadyLocal: Ready (Local Execution)
+
+  PathB --> RemoteSetupForm: Mount FirstRunRemoteSetup
+  RemoteSetupForm --> ProbeGateway: Probe /api/status (auth check)
+  ProbeGateway --> AuthPhase: Token paste OR OAuth Browser Sign-in
+  AuthPhase --> PreflightTest: Verify /api/ws handshake
+  PreflightTest --> AtomicApply: applyConnectionConfigAtomically()
+  AtomicApply --> DiscardLocal: Abandon local gate & kill child proc
+  DiscardLocal --> ReadyRemote: Ready (Remote Execution)
+</pre>
+<figcaption>Figure 2: First-launch Decision State Machine in Electron (main.ts + desktop-install-overlay.tsx).</figcaption>
+</figure>
+</section>
+
+<!-- 03 -->
+<section class="doc" id="path-local">
+<h2><span class="n">03</span>Path A: Detailed Breakdown of Local Install</h2>
+<p>When the user clicks <strong>"Install Gideon locally"</strong> (or <em>"Use Gideon on this computer"</em>), they instruct the app to provision an entire local execution stack on their machine.</p>
+
+<div class="interactive-tabs">
+  <button class="tab-btn active" onclick="switchTab('local-stages')">1. Bootstrap Stages</button>
+  <button class="tab-btn" onclick="switchTab('local-spawn')">2. Spawning hermes serve</button>
+  <button class="tab-btn" onclick="switchTab('local-wire')">3. Socket Handshake &amp; Onboarding</button>
+</div>
+
+<div id="local-stages" class="tab-content active">
+  <h3>1. Automated Bootstrap Pipeline</h3>
+  <p>Electron starts the platform bootstrap runner (e.g. <code>install.ps1</code> on Windows, or automated scripts on macOS/Linux) and communicates over a JSON line streaming protocol:</p>
+  
+  <div class="table-wrap"><table>
+    <thead><tr><th>Stage Name</th><th>Action Taken on Host</th><th>Typical Duration</th></tr></thead>
+    <tbody>
+      <tr><td><code>system-packages</code></td><td class="wrap">Verifies C++ build tools, system libraries, and OS prerequisites.</td><td class="num">1s – 5s</td></tr>
+      <tr><td><code>git</code></td><td class="wrap">Verifies Git is installed or downloads a portable Git binary for version control and skills fetching.</td><td class="num">1s – 8s</td></tr>
+      <tr><td><code>python</code></td><td class="wrap">Finds or downloads an isolated Python 3.11/3.12 runtime.</td><td class="num">5s – 30s</td></tr>
+      <tr><td><code>uv</code></td><td class="wrap">Provisions <code>uv</code> (Astral's high-speed package manager) to manage virtual environments.</td><td class="num">2s – 10s</td></tr>
+      <tr><td><code>environment</code></td><td class="wrap">Creates an isolated virtual environment in <code>~/.hermes/env</code> (or custom <code>HERMES_HOME</code>).</td><td class="num">3s – 15s</td></tr>
+      <tr><td><code>dependencies</code></td><td class="wrap">Downloads and installs <code>hermes-agent</code>, FastAPI, Uvicorn, SQLite, Playwright, and agent toolsets.</td><td class="num">20s – 90s</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>The UI renders live progress via <code>StageRow</code> components with status icons (<span class="pill ok">Done</span>, <span class="pill info">Installing</span>, <span class="pill bad">Failed</span>), live millisecond timers, and an expandable raw terminal output drawer.</p>
+</div>
+
+<div id="local-spawn" class="tab-content">
+  <h3>2. Spawning the Local Subprocess</h3>
+  <p>Once bootstrap completes, Electron's <code>spawnHermesBackend()</code> in <code>electron/main.ts</code> starts the backend:</p>
+  <pre><code>// Spawning hermes serve locally
+const child = spawn(pythonExe, [
+  '-m', 'hermes_cli.main', 'serve',
+  '--port', String(allocatedPort),
+  '--listen', '127.0.0.1',
+  '--session-token', generatedToken
+], {
+  cwd: hermesHome,
+  env: { ...process.env, HERMES_HOME: hermesHome }
+});</code></pre>
+  <ul>
+    <li><strong>Port Allocation:</strong> Dynamically allocates a free TCP loopback port (e.g., <code>127.0.0.1:54321</code>).</li>
+    <li><strong>Token Generation:</strong> Generates a random session token stored in local memory and passed to the child.</li>
+    <li><strong>READY Line Detection:</strong> Electron scans the child's <code>stdout</code> for the line <code>READY http://127.0.0.1:PORT</code> to confirm server readiness.</li>
+    <li><strong>Process Binding:</strong> The child process is tied to Electron's lifecycle. When you quit Gideon Desktop, the local <code>hermes serve</code> process is terminated with <code>SIGTERM</code>.</li>
+  </ul>
+</div>
+
+<div id="local-wire" class="tab-content">
+  <h3>3. Socket Handshake &amp; Post-Install Onboarding</h3>
+  <p>Once the local server answers the health probe:</p>
+  <ul>
+    <li>The React renderer connects its WebSocket client: <code>ws://127.0.0.1:54321/api/ws?token=...</code></li>
+    <li><code>DesktopInstallOverlay</code> fades out.</li>
+    <li>The <code>DesktopOnboardingOverlay</code> (or <code>AskDealerGate</code>) mounts:
+      <ul>
+        <li>Prompts user to configure API keys (Nous Research / Ask Dealer portal, OpenAI, Anthropic, or local Ollama).</li>
+        <li>Prompts for persona, bot name, and default tool permissions.</li>
+        <li>Saves settings to local <code>~/.hermes/config.yaml</code> and secrets to <code>~/.hermes/.env</code>.</li>
+      </ul>
+    </li>
+    <li>Main chat interface unlocks.</li>
+  </ul>
+</div>
+</section>
+
+<!-- 04 -->
+<section class="doc" id="path-gateway">
+<h2><span class="n">04</span>Path B: Detailed Breakdown of Gateway Connection</h2>
+<p>When the user clicks <strong>"Connect to existing Gideon"</strong> (Gateway Mode), they bypass local installation entirely. The desktop app transitions into a <strong>pure thin client</strong>.</p>
+
+<ol class="steps">
+  <li>
+    <div>
+      <strong>Mount FirstRunRemoteSetup</strong><br>
+      The overlay switches from the dual-card view to <code>FirstRunRemoteSetup</code> (managed by <code>useRemoteSetup({ host: 'first-run' })</code>).
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Enter Gateway URL &amp; Live Probe</strong><br>
+      The user inputs a Gateway URL (e.g., <code>https://hermes.mycompany.internal</code>, <code>http://192.168.1.150:8000</code>, or a Tailscale IP). As the user types, <code>useRemoteProbe</code> sends an HTTP <code>GET /api/status</code> to test reachability.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Authentication Classification</strong><br>
+      The gateway inspects the response to determine authentication requirements:
+      <ul>
+        <li><code>auth_required: false</code> → No credentials needed (trusted local network).</li>
+        <li><code>auth_required: true</code> with <strong>OAuth</strong> → The gateway advertises an identity provider (Google, GitHub, Authentik). Gideon shows a <em>"Sign in with [Provider]"</em> button. Clicking it opens a secure Electron browser popup, performs the OAuth flow, and captures <code>hermes_session_at</code> and <code>hermes_session_rt</code> session cookies.</li>
+        <li><code>auth_required: true</code> with <strong>Session Token</strong> → Prompts for the bearer token from the remote server's <code>.env</code> file.</li>
+      </ul>
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Preflight Verification (Test Connection)</strong><br>
+      Before writing anything to disk, the user clicks <em>"Test connection"</em>. Electron performs two preflight checks:
+      <ol>
+        <li>Authenticated REST request to <code>/api/status</code>.</li>
+        <li>Mints a single-use ticket via <code>POST /api/auth/ws-ticket</code> and completes a real WebSocket handshake to <code>wss://.../api/ws?ticket=...</code>.</li>
+      </ol>
+      Only if both pass does the <em>"Apply and reconnect"</em> button enable.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Atomic Application (applyConnectionConfigAtomically)</strong><br>
+      When the user clicks <em>"Apply and reconnect"</em>:
+      <ul>
+        <li><code>abandonFirstRunSetupChoiceForRemoteApply()</code> releases the bootstrap waiter and dismisses the install overlay.</li>
+        <li><code>teardownPrimaryBackendAndWait()</code> kills any local Python backend process that was running, releasing local CPU and memory.</li>
+        <li>Writes the remote configuration into <code>connections.json</code> in <code>userData</code>:
+          <pre><code>{
+  "primary": "conn-remote-1",
+  "connections": [
+    {
+      "id": "conn-remote-1",
+      "kind": "remote",
+      "label": "Production Cloud Gateway",
+      "baseUrl": "https://hermes.example.com",
+      "authMode": "oauth",
+      "createdAt": 1728950000000
+    }
+  ]
+}</code></pre>
+        </li>
+        <li>The renderer re-homes: wipes gateway-bound stores and connects the JSON-RPC WebSocket directly to the remote URL.</li>
+      </ul>
+    </div>
+  </li>
+</ol>
+
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor User
+  participant UI as Desktop UI (React)
+  participant Main as Electron Main
+  participant Remote as Remote Gateway Server
+
+  User->>UI: Click "Connect to existing Gideon"
+  UI->>UI: Mount FirstRunRemoteSetup
+  User->>UI: Enter Gateway URL (https://gw.cloud.io)
+  UI->>Main: probeGateway(url)
+  Main->>Remote: GET /api/status
+  Remote-->>Main: { reachable: true, auth_required: true, provider: "github" }
+  Main-->>UI: ProbeResult: OAuth required
+  User->>UI: Click "Sign in with GitHub"
+  UI->>Main: openOAuthWindow()
+  Main->>Remote: Authenticate & receive cookies
+  Main-->>UI: OAuth Connected
+  User->>UI: Click "Apply and reconnect"
+  UI->>Main: applyConnectionConfig(payload)
+  Main->>Main: abandonFirstRunSetupChoice()
+  Main->>Main: teardownLocalBackend() (Free local RAM)
+  Main->>Main: write connections.json
+  Main-->>UI: IPC: connection-applied
+  UI->>Remote: WebSocket Connect wss://gw.cloud.io/api/ws?ticket=...
+  Remote-->>UI: JSON-RPC Ready (Sessions, History, Models)
+</pre>
+<figcaption>Figure 3: Sequence Diagram of the Gateway Connection and Re-homing Flow.</figcaption>
+</figure>
+</section>
+
+<!-- 05 -->
+<section class="doc" id="head-to-head">
+<h2><span class="n">05</span>Head-to-Head Comparison: Local vs Gateway</h2>
+<p>Here is a complete technical comparison of what changes when you run in Local mode vs Gateway mode:</p>
+
+<div class="table-wrap"><table>
+  <thead>
+    <tr>
+      <th>Dimension</th>
+      <th>Local Install Mode</th>
+      <th>Gateway (Remote) Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Local Footprint</strong></td>
+      <td>
+        <span class="pill bad">Heavy</span><br>
+        Requires ~1.5 GB disk space (Python, venv, packages, browser binaries) + 300 MB – 1 GB+ RAM for <code>hermes serve</code>.
+      </td>
+      <td>
+        <span class="pill ok">Ultra-Light</span><br>
+        Zero Python required on local machine. Uses only the Electron app shell (~120 MB RAM).
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Tool Execution (Terminal &amp; Code)</strong></td>
+      <td>
+        <strong>Executes on Local Machine:</strong><br>
+        Agent runs bash/powershell commands directly in your local terminal. Modifies local files on your hard drive.
+      </td>
+      <td>
+        <strong>Executes on Remote Server:</strong><br>
+        Agent executes bash commands inside the remote server / Docker container. Edits files on the remote filesystem.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Browser Automation</strong></td>
+      <td>
+        Playwright launches local Chromium instances on your machine.
+      </td>
+      <td>
+        Browser automation runs headless on the remote server.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>24/7 Persistent Jobs (Cron)</strong></td>
+      <td>
+        <span class="pill warn">Stops when app closes</span><br>
+        Scheduled jobs only run while your computer is awake and Gideon Desktop is open.
+      </td>
+      <td>
+        <span class="pill ok">Always Running</span><br>
+        Jobs run 24/7 on the remote server even when your laptop is powered off or disconnected.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Messaging Bots (Slack/Telegram)</strong></td>
+      <td>
+        Tied to desktop session. If app closes, bots go offline.
+      </td>
+      <td>
+        Bots remain connected to Discord, Telegram, and Slack continuously.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Multi-Device Access</strong></td>
+      <td>
+        Single device only (conversations and state locked to local <code>~/.hermes</code>).
+      </td>
+      <td>
+        Access the exact same agent, session history, memory, and tools from your laptop, desktop, web browser, or phone.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Hardware Acceleration</strong></td>
+      <td>
+        Uses your local CPU/GPU for embeddings and local LLMs (Ollama).
+      </td>
+      <td>
+        Can leverage dedicated server GPUs (H100, A100, Mac Studio cluster).
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Network Dependency</strong></td>
+      <td>
+        Can run fully offline if using local models (Ollama).
+      </td>
+      <td>
+        Requires network connection to reach the remote Gateway address.
+      </td>
+    </tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- 06 -->
+<section class="doc" id="execution-boundary">
+<h2><span class="n">06</span>Where Code &amp; Tools Run (The Execution Boundary)</h2>
+<p>The most important concept to understand when choosing between Local and Gateway is the <strong>Tool Execution Boundary</strong>. Consider what happens when you ask the agent:</p>
+<pre><code>"Search my git repository, run pytest, and update the dependencies in pyproject.toml"</code></pre>
+
+<div class="grid-2">
+  <div class="card highlight-local">
+    <h4>Under Local Install:</h4>
+    <ul>
+      <li><code>terminal("pytest")</code> runs inside your local terminal shell on your laptop.</li>
+      <li>Files modified by <code>write_to_file</code> are edited on your local hard drive.</li>
+      <li>If the agent creates files, they appear in your local directory.</li>
+      <li>If the command crashes or eats CPU, it impacts your laptop's battery and fan speed.</li>
+    </ul>
+  </div>
+
+  <div class="card highlight-gateway">
+    <h4>Under Gateway (Remote):</h4>
+    <ul>
+      <li><code>terminal("pytest")</code> runs inside the remote server's terminal (or container).</li>
+      <li>Files modified by <code>write_to_file</code> are edited on the remote server's filesystem.</li>
+      <li>No files on your local laptop are modified unless you explicitly sync them (e.g. git push/pull).</li>
+      <li>Heavy builds, test suites, and Docker tasks run on the server's CPU/RAM, leaving your laptop cool and quiet.</li>
+    </ul>
+  </div>
+</div>
+
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TD
+  subgraph LocalExecution["Local Install Mode Execution"]
+    D1["Gideon Desktop UI"] -->|"IPC"| B1["Local Child hermes serve"]
+    B1 -->|"Spawns"| T1["Local Terminal (Bash / PowerShell)"]
+    B1 -->|"Reads/Writes"| F1["Local Disk (/Users/you/...)"]
+    B1 -->|"Launches"| BR1["Local Chromium Browser"]
+  end
+
+  subgraph RemoteExecution["Gateway Mode Execution"]
+    D2["Gideon Desktop UI (Laptop)"] -->|"WSS /api/ws"| B2["Remote Cloud Gateway (Server)"]
+    B2 -->|"Spawns"| T2["Remote Server Terminal (/var/www/...)"]
+    B2 -->|"Reads/Writes"| F2["Remote Server Filesystem"]
+    B2 -->|"Launches"| BR2["Remote Headless Browser"]
+  end
+</pre>
+<figcaption>Figure 4: Comparison of Tool Execution Boundaries between Local and Gateway modes.</figcaption>
+</figure>
+</section>
+
+<!-- 07 -->
+<section class="doc" id="code-internals">
+<h2><span class="n">07</span>Code Implementation Map</h2>
+<p>Every phase described above corresponds to explicit lines in the Gideon Desktop codebase:</p>
+
+<div class="table-wrap"><table>
+  <thead><tr><th>Module</th><th>File Path</th><th>Key Functions &amp; Logic</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>First-Run Gate</strong></td>
+      <td><code>apps/desktop/electron/main.ts</code></td>
+      <td class="wrap">
+        <code>getFirstRunSetupGate()</code>: Decides whether to hold the boot sequence at 12% for the user choice.<br>
+        <code>waitForFirstRunSetupChoice(backend)</code>: Awaits user decision before proceeding.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Install Overlay UI</strong></td>
+      <td><code>apps/desktop/src/components/desktop-install-overlay.tsx</code></td>
+      <td class="wrap">
+        <code>DesktopInstallOverlay</code>: Renders the two cards (Local vs Connect Existing).<br>
+        <code>continueBootstrapLocal()</code>: Dispatches local bootstrap continuation via IPC.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Remote Setup UI</strong></td>
+      <td><code>apps/desktop/src/components/remote-setup/first-run.tsx</code></td>
+      <td class="wrap">
+        <code>FirstRunRemoteSetup</code>: Renders Gateway URL input, auth status indicator, Test button, and Apply button.<br>
+        <code>useRemoteSetup</code>: Custom hook managing probe status, OAuth login, and credentials payload.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Probe &amp; Auth</strong></td>
+      <td><code>apps/desktop/electron/connection-config.ts</code></td>
+      <td class="wrap">
+        <code>normalizeRemoteBaseUrl()</code>: Strips trailing slashes, handles LAN hostnames.<br>
+        <code>buildGatewayWsUrl()</code>: Formats <code>wss://.../api/ws?token=...</code> or ticket.<br>
+        <code>cookiesHaveLiveSession()</code>: Validates short-lived AT and rotating RT OAuth cookies.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Atomic Config Apply</strong></td>
+      <td><code>apps/desktop/electron/connection-config-apply.ts</code></td>
+      <td class="wrap">
+        <code>applyConnectionConfigAtomically()</code>: Preflights REST + WS, updates <code>connections.json</code>, stops local child process (<code>teardownPrimaryBackendAndWait</code>), and re-homes window WebSocket.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Local Backend Spawn</strong></td>
+      <td><code>apps/desktop/electron/main.ts</code></td>
+      <td class="wrap">
+        <code>spawnHermesBackend()</code>: Spawns <code>hermes serve</code>, watches stdout for <code>READY</code> line, attaches stdio pipes, and monitors exit codes.
+      </td>
+    </tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- 08 -->
+<section class="doc" id="decision-helper">
+<h2><span class="n">08</span>Which Should You Choose?</h2>
+
+<div class="grid-2">
+  <div class="card highlight-local">
+    <h4>Choose Local Install if:</h4>
+    <ul>
+      <li>You want the agent to directly manipulate your local files, codebases, and desktop apps.</li>
+      <li>You are running on a powerful machine with ample disk space and RAM.</li>
+      <li>You want the option to work offline using local models (e.g., Ollama).</li>
+      <li>You do not have a dedicated server, VPS, or cloud instance already running Hermes.</li>
+      <li>You only plan to use Hermes on this specific computer.</li>
+    </ul>
+  </div>
+
+  <div class="card highlight-gateway">
+    <h4>Choose Gateway (Remote) if:</h4>
+    <ul>
+      <li>You have a remote server, VPS, Homelab (Mac Studio, Unraid, TrueNAS), or cloud cluster running Hermes.</li>
+      <li>You are on a lightweight laptop (e.g. MacBook Air) and want to conserve battery, disk space, and RAM.</li>
+      <li>You want 24/7 background tasks, scheduled cron runs, and continuous Telegram/Discord bots.</li>
+      <li>You want to access the exact same agent sessions seamlessly from multiple laptops, PCs, or web browsers.</li>
+      <li>You prefer centralized management of API keys, model endpoints, and shared databases.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout ok">
+  <span class="label">Switching Later</span>
+  <p><strong>This choice is never permanent.</strong> You can switch back and forth at any time inside Gideon Desktop by opening <strong>Settings (⌘,) → Gateway</strong> or <strong>Connections</strong>. Switching connections takes only 2 seconds and simply re-homes the WebSocket without needing to reinstall the app.</p>
+</div>
+</section>
+
+<footer>
+  <div>Gideon Desktop Guide: Local Install vs Gateway Architecture</div>
+  <div><a href="desktop-guide.html">Back to Full Desktop Guide →</a></div>
+</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-btn');
+  function isDark() {
+    var cur = root.getAttribute('data-theme');
+    return cur ? cur === 'dark' : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function labelButton() {
+    if (btn) btn.textContent = isDark() ? 'Light' : 'Dark';
+  }
+  function writeTheme(t) {
+    try { localStorage.setItem('hermes-doc-theme', t); } catch (e) {}
+  }
+  function readTheme() {
+    try { return localStorage.getItem('hermes-doc-theme'); } catch (e) { return null; }
+  }
+  var saved = readTheme();
+  if (saved === 'dark' || saved === 'light') { root.setAttribute('data-theme', saved); }
+  labelButton();
+
+  function renderDiagrams() {
+    if (!window.mermaid) return;
+    var dark = isDark();
+    window.mermaid.initialize({
+      startOnLoad: false,
+      theme: dark ? 'dark' : 'neutral',
+      fontFamily: 'IBM Plex Mono, monospace',
+      securityLevel: 'loose'
+    });
+    var blocks = document.querySelectorAll('pre.mermaid');
+    window.mermaid.run({ nodes: blocks }).catch(function () {});
+  }
+  renderDiagrams();
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var next = isDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next); writeTheme(next); labelButton(); renderDiagrams();
+    });
+  }
+
+  // TOC filter
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var filter = document.getElementById('toc-filter');
+  if (filter) {
+    filter.addEventListener('input', function () {
+      var q = filter.value.trim().toLowerCase();
+      links.forEach(function (a) {
+        var target = document.querySelector(a.getAttribute('href'));
+        var text = (a.textContent + ' ' + (q.length > 2 && target ? target.textContent : '')).toLowerCase();
+        a.parentElement.hidden = q !== '' && text.indexOf(q) === -1;
+      });
+    });
+  }
+
+  // IntersectionObserver for active TOC link
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && byId[e.target.id]) {
+          links.forEach(function (a) { a.classList.remove('active'); });
+          byId[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+    document.querySelectorAll('section.doc').forEach(function (s) { obs.observe(s); });
+  }
+
+  // Tab switching helper
+  window.switchTab = function(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    var target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  };
+})();
+</script>
+</body>
+</html>
